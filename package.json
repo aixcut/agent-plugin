@@ -1,0 +1,20 @@
+{
+  "name": "@aixcut/agent-plugin",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "build": "node scripts/build.mjs",
+    "validate": "node scripts/validate.mjs",
+    "check": "npm test && npm run build && npm run validate"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.11",
+    "yaml": "2.9.0"
+  }
+}

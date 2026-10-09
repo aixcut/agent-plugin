@@ -1,0 +1,4 @@
+interface:
+  display_name: "登录 Aixcut"
+  short_description: "仅完成 Aixcut MCP OAuth 登录，不打开网页"
+  default_prompt: "使用 $aixcut-login 仅登录 Aixcut，不打开页面。"

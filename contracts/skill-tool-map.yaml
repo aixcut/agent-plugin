@@ -1,0 +1,171 @@
+# Skill 与公开 Tool 的显式映射，供构建和测试使用；Codex 不读取这个文件。
+# 用途：阻止 Skill 与实时 Tool manifest 漂移，并让「Skill 提到的 Tool 必须存在」可校验。
+# helper 路径相对 plugin/ 根目录。forbidden 里的 Tool 只能以禁止语气出现在正文。
+skills:
+  - skill: aixcut-basics
+    surfaces: [codex-hosted]
+    requires: []
+    tools:
+      required: [aixcut_read]
+      optional: []
+      forbidden: [aixcut_login]
+    helper: null
+    references: [references/model.md]
+
+  - skill: aixcut-captions
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_read, aixcut_caption]
+      optional: [aixcut_review]
+      forbidden: [aixcut_text]
+    helper: null
+    references: [references/actions.md]
+
+  - skill: aixcut-documents
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_document]
+      optional: [aixcut_frontend]
+      forbidden: []
+    helper: null
+    references: []
+
+  - skill: aixcut-export
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_read, aixcut_review, aixcut_frontend]
+      optional: [aixcut_open]
+      forbidden: []
+    # 页内导出归本 Skill；取帧和上传归 aixcut-timeline-editing。
+    actions:
+      aixcut_frontend: [export_timeline, export_timeline_status]
+    helper: null
+    references: [references/actions.md]
+
+  - skill: aixcut-generation
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_read, aixcut_generate]
+      optional: [aixcut_review, aixcut_timeline]
+      forbidden: []
+    helper: null
+    references: [references/providers.md]
+
+  - skill: aixcut-known-errors
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: []
+      optional: [aixcut_open, aixcut_read, aixcut_frontend, aixcut_project, aixcut_track, aixcut_audio]
+      forbidden: []
+    helper: null
+    references: []
+
+  - skill: aixcut-login
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_login]
+      optional: []
+      forbidden: []
+    helper: null
+    references: []
+
+  - skill: aixcut-mcp-logout
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_logout]
+      optional: []
+      forbidden: []
+    helper: null
+    references: []
+
+  - skill: aixcut-projects
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_open, aixcut_read]
+      optional: [aixcut_exit_project, aixcut_frontend]
+      forbidden: [aixcut_login]
+    # 只用来在打开页面之后做只读的 page_status 确认，不承担取帧/导出。
+    actions:
+      aixcut_frontend: [page_status]
+    helper: null
+    references: []
+
+  - skill: aixcut-talking-head
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics, aixcut-timeline-editing]
+    tools:
+      required: [aixcut_read, aixcut_speech, aixcut_caption]
+      optional: [aixcut_clip, aixcut_audio, aixcut_review]
+      forbidden: [aixcut_text]
+    helper: null
+    references: []
+
+  - skill: aixcut-timeline-editing
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required:
+        - aixcut_read
+        - aixcut_timeline
+        - aixcut_primary
+        - aixcut_speech
+        - aixcut_clip
+        - aixcut_text
+        - aixcut_audio
+        - aixcut_track
+        - aixcut_project
+        - aixcut_frontend
+      optional: [aixcut_review]
+      forbidden: [aixcut_login]
+    # 取帧和上传归本 Skill；页内导出归 aixcut-export。
+    actions:
+      aixcut_frontend:
+        [
+          capture_source_frames,
+          capture_timeline_frames,
+          prompt_add_material,
+          import_local_media,
+          import_status,
+        ]
+    helper: scripts/download-capture-artifacts.mjs
+    references: [references/actions.md]
+
+  - skill: aixcut-verification
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_read, aixcut_review]
+      optional: [aixcut_frontend]
+      forbidden: []
+    helper: scripts/download-capture-artifacts.mjs
+    references: []
+
+  - skill: aixcut-video-assembly
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_read, aixcut_timeline, aixcut_primary, aixcut_voice, aixcut_audio, aixcut_caption, aixcut_review, aixcut_frontend]
+      optional: [aixcut_generate]
+      forbidden: []
+    actions:
+      aixcut_frontend: [export_timeline, export_timeline_status]
+    helper: null
+    references: [references/pipeline.md]
+
+  - skill: aixcut-voice
+    surfaces: [codex-hosted]
+    requires: [aixcut-basics]
+    tools:
+      required: [aixcut_read, aixcut_voice]
+      optional: [aixcut_review]
+      forbidden: []
+    helper: null
+    references: [references/actions.md, references/video-sync.md]

@@ -1,0 +1,38 @@
+{
+  "name": "aixcut-codex-plugin",
+  "version": "1.0.0",
+  "description": "Aixcut Codex plugin for opening Aixcut Studio and editing video projects through the hosted Aixcut MCP server.",
+  "author": {
+    "name": "Aixcut"
+  },
+  "repository": "https://github.com/aixcut/agent-plugin",
+  "license": "MIT",
+  "keywords": [
+    "aixcut",
+    "video",
+    "video-editing",
+    "editor",
+    "timeline",
+    "captions",
+    "dubbing",
+    "codex",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Aixcut",
+    "shortDescription": "Edit videos with Aixcut",
+    "longDescription": "Open Aixcut Studio, import local media and documents into the project, read a project before editing, apply verified timeline edits, generate image/video/music assets, render voice, export the finished cut, and check durable jobs through the hosted Aixcut MCP server.",
+    "developerName": "Aixcut",
+    "category": "Creativity",
+    "capabilities": ["Read", "Write"],
+    "brandColor": "#0B5CFF",
+    "composerIcon": "./assets/logo.svg",
+    "logo": "./assets/logo.svg",
+    "defaultPrompt": [
+      "Open Aixcut Studio.",
+      "Show the Add material prompt in my current project.",
+      "Read my Aixcut project before editing it."
+    ]
+  }
+}
