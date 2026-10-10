@@ -81,14 +81,18 @@ A completed response means the upload area is open. Tell the user to select or d
 
 ### Import an explicit local path
 
-When the user gives local paths, locate the plugin helper first and use the Site origin from the connected MCP Server instructions:
+When the user gives local paths, start or reuse the bridge yourself before importing; do not ask the user to start it. Locate the plugin helper and use the Site origin from the connected MCP Server instructions. If either is unavailable, report that specific setup blocker instead of running an incomplete command.
 
 ```bash
 BRIDGE=$(find ~/.codex/plugins -maxdepth 6 -name local-media-bridge.mjs 2>/dev/null | head -1)
 node "$BRIDGE" /absolute/path/a.mp4 /absolute/path/b.mp4 --allowed-origin "<MCP Server Site origin>"
 ```
 
-Use the printed `files[].url` values in one `aixcut_frontend(action="import_local_media")` call, with `url` for one file or `urls` for up to eight. Never invent the origin, URL, or port. The helper manages its own background process and port, reuses a running bridge when possible, and expires after its TTL; do not wrap it in `screen`, `nohup`, or `&`. If some URLs fail, report only those files and do not resubmit the full batch. If all fail, ask the user to use the manual upload path.
+The helper checks an existing bridge's health or starts a new one, waits until it is ready, and only then returns URLs. Do not call `aixcut_frontend(action="import_local_media")` until this command succeeds. Never invent the origin, URL, or port. The helper manages its own background process and port, reuses a running bridge when possible, and expires after its TTL; do not wrap it in `screen`, `nohup`, or `&`.
+
+If the helper command fails, inspect its exact error and the reported log file before deciding what to do. Do not ask the user to start the bridge or switch to manual upload after the first failure. Retry the same helper command once for a transient startup or health failure; it will recheck/restart the bridge. Do not retry missing files, unreadable paths, a missing Site origin, or a missing helper—report the specific blocker. Offer manual upload only after the bounded retry fails or a required local capability is unavailable, and explain why.
+
+After the helper succeeds, use the printed `files[].url` values in one `aixcut_frontend(action="import_local_media")` call, with `url` for one file or `urls` for up to eight. A ready bridge does not prove the Project page can fetch it. If import reports bridge-unreachable or URL failures, rerun the helper for only the failed files and retry those once with the new URLs. Report only files that still fail; offer manual upload only after that recovery fails.
 
 The response includes `import_ids`. Poll only those IDs with `import_status`. Follow `next_action.after_seconds`; do not re-import while an item is running. An item is settled only when its status is `ready`, `failed`, or `cancelled`, and its `private_copy` is no longer `copying`.
 
@@ -99,7 +103,7 @@ The response includes `import_ids`. Poll only those IDs with `import_status`. Fo
 
 For `prompt_add_material`, there is no `import_id`. After the user says the upload is complete, reread `sources` and match by filename. If it has not appeared, wait about 15 seconds and reread; never reopen the prompt to confirm the same upload.
 
-Local video does not require a complete server-side video copy. The browser keeps the original and sends extracted audio for transcription; use `capture_source_frames` or `capture_timeline_frames` for visual evidence. If `CAPTURE_PERMISSION_REQUIRED` occurs, ask the user to click the Project page once and retry the original capture. If the bridge is unreachable, rerun it for a fresh URL or use the manual upload path.
+Local video does not require a complete server-side video copy. The browser keeps the original and sends extracted audio for transcription; use `capture_source_frames` or `capture_timeline_frames` for visual evidence. If `CAPTURE_PERMISSION_REQUIRED` occurs, ask the user to click the Project page once and retry the original capture. If the bridge is unreachable, follow the bounded recovery above: rerun the helper for a fresh URL and retry once before offering the manual upload path.
 
 ## Captures and visual placement
 
