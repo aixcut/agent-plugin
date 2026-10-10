@@ -44,6 +44,13 @@ Voice, captions, and export have dedicated Skills: `aixcut-voice`, `aixcut-capti
 
 Send only fields declared by the selected Tool Schema. `aixcut_speech` edits the main voice track; `aixcut_text` does not edit captions. After a structural change, reread before issuing a position-dependent command.
 
+## Keep visual layers separate
+
+- The caption track is only for text that follows spoken words. Ingredient labels, arrows, circles, callouts, titles, and other visual annotations are not captions.
+- Add static or editable text annotations with `aixcut_text` on a non-caption text track. For an existing Motion Graph asset, add it with `aixcut_clip` on a video overlay track and set that item's `kind` to `motion-graph`; the default `video` kind rejects Motion Graph media. Never target a text or caption track with a Motion Graph.
+- Before adding an annotation, read the track list and choose a track whose kind matches the asset. After the write, read back the clip kind and track. If placement fails or lands on the wrong layer, correct or move the requested element; do not silently delete it or count subtitles as a replacement.
+- If no supported asset or operation can create the requested animation, report that limitation and preserve it as unfinished work; do not substitute a caption or claim the animation is complete.
+
 ## Idempotency and result states
 
 - Treat `applied`, `noop`, and `applied_with_warning` according to their literal meanings.

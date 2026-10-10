@@ -25,6 +25,8 @@ Resolve only relevant decisions that are still missing; treat this list as a gui
 4. **Media:** use existing assets or ask the user to upload more?
 5. **Content language:** follow the language policy. Do not infer the finished video's language solely from the conversation language.
 
+Keep spoken captions and visual annotations as separate requirements. Captions follow spoken words; animated ingredient labels, arrows, circles, and callouts belong to the corresponding visual moments. Verify both categories independently; one does not replace the other.
+
 If the user requests multiple versions, A/B, portrait/landscape, or platform variants, first call `aixcut_timeline(action="list")` and duplicate a timeline per version. Include each version's `timeline_id` in later reads/writes. Generated assets are Project-scoped and can be reused; do not regenerate them for each version.
 
 Ask one concise question at a time. If the user requests uninterrupted end-to-end execution, use reasonable reversible defaults for non-blocking choices and report them. Still resolve choices that materially change the content language, incur an unaccepted charge, or risk overwriting existing work.

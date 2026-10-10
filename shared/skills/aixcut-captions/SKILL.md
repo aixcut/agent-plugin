@@ -11,6 +11,8 @@ State the caption task's current status and next step when useful. Continue safe
 
 Caption content belongs to this Skill. Do not edit captions with the generic text Tool.
 
+The caption track contains spoken or user-supplied subtitle copy only. Ingredient labels, arrows, callouts, titles, and animated highlights are separate visual elements; do not add them as captions or treat them as satisfied by subtitle text.
+
 ## Determine the caption source first
 
 | Video type | Caption source | Action |
