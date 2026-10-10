@@ -1,85 +1,81 @@
 ---
 name: aixcut-video-assembly
-description: 把一批素材或一句话做成完整成片，负责编排画面顺序、配音、字幕、音乐和导出。用户说要剪宣传片、成片、短片、Vlog、混剪、卡点视频、产品视频，或要求带配音带字幕带音乐时使用；只做单一操作（只加字幕、只配音、只导出、只改一个片段）时不要用它。（英文：montage、promo video、compose a video）
+description: "Assemble a complete video by coordinating visuals, voiceover, captions, music, and export. Do not use for a single edit. Chinese triggers: 宣传片、成片、短片、Vlog、混剪、卡点视频."
 ---
 
-# Aixcut 成片编排
+# Aixcut Video Assembly
 
-这个技能只管"顺序和依赖"，每个阶段的具体做法由对应技能负责。一次成片要同时满足用户的画面、声音和文字要求，缺一项都算没做完。
+## Conversation guidance
 
-## 适用范围
+Keep the user oriented at each stage without turning the workflow into a fixed questionnaire. If the goal is clear, inspect the Project and media, then continue safe work. Pause only for a consequential unresolved choice, permission, unaccepted cost or credits, or overwrite/deletion risk. At handoffs, state what is complete, what is next, and whether the user needs to act.
 
-适用：
+This Skill owns the order and dependencies between stages; each specialist Skill owns its detailed procedure. A finished video must meet the user's visual, audio, and text requirements.
 
-- "帮我把这些素材剪成一条 60 秒的宣传片，要配音、要字幕、要音乐"。
-- "这条片子太长了，剪成 30 秒，配个旁白"。
-- 任何一次会同时动到配音、字幕、音乐或成片结构的多步需求。
+## Scope
 
-不适用：只改一个字幕、只换一个片段、只导出——那些直接走对应技能，不要拉起整套流程。
+Use this Skill for multi-stage work, such as turning source media into a 60-second promo with voiceover, captions, and music, or shortening a video and adding narration. For a single caption, clip replacement, or export, use the corresponding specialist Skill directly.
 
-## 动手前先对齐
+## Align before acting
 
-缺一个就问一个，不要自己拍板：
+Resolve only relevant decisions that are still missing; treat this list as a guide, not a questionnaire:
 
-1. **成片目标**：时长、画幅、平台、用途。
-2. **要不要声音**：要不要配音？要不要背景音乐？音乐要不要压过画面原声？
-3. **要不要文字**：要不要字幕？字幕跟配音文稿还是跟说话内容？
-4. **素材策略**：用现有素材，还是还需要用户再上传。
+1. **Video goal:** duration, aspect ratio, platform, and use.
+2. **Audio:** voiceover? Background music? Should music sit below original audio?
+3. **Text:** captions? Should they follow the voice script or source speech?
+4. **Media:** use existing assets or ask the user to upload more?
+5. **Content language:** follow the language policy. Do not infer the finished video's language solely from the conversation language.
 
-如果用户要求多个版本、A/B、横竖版或平台适配，先调用 `aixcut_timeline(action="list")`，再为每个版本复制时间轴。后续每个版本的读写都必须带自己的 `timeline_id`；生成素材仍按 Project 复用，不要为每个版本重复生成。
+If the user requests multiple versions, A/B, portrait/landscape, or platform variants, first call `aixcut_timeline(action="list")` and duplicate a timeline per version. Include each version's `timeline_id` in later reads/writes. Generated assets are Project-scoped and can be reused; do not regenerate them for each version.
 
-用户明确说"直接做完别问我"时才跳过对齐，但做完要在汇报里写清你替他做了哪些决定。
+Ask one concise question at a time. If the user requests uninterrupted end-to-end execution, use reasonable reversible defaults for non-blocking choices and report them. Still resolve choices that materially change the content language, incur an unaccepted charge, or risk overwriting existing work.
 
-## 执行顺序
+## Required order
 
-顺序不能换。语音时间决定下游一切，字幕、音乐长度、画面节奏都以它为准。
+Voice timing anchors downstream work. Do not reorder these stages:
 
 ```mermaid
 flowchart LR
-    A["0 素材就绪"] --> B["1 画面结构"]
-    B --> C["2 配音文稿"]
-    C --> D["3 配音渲染并落轨"]
-    D --> E["4 字幕（跟随配音文稿）"]
-    D --> F["5 背景音乐 + 淡入淡出"]
-    E --> G["6 自检"]
+    A["0 Media ready"] --> B["1 Visual structure"]
+    B --> C["2 Voice script"]
+    C --> D["3 Render and place voice"]
+    D --> E["4 Captions from transcript"]
+    D --> F["5 Background music and fades"]
+    E --> G["6 Review"]
     F --> G
-    G --> H["7 导出"]
+    G --> H["7 Export"]
 ```
 
-1. **素材就绪**：先读项目，确认素材够不够、分析有没有完成。缺素材或素材没分析完，先解决，不要开始剪。素材要用户新导入时，按 `aixcut-timeline-editing` 的「本机素材」走，等确认出现在 `sources` 里再继续。
-2. **画面结构**：按目标时长排画面顺序和每段时长。这一步定下来的结构决定配音要多长。
-3. **配音文稿**：写文稿，选音色，提交合成。
-4. **配音落轨与转录**：合成成功只代表音频素材生成好了，必须再把它放到时间轴，并回读音频源 `transcript_status`。只有转录可用才能进入自动字幕；等待或失败都要如实报告。
-5. **字幕**：对已落轨且 `transcript_status=available` 的旁白音频执行 `aixcut_caption(regenerate)`，读回 `captions` 验证。不要仅凭配音文稿声称语音转录已完成。
-6. **背景音乐**：用 `aixcut_audio` 加一条独立音乐轨，两端加淡入淡出，并用 `volume` 压低音量让配音听得清。
-7. **自检**：读回时间轴和配音，逐项核对用户提过的要求。
-8. **导出**：按 `aixcut-export` 调用项目页面导出并轮询。成片由用户浏览器直接下载，只汇报文件名和体积。
+1. **Media ready:** Read the Project and check whether assets and analysis are ready. Resolve missing media or analysis first. If the user needs to add files, follow “Local media” in `aixcut-timeline-editing`; continue only after the assets appear in `sources`.
+2. **Visual structure:** Arrange shots and durations to fit the target. This determines the required voice length.
+3. **Voice script:** Write the script in the requested content language, choose a voice profile, and submit synthesis.
+4. **Place and transcribe voice:** Successful synthesis only means the audio asset exists. Place it on the timeline, then read the source `transcript_status`. Only `available` is ready for automatic captions; report pending or failed status accurately.
+5. **Captions:** For voiceover with `transcript_status=available`, call `aixcut_caption(regenerate)` and read back `captions`. Never claim transcription is complete from the voice script alone.
+6. **Background music:** Add a separate audio track with `aixcut_audio`, add fades at both ends, and lower `volume` so narration remains clear.
+7. **Review:** Read the timeline and voice state and check each stated requirement.
+8. **Export:** Use `aixcut-export` to export from the Project page and poll status. The browser downloads the file; report its filename and size.
 
-每一阶段的读写细节见 [references/pipeline.md](references/pipeline.md)。
+Detailed stage instructions are in [references/pipeline.md](references/pipeline.md).
 
-## 检查点
+## Stage handoffs
 
-除非用户要求一次跑完，否则在这三处停下来汇报一次：
+Stage changes are status updates, not confirmation gates. After laying out visuals, report pacing and continue to voice synthesis when the request is clear and safe. After placing voice, report the script and voice profile, then continue to captions and music. Before export, summarize the structure and verified checks.
 
-- 画面结构排完、配音开始前：确认时长和节奏是不是用户想要的。
-- 配音落轨、字幕生成前：确认文稿和音色没问题。
-- 导出前：确认成片结构和时长。
+Pause only when available media cannot meet the goal, different interpretations would produce materially different edits, a generation charge or credits have not been accepted, existing work may be overwritten or deleted, or the user asked to review before continuing. Ask only about the most important unresolved choice and recommend an option.
 
-## 高频漏项
+For upload, asynchronous generation, voice rendering, transcription, or export, continue status checks when possible. If user action is required, state the exact action and what will allow work to resume.
 
-这几条是真实踩过的坑，每一条都必须在自检里逐项确认：
+## Common misses
 
-- **配音合成完成不等于配音进了片子。** 合成只产出音频素材，还要单独把它放上音频轨。这是最容易漏的一步。
-- **字幕默认来自配音文稿，不是视频逐字稿。** 没有口播台词的素材通常没有逐字稿，指望自动转写会得到空字幕。
-- **生成配音不代表生成了字幕。** 配音音频落轨后还要确认其转录状态；只有 `available` 才能重建字幕并读回验证。
-- **音乐默认要淡入淡出。** 不加的话开头结尾会很突兀。
-- **先用 `aixcut_frontend(action=analyze_music_beats)` 读取音乐节拍证据。** 只有返回 `status=available` 和 `beat_times_ms` 才能按节拍选切点；否则报告“无法判断”，不能靠听感估 BPM。
-- **配音和音乐同时存在时要区分主次。** 音乐盖住讲解声是最常见的成片问题。
-- **本机素材由浏览器持有原片。** 本机视频不走完整原片上传；有声音时只提取音频做转录，画面理解按需抽帧，最终成片统一由项目页面导出。不要把本机原片当成缺失。
+- **Rendered voice is not yet in the video.** Synthesis creates an audio asset; place it on an audio track separately.
+- **Captions are not automatically the voice script.** A visual-only source may have no transcript. For narration, check the audio transcript state after placing voice.
+- **Voice generation does not imply captions exist.** Wait for `available`, regenerate captions, and read them back.
+- **Music needs fades.** Without fades, it can start or stop abruptly.
+- **Read actual beat evidence with `aixcut_frontend(action="analyze_music_beats")`.** Only use beat-based cut points when the result has `status=available` and `beat_times_ms`. Otherwise report that beats could not be determined; do not estimate BPM by ear.
+- **Balance voice and music.** Music overpowering narration is a common quality issue.
+- **The browser owns local source files.** Full local video is not uploaded. Audio may be extracted for transcription and visual understanding uses on-demand frame capture. The Project page performs final export; do not treat local originals as missing.
 
-## 完成判定
+## Completion
 
-用户的每一条要求都要有一条读回结果对应，通常用 `aixcut_read` 读 `timeline`、`voice`、`captions`，再用 `aixcut_review` 做结构检查。
+Each user requirement must map to a read-back result. Usually read `timeline`, `voice`, and `captions` with `aixcut_read`, then inspect structure with `aixcut_review`.
 
-汇报时说清：成片时长、画面片段数、配音段数和时长、字幕条数、音乐轨和淡入淡出、以及导出结果。没有做到的要直说，不要用"应该没问题"含糊过去。
-没有实际播放导出文件时，还要明确写“完整播放/试听未验证”。
+Report total duration, visual clip count, voice segment count and duration, caption count, music track and fades, and export status. State any incomplete work plainly. If the exported file was not actually played, say “full playback/listening not verified.”

@@ -1,4 +1,4 @@
 interface:
-  display_name: "退出 Aixcut MCP"
-  short_description: "撤销 Aixcut MCP 授权并清除 Codex 本地 OAuth 凭证"
-  default_prompt: "使用 $aixcut-mcp-logout 退出 Aixcut MCP 登录。"
+  display_name: "Sign out of Aixcut MCP"
+  short_description: "Revoke Aixcut MCP authorization and clear the local OAuth credential"
+  default_prompt: "Use $aixcut-mcp-logout to sign out of Aixcut MCP."

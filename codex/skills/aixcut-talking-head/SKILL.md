@@ -1,54 +1,58 @@
 ---
 name: aixcut-talking-head
-description: 剪辑口播、访谈、课程和播客视频，重点去掉口误、停顿和废话并保持字幕同步。用户提到口播、访谈、播客、课程、念稿或去水词时使用。不用于音乐卡点、纯画面混剪或整片广告编排。（英文：talking head、interview、podcast、remove filler words）
+description: "Edit speech-led videos such as interviews, courses, or podcasts, especially to remove mistakes and pauses. Do not use for music montages or full assembly. Chinese triggers: 口播、访谈、课程、播客、去口癖."
 ---
 
-# Aixcut 口播剪辑
+# Speech-Led Editing in Aixcut
 
-## 最短路径
+## Conversation guidance
 
-1. 分页读 `aixcut_read(view="source_lines")`：默认每页 200 行，用 `next_offset` 继续读到 `has_more=false`，先取得完整口播文本和时间。不要整份请求 `word-time`。
-2. 挑出要处理的句子后，再用 `selectors` 和 `include=["word-time"]` 补读词级时间；每页最多 50 行。
-3. 按用户要求执行 `aixcut_speech`。
-4. 字幕跟随主口播轨；需要时用 `aixcut_caption` 同步或重生成。
-5. 读回 `timeline` 或 `speech` view，确认结果。
+State the current editing stage and next step when useful. Reuse the user's stated editing intent and continue safe inspection or cleanup. Pause only for a choice that materially changes the edit or an operation with important risk. Verify speech and caption state before reporting completion.
 
-## 执行顺序
+## Short path
 
-口播剪辑里语音时间是锚，下游全部依赖它，顺序不能换：
+1. Read `aixcut_read(view="source_lines")` in pages. The default is 200 rows; follow `next_offset` until `has_more=false` to get the full speech text and timing. Do not request all `word-time` data at once.
+2. After identifying the lines to edit, use `selectors` with `include=["word-time"]` for word-level timing; request at most 50 rows per page.
+3. Apply the requested edit with `aixcut_speech`.
+4. Captions follow the primary speech track. When needed, synchronize or regenerate them with `aixcut_caption`.
+5. Read back `timeline` or `speech` to confirm the result.
 
-1. 先定口播结构：删口误、废话、停顿和重复片段。
-2. 口播定稿后再动画面：B-roll、覆盖镜头的插入或删除。
-3. 画面定稿后再动字幕：字幕时间跟着最终口播走。
-4. 音乐和音效放在最后，按最终总时长铺。
+## Required order
 
-改了上游就必须回到下游重做，不要只改一边。每完成一个大步骤读回一次，再进下一步。
+Speech timing anchors downstream work. Keep this order:
 
-## 口播动作
+1. Finalize speech structure: remove mistakes, filler, pauses, and repeated takes.
+2. After speech is final, adjust visuals: add/remove B-roll or overlays.
+3. After visuals are final, update captions so their timing follows the final speech.
+4. Add music and sound effects last, fitting them to the final duration.
 
-| 场景 | 动作 |
+If an upstream stage changes, revisit dependent stages. Read back after each major stage.
+
+## Speech actions
+
+| Intent | action |
 | --- | --- |
-| 用一段新口播替换整段 | `set` |
-| 在某处插入新内容 | `insert` |
-| 删掉口误、废话、整句 | `delete` |
-| 换掉某个片段的来源 | `replace`（需要 `source` 和 `target`） |
-| 缩短停顿或掐头去尾 | `trim` |
-| 回到原始口播 | `reset` |
+| Replace the full speech sequence | `set` |
+| Insert new speech | `insert` |
+| Remove a mistake, filler, or full line | `delete` |
+| Replace a clip's source | `replace` (requires `source` and `target`) |
+| Shorten a pause or trim a clip | `trim` |
+| Restore the original speech | `reset` |
 
-`delete` 和 `trim` 支持 `target` 或 `targets`，可一次处理多个范围。删除和裁剪会改变后续位置，因此每次结构变化后必须重新读取再继续。
+`delete` and `trim` accept `target` or `targets` and can process several ranges. Deletion or trimming changes later positions; reread after each structural change.
 
-## 边界
+## Boundaries
 
-- `aixcut_speech` 只操作主口播轨；B-roll、画面片段用 `aixcut_clip`，背景音乐和音效用 `aixcut_audio`。
-- 不要用 `aixcut_text` 处理字幕。
-- 每批修改用一个新 UUID，不要把同一个 UUID 复用于不同批次。
+- `aixcut_speech` edits only the primary speech track. Use `aixcut_clip` for B-roll and visuals, and `aixcut_audio` for music or sound effects.
+- Do not use `aixcut_text` to edit captions.
+- Use a fresh UUID for each batch. Do not reuse one key across distinct batches.
 
-## 高频漏项
+## Common misses
 
-- 字幕不要在上游还没定稿时先做，否则口播一动字幕全废。
-- 口播删除会改变后续位置，每批结构变化后必须重新读取再继续。
-- 画面被替换或裁剪后，字幕时间要重做，不能只改口播。
+- Do not create captions before the speech edit is final; speech changes can invalidate caption timing.
+- Reread after every structural speech change because later positions move.
+- If visuals are replaced or trimmed, realign captions to the final speech rather than changing speech alone.
 
-## 完成判定
+## Completion
 
-口播文本已经覆盖用户的修改意图、`timeline` 读回后位置正确、字幕与口播对齐。完成后报告删除和新增的片段数量以及新的 revision。需要核对画面时用 `aixcut_review`。
+Confirm the speech reflects the request, read-back positions are correct, and captions align. Report how many segments were removed and added, plus the new revision. Use `aixcut_review` when visual verification is needed.

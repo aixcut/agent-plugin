@@ -1,40 +1,40 @@
-# 配音动作表
+# Voice Action Reference
 
-本文件说明 `aixcut_voice` 各动作的字段。所有对象都是严格 Schema，多余字段会报错。
+This reference lists fields for `aixcut_voice`. All objects use a strict Schema; extra fields are rejected.
 
-## 通用字段
+## Common fields
 
-- `project_id`：可选；省略时使用当前 Project。
-- `idempotency_key`：UUID；工具会自动生成。只有重试同一操作时才复用；新的生成意图使用新 key。
-- `target` / `targets`：来自 `aixcut_read` 的 Voice ref 或 id，不要猜 ID。
-- `items`：配音段数组。
+- `project_id`: optional; omitted means the current Project.
+- `idempotency_key`: generated automatically. Reuse it only for a retry of the same operation; use a new key for a new intent.
+- `target` / `targets`: Voice refs or IDs from `aixcut_read`; never guess IDs.
+- `items`: array of voice segments.
 
-## 配音参数
+## Voice fields
 
-| 字段 | 含义 |
+| Field | Meaning |
 | --- | --- |
-| `text` | 配音文稿 |
-| `speaker` | 说话人标识 |
-| `voice_profile_id` | 来自 Voice `profiles` 的音色 ID |
-| `emotion` | `auto`、`happy`、`sad`、`angry`、`fearful`、`disgusted`、`surprised`、`calm`、`neutral` |
-| `speed` | `0.5`、`0.75`、`1`、`1.25`、`1.5`、`1.75`、`2` |
-| `volume` | 0 到 1 |
+| `text` | Voice script in the requested content language. |
+| `speaker` | Speaker identifier. |
+| `voice_profile_id` | Voice profile ID from `Voice.profiles`. |
+| `emotion` | `auto`, `happy`, `sad`, `angry`, `fearful`, `disgusted`, `surprised`, `calm`, or `neutral`. |
+| `speed` | `0.5`, `0.75`, `1`, `1.25`, `1.5`, `1.75`, or `2`. |
+| `volume` | A value from 0 to 1. |
 
-## 动作
+## Actions
 
-| Tool | action | 必填（不含 `action`） | 可选 | 说明 |
+| Tool | action | Required | Optional | Description |
 | --- | --- | --- | --- | --- |
-| aixcut_voice | set | `items` | — | 替换全部配音段 |
-| aixcut_voice | add | `items` | — | 追加配音段 |
-| aixcut_voice | update | — | `target`、`targets`、`text`、`speaker`、`voice_profile_id`、`emotion`、`speed`、`volume`、`values` | 修改配音段 |
-| aixcut_voice | delete | — | `target`、`targets` | 删除配音段 |
-| aixcut_voice | reorder | `order` | — | 按完整列表重排配音段 |
-| aixcut_voice | render | `targets` | `force`、`place`、`start_ms`、`gap_ms`、`track`、`timeout_ms` | 完整生成；可选重建配音音轨 |
-| aixcut_voice | settings | — | `target`、`targets`、`default_speaker`、`default_voice_profile_id`、`default_emotion`、`default_speed`、`default_volume`、`values` | 无目标时改默认值，否则改指定片段 |
+| aixcut_voice | set | `items` | — | Replace all voice segments. |
+| aixcut_voice | add | `items` | — | Append voice segments. |
+| aixcut_voice | update | — | `target`, `targets`, `text`, `speaker`, `voice_profile_id`, `emotion`, `speed`, `volume`, `values` | Update voice segments. |
+| aixcut_voice | delete | — | `target`, `targets` | Delete voice segments. |
+| aixcut_voice | reorder | `order` | — | Reorder segments using the complete list. |
+| aixcut_voice | render | `targets` | `force`, `place`, `start_ms`, `gap_ms`, `track`, `timeout_ms` | Render voice audio; optionally rebuild the dedicated voice track. |
+| aixcut_voice | settings | — | `target`, `targets`, `default_speaker`, `default_voice_profile_id`, `default_emotion`, `default_speed`, `default_volume`, `values` | Update defaults when no target is provided, otherwise update selected segments. |
 
-## 渲染示例
+## Render examples
 
-只生成音频：
+Render audio only:
 
 ```json aixcut_voice
 {
@@ -43,7 +43,7 @@
 }
 ```
 
-生成后按间隔 300 毫秒铺到指定音轨：
+Render and place on the selected track with a 300 ms gap:
 
 ```json aixcut_voice
 {
@@ -56,4 +56,4 @@
 }
 ```
 
-返回包含每段生成结果，以及 `placement` 的 `applied`、`not_requested` 或失败状态。部分片段失败时不铺轨；超时后用原 `idempotency_key` 重试。
+The result contains per-segment output and `placement` status: `applied`, `not_requested`, or a failure. Partial segment failure prevents placement. After timeout, retry with the original `idempotency_key`.

@@ -1,22 +1,22 @@
-# 导出动作表
+# Export Action Reference
 
-本文件只回答页面导出的参数。项目导出统一使用 `aixcut_frontend`，不要提交服务端渲染任务。
+Project export uses `aixcut_frontend`; do not submit a server-side render job.
 
-## 通用字段
+## Common fields
 
-- `project_id`：可选；省略时使用当前 Project。
-- `workspace_id`：可选；用于指定编辑器工作区，一般省略。
-- `timeout_ms`：可选；页面动作的等待上限，一般省略。
-- 所有 Tool 都是严格对象，多余字段会被拒绝。
+- `project_id`: optional; omitted means the current Project.
+- `workspace_id`: optional; usually omitted.
+- `timeout_ms`: optional page-action wait limit; usually omitted.
+- Tool inputs are strict objects. Extra fields are rejected.
 
-## 动作表
+## Actions
 
-| Tool | action | 必填（`action` 之外） | 可选 | 说明 |
+| Tool | action | Required fields besides `action` | Optional fields | Behavior |
 | --- | --- | --- | --- | --- |
-| aixcut_frontend | export_timeline | — | `timeline_id`、`expected_revision`、`format`、`width`、`height`、`frame_rate`、`timeout_ms`、`workspace_id` | 在打开的 Project 页面里渲染并下载成片；指定 `timeline_id` 时不切换页面当前 tab，受理即回 |
-| aixcut_frontend | export_timeline_status | — | `timeout_ms`、`workspace_id` | 查询页面导出状态 |
+| aixcut_frontend | export_timeline | — | `timeline_id`, `expected_revision`, `format`, `width`, `height`, `frame_rate`, `timeout_ms`, `workspace_id` | Render and download from the open Project page. A supplied `timeline_id` does not switch the current page tab. Returns when accepted. |
+| aixcut_frontend | export_timeline_status | — | `timeout_ms`, `workspace_id` | Read export status from the page. |
 
-## 提交示例
+## Submit example
 
 ```json aixcut_frontend
 {
@@ -36,16 +36,16 @@
 }
 ```
 
-## 结果字段
+## Result fields
 
-页面导出的受理结果没有文件地址。状态查询结果包含：
+The accepted result has no file URL. Status results can contain:
 
-| 字段 | 什么时候有 | 含义 |
+| Field | Available when | Meaning |
 | --- | --- | --- |
-| `export_id` | 受理后 | 本次导出标识 |
-| `state` | 一直有 | `idle`、`running`、`succeeded`、`failed` |
-| `format`、`width`、`height`、`frame_rate` | 受理后 | 实际采用的输出参数 |
-| `file_name`、`byte_size`、`mime_type`、`elapsed_ms` | `succeeded` | 成片文件名、体积、MIME 和耗时 |
-| `error_code`、`error_message` | `failed` | 失败原因 |
+| `export_id` | After acceptance | Export identifier. |
+| `state` | Always | `idle`, `running`, `succeeded`, or `failed`. |
+| `format`, `width`, `height`, `frame_rate` | After acceptance | Actual output settings. |
+| `file_name`, `byte_size`, `mime_type`, `elapsed_ms` | On `succeeded` | Downloaded filename, size, MIME type, and elapsed time. |
+| `error_code`, `error_message` | On `failed` | Failure details. |
 
-`format` 默认是 `mp4`；宽高和帧率不填时使用时间轴画布和帧率。
+`format` defaults to `mp4`; omitted dimensions and frame rate use the timeline canvas and frame rate.

@@ -1,45 +1,57 @@
 ---
 name: aixcut-generation
-description: 生成 Aixcut 里的图片、视频和音乐，并跟踪异步任务进度。用户要求生成画面、生成配图、生成音乐、AI 生视频或查看生成进度时使用。不用于编辑已有素材，也不用于成片整体编排。（英文：generate image、generate video、generate music）
+description: "Generate images, videos, or music in Aixcut and track asynchronous jobs. Use for new visual or audio assets and generation progress. Do not use to edit existing media or assemble a complete video. Chinese triggers include 生成图片、生成视频、生成音乐、查看生成进度."
 ---
 
-# Aixcut 生成与素材
+# Aixcut Generation
 
-生成是持久化 Job，不是同步操作。
+## Conversation guidance
 
-## 最短路径
+State whether generation is being prepared, queued, running, or complete, and what happens next. Continue safe status checks when possible. Pause before an unaccepted cost or credits, or when a missing creative choice would materially change the result. Do not describe a submitted Job as a finished asset.
 
-1. 确认目标 Project，需要时先读 `aixcut_read(view="project")`。
-2. 需要展示费用或确认权限时，先调用 `aixcut_generate(action="quote")`，它只报价，不创建 Job。
-3. `aixcut_generate(action="submit")` 提交生成。
-4. 返回 `status: "async"` 时用顶层 `job_id` 调用 `aixcut_generate(action="execute")` 继续执行；`get` 只读取状态。
-5. 按顶层 `next_action.after_seconds` 决定下一次轮询时间，服务端已经按阶段给好间隔；顶层 `terminal` 为 true 后停止轮询。
-6. 汇报进度用顶层 `phase`（`waiting` 排队、`processing` 生成中、`finalizing` 入库中），不要只说「处理中」。
-7. 完成后把生成结果插入时间轴。
+Generation creates a durable Job; it is not a synchronous operation.
 
-用户要求多个视频版本时，先由编排技能调用 `aixcut_timeline(action="list")` 并复制目标时间轴；`aixcut_generate` 仍是 Project 级素材生成，一份生成结果可以被多个 `timeline_id` 复用。素材生成完成后，分别在各目标时间轴上落位和验证。
+## Short path
 
-## 生成类型
+1. Confirm the target Project; read `aixcut_read(view="project")` if needed.
+2. If generation may consume credits and the user has not accepted a quoted amount, call `aixcut_generate(action="quote")`. It does not create a Job. If the quote is nonzero, explain the amount and wait for the user's acceptance before submitting; pass the accepted amount as `accepted_quoted_credits`.
+3. Submit using `aixcut_generate(action="submit")` only after required creative choices are clear and any quoted charge is accepted.
+4. If the envelope returns `status: "async"`, use its top-level `job_id` with `aixcut_generate(action="execute")` to advance the job. `get` only reads status.
+5. Use top-level `next_action.after_seconds` for the next poll. Stop when top-level `terminal` is true.
+6. Report top-level `phase`: `waiting` (queued), `processing` (generating), or `finalizing` (publishing to the Project). Do not report only “in progress.”
+7. After generation, place the result on a timeline when the user asked for it.
 
-- `kind` 取 `image`、`video` 或 `music`，其中音乐在服务端按音频处理。
-- 未指定 provider 时使用服务端默认值；只在用户明确要求时覆盖。
-- 提示词、风格和时长按用户原话填写，不要擅自改写创意方向。
+For multiple video versions, the assembly Skill first lists and duplicates timelines with `aixcut_timeline(action="list")`. `aixcut_generate` creates Project-level assets that can be reused by multiple `timeline_id`s. Place and verify the result on each requested timeline.
 
-## 素材来源
+## Content language and prompt
 
-生成工具只产出新素材，不用它导入现成文件。导入本机素材或文档见 `aixcut-timeline-editing` 的「本机素材」和 `aixcut-documents`。
+Follow the user's requested content language and target audience for visible text, dialogue, lyrics, or other language-bearing parts of the asset. A prompt may be written in English for model reliability, but the prompt must still explicitly state the requested spoken/on-screen language when relevant. Do not silently translate the user's creative brief or switch the asset to English because this Skill is in English. Preserve the creative direction and wording unless asked to adapt it. Apply the shared language policy from `aixcut-basics`.
 
-- 生成出来的素材会进入项目素材库；最终成片统一由打开的项目页面导出。
-- 不要伪造 URL，也不要把本机路径当链接发送。
+Resolve only the language choice relevant to the requested asset: visible text for images; dialogue and on-screen text for videos; lyrics for songs (instrumental music has no content language); and script language for voiceover. If the user says “song” but does not indicate lyrics or instrumental music, ask which they want before quoting or submitting. Do not ask about language for instrumental music.
 
-## 边界
+## Generation types
 
-- 提交成功不等于完成，禁止在 Job 还是 `queued`、`running` 或 `publishing` 时报告生成完成。
-- 失败时报告 `result.data.job.error_code`。
-- 顶层 `retryable` 只在 Job 失败时出现：`true` 表示稍后重试同一个请求有机会成功，`false` 表示要先改参数、换素材或检查配置。没有这个字段时不要自动重试。
-- 取消用 `action="cancel"`，列表用 `action="list"`。
-- 生成结果的下载地址是短期签名地址，不要写入项目文档或长期保存。
+- `kind` is `image`, `video`, or `music`; the server processes music as audio.
+- If the user does not specify a provider, use the server default. Override only on explicit request.
+- Prompt, style, duration, and language-bearing content should follow the user's brief; do not rewrite the creative direction without reason.
 
-## 完成判定
+## Asset source
 
-Job 进入终态、产物已经插入时间轴、且读回 `timeline` 能看到对应片段。完成后报告 `job_id`、最终状态和落位后的 ref。
+Generation creates assets in the Project library; it does not import files or perform post-production on existing audio. Use `aixcut-timeline-editing` to place, trim, mix, or fade audio, and `aixcut-timeline-editing` or `aixcut-documents` to import local media or documents. Provider-supported image editing with reference images remains a generation operation.
+
+Generated media does not guarantee exact beat alignment, lyric timing, or caption timing. Do not promise frame-accurate synchronization from a generation prompt; use timeline tools and read-back evidence for placement and synchronization.
+
+- Generated assets enter the Project library. Final video export happens in the open Project page.
+- Do not invent URLs or send local paths as links.
+
+## Boundaries
+
+- Submission is not completion. Do not report success while the Job is `queued`, `running`, or `publishing`.
+- On failure, report `result.data.job.error_code`.
+- Top-level `retryable` appears only for failed Jobs. `true` means the same request may work later; `false` means fix parameters, media, or configuration first. Do not retry automatically when absent.
+- Use `action="cancel"` to cancel and `action="list"` to list Jobs.
+- Generation download URLs are short-lived signed URLs. Do not store them in Project documents or retain them long term.
+
+## Completion
+
+The Job must be terminal, the asset must be placed if requested, and a timeline read must show the corresponding clip. Report `job_id`, final status, and placed ref.

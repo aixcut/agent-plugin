@@ -1,23 +1,24 @@
 ---
 name: aixcut-login
-description: 仅确认当前 Aixcut MCP 的 OAuth 登录状态，不打开网页。用户明确要求只登录、恢复认证或检查登录状态时使用。不用于打开项目页面，也不用于退出登录。（英文：login、sign in、check auth）
+description: "Check the current Aixcut MCP OAuth login state without opening a web page. Use only when the user explicitly asks to sign in, restore authorization, or check login status. Do not use for opening a Project or signing out. Chinese triggers include 登录、恢复授权、检查登录状态."
 ---
 
-# 仅登录 Aixcut
+# Check Aixcut MCP Login
 
-## 操作
+## Conversation guidance
 
-调用一次 `aixcut_login`，参数为 `{}`。成功时 Envelope 的 `status` 是 `ok`，业务结果 `result.status`
-必须是 `authenticated`。
+Report the verified authorization state and the next step in the user's setup. Keep MCP availability, Plugin installation, and Project readiness distinct. If authorization is missing, let the Codex Host handle OAuth and explain what the user will see.
 
-## 状态处理
+Call `aixcut_login` once with `{}`. Success requires the envelope `status` to be `ok` and the business result `result.status` to be `authenticated`.
 
-- **已经授权**：Tool 直接返回 `result.status=authenticated`。
-- **未授权或授权过期**：Codex Host 显示 Aixcut OAuth 页面，并在完成后恢复当前调用。AI 不操作授权页面，也不重复调用 Tool。
-- **授权被拒绝、取消、失败或超时**：停止并如实报告登录未完成。
+## Result handling
 
-## 限制
+- **Already authorized:** the Tool returns `result.status="authenticated"`.
+- **Authorization missing or expired:** the Codex Host opens the Aixcut OAuth page and resumes this call after completion. Do not operate the authorization page or call the Tool again.
+- **Authorization denied, cancelled, failed, or timed out:** stop and report that login did not complete.
 
-- 不处理任何页面打开意图；打开页面使用 `aixcut-projects` 技能。
-- 不向 `aixcut_login` 添加 `project_id` 或其他业务参数。
-- 其他 Tool 遇到未授权时由 Codex Host 恢复原调用，不先调用 `aixcut_login`。
+## Constraints
+
+- This Skill does not handle page-opening requests. Use `aixcut-projects` for opening a page.
+- Do not add `project_id` or any business argument to `aixcut_login`.
+- For other Tools, the Codex Host resumes the original call when authorization is required; do not call `aixcut_login` first.

@@ -1,72 +1,73 @@
 ---
 name: aixcut-verification
-description: 验证 Aixcut 编辑结果，检查项目结构、时间轴、配音和可导出性；改动画面位置、叠层或字幕位置时截帧核对画面。用户要求确认改动生效、检查结构、问「这样能不能导出」或导出前自检时使用。只读不改，不要用它做任何修改。（英文：verify、QA、check renderable）
+description: "Verify Aixcut structure, timeline, voice, captions, and renderability. Read-only: never edit. Chinese triggers: 检查改动、核对结果、能否导出、导出前检查."
 ---
 
-# Aixcut 验证
+# Verify Aixcut Results
 
-写入之后必须验证，不要把工具返回的 `applied` 当成最终结论。
+## Conversation guidance
 
-## 最短路径
+Separate verified facts, unresolved checks, and the next step. Report only what the read-back or review confirms; if a check is unavailable, say what remains unverified and how to complete it.
 
-1. 读受影响的 view，例如 `timeline`、`captions`、`speech` 或 `voice`。
-2. 用 `aixcut_review` 做结构检查。
-3. 需要确认「肉眼看到的样子」时截帧。
-4. 如实报告：哪些验证通过，哪些没有验证。
+Every write needs the verification appropriate to the request. A tool result of `applied` is not by itself a final conclusion.
 
-## 审查范围
+## Short path
 
-| view | 检查内容 |
+1. Read the affected view, such as `timeline`, `captions`, `speech`, or `voice`.
+2. Call `aixcut_review` for structural checks.
+3. Capture frames when the user needs visual confirmation.
+4. Report what passed and what was not checked.
+
+## Review scope
+
+| view | Check |
 | --- | --- |
-| `project` | 项目整体结构和轨道 |
-| `timeline` | 片段顺序、时长、间隙和重叠 |
-| `voice` | 配音文稿、音色和落轨 |
-| `renderability` | 检查时间线结构、片段来源和有效时长；它不再套用已删除的服务端渲染器 v1 限制。画布超过 4K UHD 像素预算会给 `CANVAS_HIGH_RESOLUTION` 警告，不会自动改画布 |
+| `project` | Overall Project structure and tracks. |
+| `timeline` | Clip order, duration, gaps, and overlaps. |
+| `voice` | Voice script, profile, and timeline placement. |
+| `renderability` | Static structure, source availability, and valid duration. Do not apply removed server-renderer v1 limits. Canvases beyond the 4K UHD pixel budget produce a `CANVAS_HIGH_RESOLUTION` warning; do not change the canvas automatically. |
 
-## 画面验证
+## Visual verification
 
-截帧是条件动作，不是每步都做。规则是硬约束：
+Frame capture is conditional. It is required when:
 
-必须截帧：
+- Any visual clip's position or size changes, or another visual is layered at the same time.
+- A lower third, caption position, or caption visibility changes.
+- The user asks whether something is obscured or how it looks.
 
-- 改了任一画面的位置或大小，或往同一时刻叠了第二个画面。
-- 动了下三分、字幕位置，或改了字幕显示开关。
-- 用户问「会不会挡住」「看起来怎么样」「好不好看」。
+Do not capture frames for timing-only edits (trim, split, move, speed), volume, fades, caption wording, or track add/remove. Those changes do not alter the image; capture would only add latency and context.
 
-不要截帧：
+### Capture procedure
 
-- 只改时间（裁剪、拆分、移位、变速）、音量、淡入淡出、字幕文案、轨道增删。
-- 这些改动画面不会变，截帧只会增加等待和上下文占用。
+- Use `aixcut_frontend(capture_source_frames)` for source footage and `capture_timeline_frames` for the timeline composition.
+- `selections` contains 1–8 entries. Each entry must use exactly one form: `{"times_ms":[2000,7000]}` (up to 16 timeline points or 24 source points) or `{"start_ms":0,"end_ms":6000,"count":3}`. Do not mix forms within an entry.
+- Capture 1–8 frames in one call and stop when sufficient; do not keep capturing.
+- Pass `expected_revision` when the latest revision matters. `MCP_FRONTEND_TIMELINE_STALE` means the timeline changed; reread it before deciding whether to capture again.
+- If capture returns `CAPTURE_PERMISSION_REQUIRED`, ask the user to click anywhere on the Project page, then retry the same request. Do not reimport media.
+- Captured frames are temporary JPEG URLs. Provide usable links to the user when available; do not claim that the MCP server wrote them to the user's computer.
 
-调用方式：
+### Inspecting the composition
 
-- 素材原始画面用 `aixcut_frontend(capture_source_frames)`，时间轴画面用 `capture_timeline_frames`。
-- `selections` 是 1–8 组，每组二选一：`{"times_ms": [2000, 7000]}`（时间轴最多 16 个点，素材最多 24 个），或 `{"start_ms": 0, "end_ms": 6000, "count": 3}`。同一组里不要混着写。
-- 一次 1–8 张，够用就停，不要连续截。
-- 需要最新 revision 时带上 `expected_revision`；时间轴已经变化会返回 `MCP_FRONTEND_TIMELINE_STALE`，此时重新读取再决定是否重截。
-- 截帧返回 `CAPTURE_PERMISSION_REQUIRED` 时，说明本机素材的访问授权失效了：让用户在项目页面上点一次任意位置，再重试同一请求。不要重新导入素材。
-- 截帧结果是临时 JPEG 地址。保存到本地时把工具 JSON 结果通过 stdin 传给 `scripts/download-capture-artifacts.mjs <output-directory>`，只有脚本成功后才能报告本地路径。
+- Timeline capture results include a `composition` roster. Use it to map visible elements to refs rather than guessing.
+- `composition.frames` gives each captured frame's `index`, `times_ms`, and visible items with ref, time range, track, and `visual_position`. `index` matches the image order. Items with `enabled: false` are absent from the rendered frame.
+- If `frames` is missing, use `composition.clips` as the full timeline roster and map each image to its time.
+- The roster's `visual_position` should match the read-back: `preset` is a named position, `box` is a freeform proportional box, and `auto` means the editor is arranging it automatically.
+- If an element obscures another element or captions, fix the position and capture again. Do not infer the corrected result from the first image.
 
-读图方式：
+## Pre-export checks
 
-- 时间轴截帧的返回里带 `composition` 画面名册，用它把画面里的元素和 ref 对上，不要看图猜「这条是哪条」。
-- `composition.frames` 按每次截帧给出 `index`、`times_ms` 和该时刻在屏的片段（各带 ref、时间范围、轨道和 `visual_position`）；`index` 对应返回的图片顺序。`enabled` 为 false 的片段不会出现在画面里。
-- 没有 `frames`（页面没回报截帧时刻）时退回 `composition.clips` 整条时间轴名单，这时要按时间自己对应图片。
-- 名册里的 `visual_position` 与读回一致：`preset` 是对得上的具名位置，`box` 是自由比例盒，`auto` 表示编辑器仍在自动摆放。
-- 发现遮挡或压住字幕：先改位置，改完再截一次确认，不要凭第一次的图下结论。
+`renderability` is a static structure check, not an export simulation. The Project page renders local or cloud media; a full cloud copy is not required. Do not reject Motion Graph or other features using obsolete server-renderer v1 limits. `renderable: true` means only that the snapshot structure passed; it does not prove the page can decode every source or that export will succeed. The final outcome is `export_timeline_status`.
 
-## 导出前验证
+Warn the user to confirm the target resolution when the canvas exceeds the 4K pixel budget because this can increase render time and file size. Do not change it without instruction.
 
-`renderability` 是静态结构预检，不是实际导出模拟：当前成片由项目页面读取本机/云端素材并渲染，不需要素材有完整云端副本；Motion Graph 等功能也不能再按旧服务端渲染器 v1 的限制判成不可导出。`renderable: true` 只表示快照结构检查通过，不保证页面运行时能解码每个素材或导出必定成功；最终以 `export_timeline_status` 终态为准。画布超过 4K 像素预算时要提醒用户核对目标分辨率，因为它会增加渲染时间和文件体积，但不要擅自修改画布。
+Structural review cannot prove that the output plays fully, has synchronized audio/video, or sounds correct. MCP has no complete playback/listening check. If there is no playback or listening evidence, state “full playback/listening not verified”; do not present a passing `review` as proof of finished media quality. Caption verification must distinguish a voice script from a real transcript: the automatic caption path is complete only when the audio source has `transcript_status=available` and `aixcut_read(view="captions")` returns captions.
 
-结构检查不能证明导出文件可完整播放、音画同步或听感正常。当前 MCP 没有对导出文件进行完整播放和试听的验证步骤；若没有实际播放/试听证据，必须标记“完整播放/试听未验证”，不得把 `review` 通过说成成片播放质量通过。字幕检查还应区分配音文稿和真实转录：只有音频源 `transcript_status=available` 且读回 `captions` 有内容，才能认定自动字幕链路完成。
+## Boundaries
 
-## 边界
+- Verification is read-only. Do not modify content during the check.
+- Browser actions require the target Project page to be online. If it is offline, report that visual verification could not be completed; do not substitute structural checks for visual proof.
+- Structural review and visual inspection prove different things. Report them separately.
 
-- 验证只读，不要在验证步骤里顺手改内容。
-- 浏览器动作依赖 Project 页面在线；页面不在线时如实说明无法完成画面验证，不要用结构检查冒充画面确认。
-- `review` 通过不代表画面一定符合预期，反过来也一样，两者要分别说明。
+## Completion
 
-## 完成判定
-
-每个用户的修改意图都有一条对应的读回或审查结果，且结论与真实返回值一致。
+Each user-requested change must have a matching read-back or review result, and the summary must reflect the actual result.

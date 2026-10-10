@@ -1,65 +1,71 @@
 ---
 name: aixcut-captions
-description: 创建、修改、拆分和美化 Aixcut 字幕，并处理字幕与配音或口播的同步。用户提到字幕、字幕条、台词、字幕样式、高亮、双语字幕、字幕没出来或字幕不同步时使用。不用于合成配音音频本身，也不用于整片画面编排。（英文：caption、subtitle、subtitle style）
+description: "Create, edit, split, and style Aixcut captions and sync them with voice or speech. Do not use for voice synthesis or full assembly. Chinese triggers: 字幕、台词、高亮、双语字幕、字幕不同步."
 ---
 
-# Aixcut 字幕
+# Aixcut Captions
 
-字幕内容归这个技能所有，不要用文字工具去改字幕。
+## Conversation guidance
 
-## 先判断字幕从哪来
+State the caption task's current status and next step when useful. Continue safe work with the information already available. Ask only for a missing choice that materially changes the captions, and ask one question at a time. Distinguish an accepted update from captions verified by reading the Project back.
 
-内容不同，来源不同，选错了就会得到空字幕。
+Caption content belongs to this Skill. Do not edit captions with the generic text Tool.
 
-| 成片类型 | 字幕来源 | 做法 |
+## Determine the caption source first
+
+| Video type | Caption source | Action |
 | --- | --- | --- |
-| 旁白型（画面 + 配音） | **已落轨配音的转录结果** | 确认配音音频源 `transcript_status=available`，执行 `aixcut_caption(regenerate)` 并读回 |
-| 口播型（有人对着镜头说话） | **口播逐字稿** | 可以让字幕跟随口播自动派生 |
-| 用户直接给文案 | 用户文案 | 按用户文案写入，时间按画面或配音对齐 |
+| Narrated video (visuals + voiceover) | Transcript of the voiceover audio already placed on the timeline | Confirm the audio source has `transcript_status=available`, call `aixcut_caption(regenerate)`, then read the result back. |
+| Talking-head video | The speech script/transcript | Captions may be derived from the speech track. |
+| User supplied copy | The user's copy | Use that copy and align timing to the visuals or voiceover. |
 
-关键点：**画面素材通常没有可用逐字稿**。旁白型成片应读取配音音频对应的转录结果，不可把“已有配音文稿”当成转录已完成的证据，也不可手工复制文稿冒充 ASR。
+Visual source clips usually do not have a usable transcript. For narrated videos, read the transcript for the voiceover audio. A saved voice script is not proof that transcription finished; do not copy the script and present it as ASR output.
 
-## 最短路径
+## Short path
 
-1. 读 `aixcut_read(view="captions")` 拿现有字幕和稳定 ref，同时读 `voice` / `timeline` 确认旁白音频已落轨。
-2. 旁白场景回读音频源 `transcript_status`：`available` 才能执行 `aixcut_caption(regenerate)`；待处理时稍后重读，缺失、过期或空时按错误状态报告。
-3. 读回 `captions` 确认条数、首尾时间和文本确由转录结果生成。
+1. Read `aixcut_read(view="captions")` for current captions and stable refs. Also read `voice` or `timeline` to confirm the voiceover audio is placed.
+2. For narration, reread the audio source's `transcript_status`. Regenerate only when it is `available`; if pending, wait and reread; report missing, outdated, or empty transcripts accurately.
+3. Read `captions` again to confirm the count, first/last timing, and that generated text came from the transcript.
 
-## 字幕来源判定
+## Choose the content language
 
-- 有配音文稿：文稿本身不等于 ASR。先确认配音已落轨且对应转录状态为 `available`，再用 `regenerate` 从实际转录派生字幕。
-- 有口播逐字稿：直接用重建动作从口播派生，不要手工抄。
-- 两者都没有：先做配音或先确认用户想写什么，不要凭空编字幕。
+Use the language the user requested for the finished captions, not the language of this Skill or the conversation by default. Preserve supplied wording unless translation is requested. If the user asks for translated subtitles, translate the source transcript into the explicit target language; if they ask for bilingual captions, preserve both languages in the requested format. Ask only when the target language is unclear and materially affects the result. Apply the shared language policy from `aixcut-basics`.
 
-## 时间对齐
+## Source rules
 
-- 字幕时间跟着**声音**走，不跟着画面走。
-- 一条字幕不要超过两行；长句按逗号、分号和语义断点拆开。
-- 拆条后相邻字幕之间不要留空档，也不要重叠。
-- 配音位置变了，字幕必须重做，不能只改配音。
+- A voice script is not ASR. Confirm the voiceover is placed and its transcript is `available`, then regenerate from the actual transcript.
+- For a talking-head transcript, derive captions from the speech track; do not copy it manually.
+- If neither source exists, create or confirm the intended copy with the user. Never invent captions.
 
-## 写入与修改
+## Timing
 
-- 整体替换用整段写入；新增单条用追加。
-- 改文案、拆条、调样式、做高亮分别有对应动作。
-- 每次结构变化后用新的 `idempotency_key`，并重新读取，位置类操作依赖最新 ref。
-- 参数细节见 [references/actions.md](references/actions.md)。
+- Align captions to speech, not to visual cuts alone.
+- Keep each caption to at most two lines. Split long sentences at punctuation or semantic boundaries.
+- Do not leave gaps or overlaps between adjacent captions after splitting.
+- If voiceover placement changes, rebuild or realign captions too.
 
-## 写入会切到手动模式
+## Writing and editing
 
-写入和修改字幕会把字幕轨切成手动模式，浏览器不再按逐字稿自动重建这一轨。这是预期行为：只有切到手动，手写的内容才不会被下一次派生重建整轨替换。
+- Replace the whole track with the set action; append new captions with the add action.
+- Use the corresponding action for wording, splitting, styling, and highlights.
+- Use a new `idempotency_key` for each structural write and reread after each one. Position edits require the latest ref.
+- See [references/actions.md](references/actions.md) for fields and actions.
 
-- 想恢复自动跟随，用 `aixcut_caption` 的 `mode` 动作切回 `auto`。这会按逐字稿重建整轨并覆盖已有手写字幕，切之前先跟用户确认。
-- 读回 `aixcut_read(view="captions")` 的 `mode` 字段确认当前模式，不要凭记忆判断。
-- 写入后不要顺手把模式切回 `auto`，那等于让刚写的字幕等着被覆盖。
+## Writes switch captions to manual mode
 
-## 边界
+Writing or editing captions changes the caption track to manual mode, so the browser no longer rebuilds it from the transcript. This is expected; manual captions must be protected from automatic replacement.
 
-- 字幕内容不要用普通文字工具改。
-- 自动派生失败只产生警告，主流程仍然生效，要如实报告，不要谎称字幕已经生成。
-- 转录仍处理中时，不要重复渲染配音或反复导入音频；重读状态并保留 `MCP_CAPTION_TRANSCRIPT_PENDING` 等真实错误信息。
-- 不要靠改逐字稿来修字幕文案；逐字稿只用来修识别错误。
+- To resume automatic following, confirm with the user first. `aixcut_caption(action="mode", mode="auto")` rebuilds the entire track from the transcript and overwrites manual captions.
+- Read `aixcut_read(view="captions").mode`; do not rely on memory.
+- Do not switch back to `auto` after a write unless the user asks; it would make the new captions eligible for replacement.
 
-## 完成判定
+## Boundaries
 
-字幕内容与用户要求一致、条数和时间与声音对得上、读回显示正确。汇报时说清条数、首尾时间和新的 revision。
+- Do not use a generic text Tool for captions.
+- Automatic derivation failure is a warning; report it and do not claim captions were created.
+- While transcription is pending, do not rerender the voiceover or reimport audio. Reread the state and preserve errors such as `MCP_CAPTION_TRANSCRIPT_PENDING`.
+- Do not edit the transcript to change caption wording; transcript edits are for recognition corrections.
+
+## Completion
+
+Confirm the copy matches the request, timing and count align with the audio, and read-back shows the correct result. Report the count, first/last timing, and new revision.
