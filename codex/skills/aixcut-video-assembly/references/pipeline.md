@@ -72,13 +72,14 @@ For multiple versions, call `aixcut_timeline list`, then duplicate the source ti
 
 For local media, the Project page must be open and media access must be restored before capture or export.
 
-## Stage 1: Visual structure
+## Stage 1: Visual structure and annotations
 
 1. Read `timeline` to inspect existing clips and the target duration.
 2. Create a lightweight shot plan before editing. For each shot, record the source ref, source in/out points, output time range, visible subject, and which claims the image can support. Use `capture_source_frames` when needed; do not state specific visual facts without evidence.
 3. Choose source ranges and durations to meet the requested total length.
 4. Give the sequence a narrative: an engaging opening, a developed middle, and a clear closing action or emotional landing.
 5. Read the timeline back and verify there are no unintended gaps or overlaps and the total duration matches. Do not save the shot plan as a Project document unless asked.
+6. Classify and place visual annotations before caption generation. Ensure dedicated `art-text` and Motion Graph overlay tracks, pass explicit track refs, and reread `timeline` after every annotation write. A wrong-track annotation must be moved or corrected, never deleted as a substitute.
 
 ## Stage 2: Voice script
 
@@ -104,6 +105,7 @@ If `place` is omitted and no manual placement is done, generated audio is not pa
 4. Captions follow the voice timing, not shot boundaries. Keep each caption to at most two lines and split long sentences at semantic boundaries.
 5. After derivation, reread `captions` and check count, first and last times, text, and mode. A manual write switches to manual mode; do not switch back to automatic mode blindly.
 6. See `aixcut-captions` for caption-specific details.
+7. Confirm the caption track contains only spoken subtitle clips; visual annotations must remain on their dedicated tracks.
 
 ## Stage 5: Background music
 

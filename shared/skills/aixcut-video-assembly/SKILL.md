@@ -27,6 +27,8 @@ Resolve only relevant decisions that are still missing; treat this list as a gui
 
 Keep spoken captions and visual annotations as separate requirements. Captions follow spoken words; animated ingredient labels, arrows, circles, and callouts belong to the corresponding visual moments. Verify both categories independently; one does not replace the other.
 
+Visual annotations are a separate stage before caption generation. Classify each requested element as a spoken caption, static art text, or Motion Graph, place it on its dedicated track, and verify its clip kind and track before moving to captions.
+
 If the user requests multiple versions, A/B, portrait/landscape, or platform variants, first call `aixcut_timeline(action="list")` and duplicate a timeline per version. Include each version's `timeline_id` in later reads/writes. Generated assets are Project-scoped and can be reused; do not regenerate them for each version.
 
 Ask one concise question at a time. If the user requests uninterrupted end-to-end execution, use reasonable reversible defaults for non-blocking choices and report them. Still resolve choices that materially change the content language, incur an unaccepted charge, or risk overwriting existing work.
@@ -53,7 +55,7 @@ flowchart LR
 4. **Place and transcribe voice:** Successful synthesis only means the audio asset exists. Place it on the timeline, then read the source `transcript_status`. Only `available` is ready for automatic captions; report pending or failed status accurately.
 5. **Captions:** For voiceover with `transcript_status=available`, call `aixcut_caption(regenerate)` and read back `captions`. Never claim transcription is complete from the voice script alone.
 6. **Background music:** Add a separate audio track with `aixcut_audio`, add fades at both ends, and lower `volume` so narration remains clear.
-7. **Review:** Read the timeline and voice state and check each stated requirement.
+7. **Review:** Read the timeline and voice state and check each stated requirement. Verify captions and visual annotations independently; the caption track must contain only spoken subtitle clips, while art text and Motion Graphs remain on their dedicated tracks.
 8. **Export:** Use `aixcut-export` to export from the Project page and poll status. The browser downloads the file; report its filename and size.
 
 Detailed stage instructions are in [references/pipeline.md](references/pipeline.md).
