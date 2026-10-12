@@ -40,7 +40,7 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 ## Mutation conflicts and uncertain state
 
 - `MCP_MUTATION_SERVER_REJECTED`: Read the latest snapshot and regenerate the operation. Do not replay the old payload unchanged.
-- `NLE_IDEMPOTENCY_CONFLICT`: The UUID is already associated with different content. Create a new UUID and regenerate the operation; never reuse one key with changed input.
+- `NLE_IDEMPOTENCY_CONFLICT`: The key is already bound to a different project, timeline, or action. Read the timeline and confirm whether the earlier write already achieved the intent before redoing. A same-key retry against the same target is reported as a replay instead, not as this error.
 - `MCP_TRACK_ENSURE_NOT_APPLIED`: `aixcut_track ensure` returned success, but read-back found no track (often an old UUID replayed a stale receipt). Retry `ensure` once with a new UUID.
 - `MCP_CANVAS_DEFAULTED`: This is a warning, not a failure. A `0×0` canvas was set to `1920×1080`. If portrait or another ratio is required, use `aixcut_project action=canvas` to override it.
 - `MCP_MUTATION_LOCAL_REJECTED`: Local validation failed, usually because a ref is stale or a range is out of bounds. Read fresh data and correct the input.

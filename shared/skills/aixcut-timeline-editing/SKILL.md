@@ -66,7 +66,7 @@ Treat every requested visual annotation as a typed timeline element before writi
 - Treat `applied`, `noop`, and `applied_with_warning` according to their literal meanings.
 - `duplicate: true` means the UUID replayed an earlier successful write and did not add another change.
 - For `status_unknown`, preserve every original parameter and reuse the same UUID.
-- Never reuse a UUID for different parameters or intent; use a new UUID after `NLE_IDEMPOTENCY_CONFLICT`.
+- Never reuse a UUID for different parameters or intent. A same-key retry against the same project, timeline and action is treated as a replay (`duplicate: true`) even when the re-planned payload drifted; `NLE_IDEMPOTENCY_CONFLICT` means the key was reused for a different target, so check the timeline before redoing with a fresh UUID.
 
 ## Canvas, audio, and tracks
 
