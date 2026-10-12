@@ -11,6 +11,8 @@ Separate verified facts, unresolved checks, and the next step. Report only what 
 
 Every write needs the verification appropriate to the request. A tool result of `applied` is not by itself a final conclusion.
 
+After each structural write, immediately read back every affected view before continuing. Timeline, audio or voice, and caption writes require rereading the affected `timeline`, audio or `voice`, and `captions` views so the returned refs and state are current.
+
 ## Short path
 
 1. Read the affected view, such as `timeline`, `captions`, `speech`, or `voice`.
@@ -61,6 +63,10 @@ Do not capture frames for timing-only edits (trim, split, move, speed), volume, 
 Warn the user to confirm the target resolution when the canvas exceeds the 4K pixel budget because this can increase render time and file size. Do not change it without instruction.
 
 Structural review cannot prove that the output plays fully, has synchronized audio/video, or sounds correct. MCP has no complete playback/listening check. If there is no playback or listening evidence, state “full playback/listening not verified”; do not present a passing `review` as proof of finished media quality. Caption verification must distinguish a voice script from a real transcript: the automatic caption path is complete only when the audio source has `transcript_status=available` and `aixcut_read(view="captions")` returns captions.
+
+### Final review report
+
+Report each final review dimension separately: structure, transcript, voice roles, captions, visual annotations, and double human voice risk. A passing `aixcut_review` does not prove full playback or listening; when the output was not actually played or heard, state “full playback/listening not verified.”
 
 ## Boundaries
 

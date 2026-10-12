@@ -75,6 +75,14 @@ Treat every requested visual annotation as a typed timeline element before writi
 - Before adding audio, ensure an audio track exists with `aixcut_track action=ensure`. If read-back reports `MCP_TRACK_ENSURE_NOT_APPLIED`, retry once with a new UUID.
 - Change track mute or enabled state only after reading the current track state.
 
+### Audio roles and write boundaries
+
+Original/source audio or narration, AI-generated voice, BGM/music, and SFX/sound effects are different audio roles. Keep each role on its separate dedicated track; never treat an AI voice clip as a replacement for original audio unless replacement was explicitly requested.
+
+Before every audio write, read the current timeline and track list, then confirm the target track and the intended start/end range. Read the source audio and existing voice state when deciding whether a human voice already covers that range. Reuse a correct existing narration for edit-only requests and skip new voice placement; this prevents double voice or overlapping narration.
+
+Only add BGM/music when it is explicitly enabled, requested, or confirmed. When music is enabled, place it on its own track with both fade-in and fade-out, and lower its volume (about `0.2–0.4`) under voice or narration. Leave optional or unmentioned music off until confirmation. SFX follows the same separate-track and range-confirmation rule.
+
 ## Local media
 
 There are two supported import paths. Both are asynchronous and an accepted response does not mean that the media is ready.

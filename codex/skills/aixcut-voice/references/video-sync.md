@@ -2,7 +2,10 @@
 
 Use this workflow whenever the user asks for voiceover, narration, explanation, or script changes while visuals already exist or may change. Do not treat it as an audio-only task.
 
-## Choose the timing anchor
+## Choose the timing anchor and protect original sound
+
+Before choosing a timing anchor, inspect the timeline's original/source audio and existing voice coverage. Protect and preserve original sound by default; a new voice render or replacement must be explicitly requested and must target a confirmed range and track. If the user only asks for visual editing and the existing narration is correct, reuse that audio.
+
 
 | Situation | Anchor | Approach |
 | --- | --- | --- |

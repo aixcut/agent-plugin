@@ -9,9 +9,9 @@ description: "Create, edit, split, and style Aixcut captions and sync them with 
 
 State the caption task's current status and next step when useful. Continue safe work with the information already available. Ask only for a missing choice that materially changes the captions, and ask one question at a time. Distinguish an accepted update from captions verified by reading the Project back.
 
-Caption content belongs to this Skill. Do not edit captions with the generic text Tool. Captions are only spoken subtitle text; visual annotations such as labels, arrows, callouts, titles, and Motion Graphs belong to their dedicated visual tracks.
+Caption content belongs to this Skill. Do not edit captions with the generic text Tool. The caption track may contain only real spoken words or user-provided subtitle copy. Visual annotations such as ingredient labels, arrows, callouts, titles, dashed or dotted circles, animated highlights, and Motion Graphs belong to their dedicated visual tracks and must never be represented as captions.
 
-The caption track contains spoken or user-supplied subtitle copy only. Ingredient labels, arrows, callouts, titles, and animated highlights are separate visual elements; do not add them as captions or treat them as satisfied by subtitle text.
+The caption track contains spoken or user-supplied subtitle copy only. Ingredient labels, arrows, callouts, titles, dashed or dotted circles, and Motion Graphs are separate visual elements; do not add them as captions or treat them as satisfied by subtitle text.
 
 ## Determine the caption source first
 

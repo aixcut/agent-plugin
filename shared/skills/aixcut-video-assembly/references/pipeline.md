@@ -56,7 +56,7 @@ For multiple versions, call `aixcut_timeline list`, then duplicate the source ti
 
 ## Stage 0: Confirm source readiness
 
-1. Read the Project summary and source list:
+1. Read the Project summary, source list, current timeline, audio tracks, existing voice state, existing music state, and source transcript states before deciding whether any audio should be generated:
 
 ```json aixcut_read
 {
@@ -70,7 +70,11 @@ For multiple versions, call `aixcut_timeline list`, then duplicate the source ti
 5. If media is missing or insufficient, ask the user to upload it using the “Local media” flow in `aixcut-timeline-editing`, then wait for the upload to finish.
 6. If import or transcription is still running, reread later. Do not re-import or substitute other media.
 
+7. Classify the audio request before editing: `preserve-original`, `generate-voice`, `replace-original`, `add-music`, `no-music`, `optional-music`, or `needs-clarification`. Existing correct narration defaults to `preserve-original`; optional or unmentioned music defaults to `optional-music` and therefore remains off until confirmed. A complete assembly request is not permission to synthesize voice or music.
+
 For local media, the Project page must be open and media access must be restored before capture or export.
+
+The conditional order remains visual structure → requested voice only → captions from a real `transcript_status=available` source → confirmed music only → review/export.
 
 ## Stage 1: Visual structure and annotations
 
@@ -91,9 +95,11 @@ For local media, the Project page must be open and media access must be restored
 
 ## Stage 3: Render and place voice audio
 
+Run this stage only when the resolved voice intent is `generate-voice` or `replace-original`. For `preserve-original`, keep the source audio and skip rendering. For `needs-clarification`, ask one concise question before rendering.
+
 1. **Render:** Call `aixcut_voice(render)` and wait for per-segment results. One call generates or reuses audio, registers the media, binds voice segments, and starts transcription; do not poll an obsolete voice Job.
 2. **Place audio:** For a full rebuild of the dedicated voice track, pass `place=true` and confirm `placement.status="applied"`. This clears and rebuilds the target voice track. To preserve existing clips or custom timing, omit `place` and place audio with `aixcut_audio`. Reread `timeline` and confirm the clips, timing, and source refs.
-3. Reread the audio source's `transcript_status`. Continue with automatic captions only when it is `available`; otherwise wait and reread.
+3. Reread the audio source's `transcript_status`. Continue with automatic captions only when `transcript_status=available`; otherwise wait and reread, or report the pending/failed state without fabricating captions.
 
 If `place` is omitted and no manual placement is done, generated audio is not part of the video. On timeout, the outcome is unknown: retry with the same idempotency key and original parameters.
 
@@ -108,6 +114,8 @@ If `place` is omitted and no manual placement is done, generated audio is not pa
 7. Confirm the caption track contains only spoken subtitle clips; visual annotations must remain on their dedicated tracks.
 
 ## Stage 5: Background music
+
+Run this stage only when the resolved intent is `add-music` and the user has explicitly requested or confirmed adding music. For `no-music` and `optional-music`, do not generate, add, or replace a music clip. If the user has not confirmed an optional choice, keep the stage skipped and report that music remains off.
 
 1. Cover the full video duration with one music clip or divide it into sections.
 2. Add fades at both ends using `fade_in_ms` and `fade_out_ms`; see `aixcut-timeline-editing`.
@@ -129,6 +137,7 @@ Read the relevant views and verify each item; do not rely on memory.
 | Music fades | Read `audio` | Music clips have the requested fades |
 | Export readiness | Check `renderability` with `aixcut_review` | No blocking issues |
 | Transcript state | Read the voice audio source | Claim transcript availability only for `available`; report other states as returned |
+| Audio intent | Read Project, Timeline, source audio, voice, music, and transcript state | The final structure matches the resolved intent; no unrequested voice or music was generated |
 | Full playback | Current MCP cannot prove the exported file was played and heard in full | State “full playback/listening not verified” unless it was actually reviewed |
 
 ## Stage 7: Export
