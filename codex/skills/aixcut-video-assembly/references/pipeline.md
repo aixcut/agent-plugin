@@ -64,11 +64,11 @@ For multiple versions, call `aixcut_timeline list`, then duplicate the source ti
 }
 ```
 
-2. Do not use an old server-side analysis status to decide whether a local video is available. For `import_local_media`, wait for `import_status` to reach a terminal state. For `prompt_add_material`, wait for the user's confirmation and match the uploaded file by `file_name` in `sources`.
-3. For videos with speech, wait until that source's `transcript_status` is `available` before reading `source_lines`. Without speech or a transcript, use `capture_source_frames` or `capture_timeline_frames` as needed for visual evidence.
+2. Do not use an old server-side analysis status to decide whether a local video is available. For `import_local_media`, use `import_status` only until the import is settled, then use the returned `media_id` to match the source in `aixcut_read(view="sources")` and check `transcript_status` plus `transcription_tasks` when speech matters. If ASR is pending or running, wait briefly and reread `sources`; do not keep polling a settled import. For `prompt_add_material`, wait for the user's confirmation and match the uploaded file by `file_name` in `sources`.
+3. For videos with speech, verify that source's `transcript_status` is `available` before reading `source_lines`. Import `ready` does not mean ASR is complete. Without speech or a transcript, use `capture_source_frames` or `capture_timeline_frames` as needed for visual evidence.
 4. Export the assembled video through `aixcut_frontend` page export. Do not branch on whether a complete server-side video copy exists.
 5. If media is missing or insufficient, ask the user to upload it using the “Local media” flow in `aixcut-timeline-editing`, then wait for the upload to finish.
-6. If import or transcription is still running, reread later. Do not re-import or substitute other media.
+6. If import is still running, reread `import_status`; if transcription is pending or running, reread `sources`. Do not re-import or substitute other media.
 
 7. Classify the audio request before editing: `preserve-original`, `generate-voice`, `replace-original`, `add-music`, `no-music`, `optional-music`, or `needs-clarification`. Existing correct narration defaults to `preserve-original`; optional or unmentioned music defaults to `optional-music` and therefore remains off until confirmed. A complete assembly request is not permission to synthesize voice or music.
 

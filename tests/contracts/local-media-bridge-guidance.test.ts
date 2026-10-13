@@ -7,6 +7,11 @@ const skillPath = resolve(
   "shared/skills/aixcut-timeline-editing/SKILL.md",
 );
 const skill = readFileSync(skillPath, "utf8");
+const pipelinePath = resolve(
+  process.cwd(),
+  "shared/skills/aixcut-video-assembly/references/pipeline.md",
+);
+const pipeline = readFileSync(pipelinePath, "utf8");
 const localMediaStart = skill.indexOf("## Local media");
 const capturesStart = skill.indexOf("## Captures", localMediaStart);
 const localMedia = skill.slice(localMediaStart, capturesStart);
@@ -31,5 +36,27 @@ describe("local media bridge guidance", () => {
     expect(localMedia).not.toMatch(
       /If the bridge is unreachable, rerun it for a fresh URL or use the manual upload path/i,
     );
+  });
+
+  it("checks automatic transcription through the source view after import settles", () => {
+    expect(localMedia).toMatch(
+      /use `import_status` only until each import is settled/i,
+    );
+    expect(localMedia).toMatch(
+      /call `aixcut_read\(view="sources"\)`[\s\S]*?match the source by the returned `media_id`[\s\S]*?`transcript_status`/i,
+    );
+    expect(localMedia).toMatch(/wait briefly and reread `sources`/i);
+    expect(localMedia).toMatch(
+      /read `source_lines` only after the matching source has `transcript_status=available`/i,
+    );
+    expect(localMedia).not.toMatch(/poll the same `import_ids` while `transcription\.status` is `running`/i);
+  });
+
+  it("keeps the video assembly workflow on the source transcription status", () => {
+    expect(pipeline).toMatch(
+      /use `import_status` only until the import is settled[\s\S]*?check `transcript_status` plus `transcription_tasks`/i,
+    );
+    expect(pipeline).toMatch(/if transcription is pending or running, reread `sources`/i);
+    expect(pipeline).not.toMatch(/optional `transcription` state/i);
   });
 });

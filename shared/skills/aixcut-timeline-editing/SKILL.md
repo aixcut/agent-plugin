@@ -122,10 +122,12 @@ After the helper succeeds, use the printed `files[].url` values in one `aixcut_f
 
 The response includes `import_ids`. Poll only those IDs with `import_status`. Follow `next_action.after_seconds`; do not re-import while an item is running. An item is settled only when its status is `ready`, `failed`, or `cancelled`, and its `private_copy` is no longer `copying`.
 
-- On `ready`, use the returned `media_id` directly; do not search `sources` again.
+- On `ready`, use the returned `media_id` directly; do not search `sources` just to rediscover which source was imported.
 - On `unknown`, the page no longer tracks the import (for example, after a refresh). Reread `sources` and match by `file_name`.
 - Retry `failed` or `cancelled` only when `retryable` is `true`; otherwise report its `error_code` and `error_message`.
 - `private_copy=ok` means the complete local copy is saved. `fallback` means the media remains usable, but refresh or page export may fail to access the original; report `private_copy_reason`. Removing a clip from the timeline does not remove this copy. It is released when the source is deleted from the library or the Project is deleted.
+
+ASR is independent of the file import status. Use `import_status` only until each import is settled; it is not the source of transcription status. When the user's task depends on speech or transcript text, call `aixcut_read(view="sources")`, match the source by the returned `media_id`, and check its `transcript_status` and `transcription_tasks`. If a matching transcription task is pending or running, wait briefly and reread `sources`; do not keep polling the settled import or re-import. If needed to confirm whether transcription should exist, call `aixcut_read(view="source", source=media_id)` and check `has_audio`. Do not wait for ASR when there is no audio or the task only needs visual evidence. Read `source_lines` only after the matching source has `transcript_status=available`; report empty, outdated, or failed transcription instead of fabricating text or re-importing.
 
 For `prompt_add_material`, there is no `import_id`. After the user says the upload is complete, reread `sources` and match by filename. If it has not appeared, wait about 15 seconds and reread; never reopen the prompt to confirm the same upload.
 
