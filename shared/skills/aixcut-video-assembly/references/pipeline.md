@@ -2,7 +2,7 @@
 
 This reference specifies what to read and confirm at each stage. Use the specialist Skills and live Tool Schemas for exact parameters.
 
-After every structural write, reread the affected `timeline`, `audio`, or `captions` view immediately. Do not reuse refs across revisions or wait until export to verify writes.
+After every atomic batch of structural writes, reread the affected `timeline`, `audio`, or `captions` view immediately. Do not reread between the items of a single batch. Do not reuse refs across revisions or wait until export to verify writes.
 
 For multiple versions, call `aixcut_timeline list`, then duplicate the source timeline. Keep a separate `timeline_id` for each version. For each version, read, edit, reread/review that same timeline, then export. Reuse generated and source media across versions within the same Project.
 

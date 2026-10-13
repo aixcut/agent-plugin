@@ -21,6 +21,14 @@ Voice, captions, and export have dedicated Skills: `aixcut-voice`, `aixcut-capti
 4. Read affected views after a successful write; use `aixcut_review` when structure or visual placement needs confirmation.
 5. Report the actual result fields when present: `status`, `mutation_id`, `operation_id`, `revision_after`, `created`, `removed`, `ref_map`, and `warnings`.
 
+### Batching writes
+
+- Send one call per action and track, not one call per element: pass the whole set through `items[]`, or every target through `targets`, in that single call. `aixcut_clip`, `aixcut_text`, `aixcut_audio`, and `aixcut_primary` accept lists.
+- Never issue one call per clip, per label, or per segment when one supported call can carry the batch.
+- Never merge different actions, different tracks, or different domains into one call; only the live Tool Schema decides what may be combined.
+- Do not run structural writes on the same timeline concurrently.
+- Reuse the last read while the timeline is unchanged; reread before a position-dependent command and after each atomic batch.
+
 ## Multiple timelines and versions
 
 - For versions, A/B variants, aspect-ratio adaptations, or “keep the original and make another”, call `aixcut_timeline(action="list")` first.

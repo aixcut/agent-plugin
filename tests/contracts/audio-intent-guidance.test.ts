@@ -111,9 +111,9 @@ describe("Audio intent gating guidance", () => {
     );
   });
 
-  it("requires immediate read-back of every affected view after structural writes", () => {
+  it("requires immediate read-back of every affected view after each structural batch", () => {
     expect(verification).toMatch(
-      /after each structural write.*?(?:immediately|immediate).*?(?:read|reread).*?(?:timeline).*?(?:audio|voice).*?(?:captions?)/is,
+      /after each atomic batch.*?(?:immediately|immediate).*?(?:read back|reread).*?(?:timeline).*?(?:audio|voice).*?(?:captions?)/is,
     );
   });
 

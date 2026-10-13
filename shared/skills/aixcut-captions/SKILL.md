@@ -62,6 +62,12 @@ Writing or editing captions changes the caption track to manual mode, so the bro
 - Read `aixcut_read(view="captions").mode`; do not rely on memory.
 - Do not switch back to `auto` after a write unless the user asks; it would make the new captions eligible for replacement.
 
+## Do not rebuild an already valid track
+
+- Do not regenerate captions that the server already derived and that still match the current voice and timeline. Rebuilding an unchanged, still-valid track only adds latency.
+- Reread `captions` and its `mode` before deciding. When the existing captions are current, report them and skip the rebuild.
+- When the voice audio or its timing changed, rebuild as usual.
+
 ## Boundaries
 
 - Do not use a generic text Tool for captions.

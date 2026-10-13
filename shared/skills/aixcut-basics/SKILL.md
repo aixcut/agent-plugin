@@ -21,6 +21,16 @@ Read the current Project and use returned refs. Reuse an `idempotency_key` only 
 
 Inspect `active_project_id`. If empty, ask for the Project name or `project_id`; never choose the first listed Project. Studio and the Project list do not bind one.
 
+## Batching and read reuse
+
+- Read the Project and the timeline once, then reuse that evidence while the Project, timeline, and revision are unchanged.
+- Reread only after a write, an external change, a surfaced warning, or a conflict.
+- Keep independent read calls parallel. Structural writes on the same timeline stay serial; a command that depends on a position or a fresh ref needs a read first.
+- Group the same action on the same track into one call: pass every item in `items[]`, or every target in `targets`, in that single call.
+- Never issue one call per label, clip, segment, or track when one supported call can carry the whole batch.
+- Only the live Tool Schema decides what may be combined. Do not invent mixed-action, mixed-track, or cross-domain batch calls.
+- Read the affected views back after each atomic batch, not after every single item.
+
 ## Results and boundaries
 
 Business fields are in `result`. `noop` is final; report `warnings` for `applied_with_warning`. For `status_unknown`, retry only the original request and UUID. For `async`, follow `job_id` and `next_action` until terminal.

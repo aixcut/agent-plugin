@@ -11,7 +11,7 @@ Separate verified facts, unresolved checks, and the next step. Report only what 
 
 Every write needs the verification appropriate to the request. A tool result of `applied` is not by itself a final conclusion.
 
-After each structural write, immediately read back every affected view before continuing. Timeline, audio or voice, and caption writes require rereading the affected `timeline`, audio or `voice`, and `captions` views so the returned refs and state are current.
+After each atomic batch of structural writes, immediately read back every affected view before continuing. One call that carries the whole batch counts as one batch; do not reread between the items of a single batch. Timeline, audio or voice, and caption writes require rereading the affected `timeline`, audio or `voice`, and `captions` views so the returned refs and state are current.
 
 ## Short path
 
