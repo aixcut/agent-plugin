@@ -64,8 +64,8 @@ For multiple versions, call `aixcut_timeline list`, then duplicate the source ti
 }
 ```
 
-2. Do not use an old server-side analysis status to decide whether a local video is available. For `import_local_media`, wait for `import_status` to reach a terminal state. For `prompt_add_material`, wait for the user's confirmation and match the uploaded file by `file_name` in `sources`.
-3. For videos with speech, wait until that source's `transcript_status` is `available` before reading `source_lines`. Without speech or a transcript, use `capture_source_frames` or `capture_timeline_frames` as needed for visual evidence.
+2. Do not use an old server-side analysis status to decide whether a local video is available. For `import_local_media`, wait for `import_status` to reach a terminal state and track its optional `transcription` state separately when speech matters; if it is still running, poll the same `import_ids`. For `prompt_add_material`, wait for the user's confirmation and match the uploaded file by `file_name` in `sources`.
+3. For videos with speech, verify that source's `transcript_status` is `available` before reading `source_lines`. Import `ready` does not mean ASR is complete. Without speech or a transcript, use `capture_source_frames` or `capture_timeline_frames` as needed for visual evidence.
 4. Export the assembled video through `aixcut_frontend` page export. Do not branch on whether a complete server-side video copy exists.
 5. If media is missing or insufficient, ask the user to upload it using the “Local media” flow in `aixcut-timeline-editing`, then wait for the upload to finish.
 6. If import or transcription is still running, reread later. Do not re-import or substitute other media.

@@ -32,4 +32,14 @@ describe("local media bridge guidance", () => {
       /If the bridge is unreachable, rerun it for a fresh URL or use the manual upload path/i,
     );
   });
+
+  it("tracks automatic transcription separately from import readiness", () => {
+    expect(localMedia).toMatch(/`import_status`[\s\S]*?`transcription`/i);
+    expect(localMedia).toMatch(
+      /poll the same `import_ids` while `transcription\.status` is `running`/i,
+    );
+    expect(localMedia).toMatch(
+      /read `source_lines` only after the matching source has `transcript_status=available`/i,
+    );
+  });
 });
