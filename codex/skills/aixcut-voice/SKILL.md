@@ -1,37 +1,56 @@
 ---
 name: aixcut-voice
-description: 写配音文稿、选音色、合成配音并可选铺到时间轴。用户提到配音、旁白、解说、口播文案、换音色或配音没声音时使用。不用于生成背景音乐和音效，也不用于画面编排。（英文：voiceover、dubbing、TTS、narration）
+description: "Write voiceover scripts, select a voice, synthesize speech, and optionally place it on the timeline. Do not use for music or visual assembly. Chinese triggers: 配音、旁白、解说、口播文案、换音色."
 ---
 
-# Aixcut 配音
+# Aixcut Voiceover
 
-配音文稿和音色保存在 Project 的 Voice 文档里；生成音频会绑定回对应配音段。铺轨是单独的可选步骤。
+## Conversation guidance
 
-## 操作流程
+State whether the script, voice selection, rendering, or timeline placement is in progress and what happens next. Follow the requested content language and preserve supplied copy unless translation or rewriting is requested. Pause for consequential voice or script choices, unaccepted generation cost, or overwrite risk; verify the rendered and placed audio before reporting completion.
 
-1. 调用 `aixcut_read(view="voice")`，读取配音段、音色清单和默认值。
-2. 按用户要求用 `aixcut_voice(set/add/update/settings)` 修改文稿、音色或参数。
-3. 调用 `aixcut_voice(action="render", targets=[...])`。一次调用会生成或复用音频、登记素材、绑定配音段并等待转录完成。
-4. 用户要求放到时间轴时，传 `place=true`，可设置 `start_ms`、`gap_ms` 和 `track`。铺轨会清空选中的配音音轨并按当前结果重建，这是配音轴的重排操作；只对专用配音音轨执行。不要求铺轨时省略 `place`。
-5. 根据返回的逐段结果和 `placement` 结果汇报。音频生成成功不代表铺轨也成功。
+Voice scripts and voice profiles are stored in the Project Voice document. Rendered audio is linked back to its voice segments. Timeline placement is a separate optional step.
 
-配音渲染需要用户已登录且打开目标 Project 页面。页面关闭、未就绪或没有写权限时，调用会返回明确错误。调用超时表示结果未知：用相同的 `idempotency_key` 和相同参数重试，不要另起新请求；用户明确要求重新生成时再使用新 key。
+## Audio intent and evidence
 
-## 音色和文稿
+Before rendering, read the current `timeline`, audio tracks and clips, source media transcription state, and existing voice segments or rendered voice audio. Use `aixcut_read(view="timeline")`, `aixcut_read(view="sources")`, and `aixcut_read(view="voice")` as needed; do not infer intent from the presence of this Skill alone.
 
-- 音色 ID 必须来自 `aixcut_read(view="voice")` 返回的 `profiles`。
-- 用户点名音色时按用户选择；未指定时使用文档默认值。
-- 多段文稿按自然停顿拆分；每段独立生成，铺轨时按顺序放置。
-- 语速与情绪只接受动作表列出的值。
+- If an existing source voice, speech, or narration is correct and the user only asks to edit visuals, timing, or captions, reuse the existing audio and skip voice render and placement.
+- The render action only generates or binds AI-generated audio to voice segments. It does not replace original or source audio by default.
+- Render and place only when the user explicitly requests new AI voice or explicitly requests replacing the original voice. A request to edit a timeline alone is not such a request.
+- Before any placement, identify the target track and requested start/end range. Keep original speech, AI voice, music, and sound effects on their intended tracks; do not create a second human voice over a correct source narration.
 
-## 边界
+## Workflow
 
-- `render` 不会默认修改时间轴；只有 `place=true` 才铺轨。
-- 逐段失败会显示失败项。部分失败时不会铺轨；修复文稿或音色后用新 key 重试。
-- 后端任务提交后，即使浏览器连接中断，生成也可能继续；连接中断不会撤销已生成音频。
-- 不要手工写 `audio_status`、`audio_media_id` 或 `audio_synthesis_hash`；绑定由配音任务完成。
-- 参数细节见 [references/actions.md](references/actions.md)。
+1. Read the current timeline, audio tracks and clips, source transcript state, and existing voice before deciding whether rendering is needed. Then call `aixcut_read(view="voice")` to read the voice segments, profiles, and defaults.
+2. Use `aixcut_voice(set/add/update/settings)` to update scripts, profiles, or settings as requested.
+3. If the resolved intent is an explicit new or replacement voice, call `aixcut_voice(action="render", targets=[...])`. This generates or reuses AI audio, registers the media, links it to voice segments, and waits for transcription. Otherwise reuse the existing source audio and stop before rendering.
+4. If the user explicitly asks to place newly rendered audio on the timeline, pass `place=true`; optionally set `start_ms`, `gap_ms`, and `track`. Confirm the target track and range first. Placement clears and rebuilds the selected dedicated voice track, so use this only for that voice track. Omit `place` when placement is not requested.
+5. Report segment results and `placement` separately. Successful audio generation does not prove timeline placement succeeded.
 
-## 完成判定
+Voice rendering requires the user to be signed in and the target Project page to be open. A closed, unready, or read-only page returns an explicit error. A timeout means the outcome is unknown: retry with the same `idempotency_key` and identical arguments. Use a new key only when the user explicitly asks to regenerate.
 
-检查逐段状态和 `placement`。只生成时确认配音段已有音频；要求铺轨时还要确认返回 `placement.status="applied"`。
+## Script language and voice
+
+- Write the voice script in the user's requested content language or audience language. Conversation language does not determine voice language.
+- Preserve user-provided scripts unless asked to translate or rewrite. If the user asks for translation, translate into the explicit target language before rendering; do not silently translate.
+- If the script language is unclear and changes the result, ask one concise question before rendering. Do not use an English prompt or Skill as a reason to switch the spoken language to English.
+- Apply the shared language policy from `aixcut-basics`.
+- Voice profile IDs must come from `profiles` returned by `aixcut_read(view="voice")`.
+- Use the voice the user names. Otherwise, use the document default.
+- Split multi-part scripts at natural pauses. Each segment renders separately and is placed in order.
+- Speed and emotion values must be among those listed in the action reference.
+
+## Boundaries
+
+- `render` does not edit the timeline by default; only `place=true` places audio.
+- `render` never replaces original source audio unless the user explicitly requests replacement; generated audio is only bound to the requested AI voice segments until placement is requested.
+- Keep original/source speech, AI-generated voice, BGM/music, and SFX on separate intended tracks. Confirm the track and time range before writing so a correct source narration is not doubled.
+- Failed segments are reported individually. Partial failure prevents placement; fix the script or voice profile and retry with a new key.
+- After the server accepts a Job, rendering may continue even if the browser disconnects; disconnecting does not cancel generated audio.
+- Never write `audio_status`, `audio_media_id`, or `audio_synthesis_hash` manually; the voice Job owns those links.
+- See [references/actions.md](references/actions.md) for parameters.
+
+## Completion
+
+Check each segment status and `placement`. For render-only requests, confirm each voice segment has audio. If placement was requested, also confirm `placement.status="applied"`.

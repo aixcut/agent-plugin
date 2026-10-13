@@ -1,44 +1,48 @@
 ---
 name: aixcut-export
-description: 把 Aixcut 项目导出成 mp4、mov 或 webm 成片，并查询页面导出进度和结果。用户要求导出、导出文件、渲染、下载成片、问导出好了没或导出失败时使用。不用于剪辑、配音或字幕修改。（英文：export、render、download video）
+description: "Export an Aixcut Project as MP4, MOV, or WebM and check the page-based export status and result. Use when the user asks to export, render, download, or check an export. Do not use for editing, voiceover, or captions. Chinese triggers include 导出、渲染、下载成片."
 ---
 
-# Aixcut 导出
+# Export from Aixcut
 
-当前只有一条导出链路：项目页面在浏览器里渲染，成片下载到用户电脑。
+## Conversation guidance
 
-本机视频不走完整原片上传；有声音时只上传浏览器提取的音频做转录，画面理解由 `capture_source_frames` / `capture_timeline_frames` 按需抽帧。不要把完整视频副本或“云端切片已就绪”当成本机导入和导出的前置条件，也不要提交服务端渲染任务。
+State the export's current status and next step when useful. Continue checks and polling when possible. Distinguish queued, rendering, completed, failed, and unknown; report an export as complete only after its result is available.
 
-## 导出流程
+There is one export path: the open Project page renders the timeline in the browser and downloads the finished file to the user's computer.
 
-1. 调用 `aixcut_frontend(action="export_timeline")`。需要导出某个非当前版本时传 `timeline_id`；页面会读取目标版本但不会切换用户当前 tab。页面会立即返回 `export_id` 和实际采用的 `format`、`width`、`height`、`frame_rate`。不会返回文件地址，成片由浏览器下载。
-2. 受理不等于完成。等待 `next_action.after_seconds` 后调用 `aixcut_frontend(action="export_timeline_status")`，直到 `state` 是 `succeeded` 或 `failed`。
-3. `succeeded` 表示成片已经交给浏览器下载；如实汇报 `file_name`、`byte_size`、`mime_type` 和 `elapsed_ms`，不要承诺服务器下载链接。
-4. 用户没看到文件时，先检查浏览器下载列表和拦截提示，不要重复提交。
-5. 用户想换格式、分辨率或帧率时，再提交一次 `export_timeline`。同一页面同时只能有一次导出，重复提交时改查 `export_timeline_status`。
+Local video is not uploaded in full. If it has audio, the browser may upload extracted audio for transcription; visual understanding uses on-demand `capture_source_frames` or `capture_timeline_frames`. Do not require a full cloud copy or server-side render job.
 
-页面导出要求目标 Project 页面已打开并完成初始化。页面不在线或绑定了其他项目时，先让用户打开目标页面；拿不准时调用 `aixcut_frontend(action="page_status")`。
+## Workflow
 
-本机素材还需要浏览器文件访问授权。导出或抽帧报 `CAPTURE_PERMISSION_REQUIRED` 时，让用户在项目页面点一次任意位置后原样重试；不要重新导入文件。
+1. Call `aixcut_frontend(action="export_timeline")`. Pass `timeline_id` to export a non-current version; the page reads that timeline without changing the user's current tab. The call returns `export_id` and the actual `format`, `width`, `height`, and `frame_rate`. It does not return a file URL; the browser downloads the file.
+2. Accepted does not mean complete. Wait for top-level `next_action.after_seconds`, then call `aixcut_frontend(action="export_timeline_status")` until `state` is `succeeded` or `failed`.
+3. `succeeded` means the file was handed to the browser download flow. Report `file_name`, `byte_size`, `mime_type`, and `elapsed_ms`; do not promise a server download link.
+4. If the user cannot find the file, check the browser download list and blocked-download notice before considering another export.
+5. If the user wants a different format, resolution, or frame rate, submit one new `export_timeline` request. Only one export can run on a page at once; while one is active, query its status instead of submitting again.
 
-## 失败怎么读
+The target Project page must be open and initialized. If it is offline or bound to another Project, ask the user to open the target page. If uncertain, call `aixcut_frontend(action="page_status")`.
 
-| 错误码 | 含义 | 处理 |
-| --- | --- | --- |
-| `MCP_EXPORT_ALREADY_RUNNING` | 页面已经有一次导出在运行 | 不要重发，查询 `export_timeline_status` |
-| `MCP_EXPORT_INVALID_INPUT` | 输出格式、宽高或帧率不合法 | 按提示修正后再提交 |
-| `MCP_EXPORT_FAILED` | 页面渲染失败 | 按 `error_message` 说明；必要时换参数再试一次 |
-| `MCP_EXPORT_CANCELLED` | 用户取消了导出 | 如实说明，不要当成系统故障 |
-| `MCP_FRONTEND_NOT_BOUND` | 当前授权没有绑定浏览器页面 | 让用户打开 Aixcut Project 页面 |
-| `MCP_FRONTEND_CLIENT_OFFLINE` | 当前 MCP grant 没有活跃的页面连接 | 停止自动重开项目；让用户在同一 MCP 会话中打开目标 Project，之后只查 `page_status`，在线后最多重试导出一次 |
-| `MCP_FRONTEND_PAGE_NOT_ACTIVE` | 页面在线但打开的是其他项目 | 让用户切换到目标 Project |
+Local media also requires browser file-access permission. If export or frame capture returns `CAPTURE_PERMISSION_REQUIRED`, ask the user to click anywhere on the Project page and retry the same request. Do not reimport the media.
 
-## 边界
+## Error handling
 
-- 导出不改变时间轴内容，不要顺手修改项目。
-- 成片不经过 MCP，不要承诺稍后提供文件链接。
-- 本机素材导入和异步收尾见 `aixcut-timeline-editing`；完整成片编排见 `aixcut-video-assembly`。
+| Error | Meaning and action |
+| --- | --- |
+| `MCP_EXPORT_ALREADY_RUNNING` | Do not submit again; call `export_timeline_status`. |
+| `MCP_EXPORT_INVALID_INPUT` | Correct the format, dimensions, or frame rate and submit again. |
+| `MCP_EXPORT_FAILED` | Explain `error_message`; retry once only with a justified parameter change. |
+| `MCP_EXPORT_CANCELLED` | Report that the user cancelled the export. Do not retry as a system failure. |
+| `MCP_FRONTEND_NOT_BOUND` | Ask the user to open the Aixcut Project page. |
+| `MCP_FRONTEND_CLIENT_OFFLINE` | Do not reopen the Project automatically. Ask the user to open the target Project in this MCP session, then check `page_status`; retry export at most once after it is online. |
+| `MCP_FRONTEND_PAGE_NOT_ACTIVE` | Ask the user to switch the online page to the target Project. |
 
-## 完成判定
+## Boundaries
 
-只有 `export_timeline_status` 返回 `state: "succeeded"` 才算完成，并且要说明文件名、格式、分辨率、时长和体积。
+- Export does not change timeline content. Do not make unrequested edits.
+- The finished file does not pass through MCP. Do not promise a later server link.
+- For local media and asynchronous recovery, see `aixcut-timeline-editing`. For a full production workflow, see `aixcut-video-assembly`.
+
+## Completion
+
+Complete only when `export_timeline_status` reports `state: "succeeded"`. Report the filename, format, resolution, duration, and file size.

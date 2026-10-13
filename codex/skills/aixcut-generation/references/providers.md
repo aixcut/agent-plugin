@@ -1,118 +1,120 @@
-# 生成 Provider 参数表
+# Generation Provider Reference
 
-本文件是 `aixcut-generation` 的参数查表，只回答「生成要填哪些字段」。轮询节奏、终态判定和落位要求以主 Skill 为准。
+This reference lists parameters only. Follow the main Skill for polling, terminal-state handling, and placement.
 
-## 通用字段
+## Common fields
 
-- `project_id`：可选；省略时用当前打开的 Project。
-- `idempotency_key`：`aixcut_generate(action="submit")` 可选；省略时服务端自动生成并在结果中返回。重试相同提交时复用结果里的 key。
-- `provider` 和 `model`：省略时用服务端默认值，只在用户明确要求时覆盖。
-- `input`：Provider 私有参数的对象，键名见下表；多余或拼错的键不会报错，只会被 Provider 忽略。
+- `project_id`: optional; omitted means the current Project.
+- `idempotency_key`: optional for `aixcut_generate(action="submit")`; the server creates and returns one if omitted. Reuse it only when retrying the same submission.
+- `provider` and `model`: use server defaults when omitted; override only when explicitly requested.
+- `input`: provider-specific parameters. Unknown keys may be ignored by the provider rather than rejected.
 
-## kind 与默认 Provider
+## Kinds and default providers
 
-| kind | 默认 provider | 默认模型 | 实际处理 |
+| kind | Default provider | Default model | Use |
 | --- | --- | --- | --- |
-| `image` | `image2` | `gpt-image-2` | 图片生成或图片编辑 |
-| `video` | `kling` | `kling-3` | 文生视频或图生视频；`kling-v3` 是兼容别名 |
-| `music` | `minimax` | `music-2.5+` | 服务端按音频处理 |
+| `image` | `image2` | `gpt-image-2` | Generate or edit an image. |
+| `video` | `kling` | `kling-3` | Text-to-video or image-to-video; `kling-v3` is a compatibility alias. |
+| `music` | `minimax` | `music-2.5+` | Processed by the server as audio. |
 
-默认值来自服务端配置，可能随环境调整；`kind` 也可以写在 `input.kind` 或 `input.media_type` 里，三者取第一个非空值。
+Defaults come from server configuration and may vary by environment. `kind` may also appear in `input.kind` or `input.media_type`; the first non-empty value is used.
 
-## input 参数
+## `input` parameters
 
-### image2
+### `image2`
 
-| 键 | 必填 | 说明 |
+| Key | Required | Description |
 | --- | --- | --- |
-| `prompt` | 是 | 生成或编辑提示词 |
-| `mode` | 否 | `generate`（默认）或 `edit` |
-| `reference_images` | `edit` 时必填 | 参考图 URL 数组 |
-| `size` | 否 | 例如 `1536x864` |
-| `aspect_ratio` | 否 | `16:9`、`9:16`、`1:1`、`4:3`、`3:4`，未给 `size` 时按它换算 |
-| `quality` | 否 | 默认 `medium` |
-| `background` | 否 | 透传为背景参数 |
+| `prompt` | Yes | Image generation or editing prompt. Follow the requested content language for visible text; state it explicitly when needed. |
+| `mode` | No | `generate` by default, or `edit`. |
+| `reference_images` | Required for `edit` | Array of reference image URLs. |
+| `size` | No | For example, `1536x864`. |
+| `aspect_ratio` | No | `16:9`, `9:16`, `1:1`, `4:3`, or `3:4`; converted to dimensions when `size` is omitted. |
+| `quality` | No | Defaults to `medium`. |
+| `background` | No | Passed through as a background parameter. |
 
-### kling
+### `kling`
 
-| 键 | 必填 | 说明 |
+| Key | Required | Description |
 | --- | --- | --- |
-| `prompt` | 是 | 视频提示词 |
-| `mode` | 否 | ClipOS 统一模式；省略时 MCP 使用 `full_reference`。需要参考首帧/尾帧时按模型能力传对应模式 |
-| `first_frame_url` | `i2v` 时必填 | 首帧图 URL |
-| `last_frame_url` | 否 | 尾帧图 URL |
-| `aspect_ratio` | 否 | 默认 `16:9` |
-| `resolution` | 否 | 默认 `720p` |
-| `duration_seconds` | 否 | 默认 5 |
-| `generate_audio` | 否 | 默认 `false` |
-| `negative_prompt` | 否 | 负向提示词 |
-| `audio` | 否 | 显式填 `false` 时关闭声音 |
+| `prompt` | Yes | Video prompt. Include target language for dialogue or visible text. |
+| `mode` | No | ClipOS unified mode; MCP uses `full_reference` when omitted. Use a supported mode for first/last-frame references. |
+| `first_frame_url` | Required for `i2v` | First-frame image URL. |
+| `last_frame_url` | No | Last-frame image URL. |
+| `aspect_ratio` | No | Defaults to `16:9`. |
+| `resolution` | No | Defaults to `720p`. |
+| `duration_seconds` | No | Defaults to 5. |
+| `generate_audio` | No | Defaults to `false`. |
+| `negative_prompt` | No | Negative prompt. |
+| `audio` | No | Explicitly set `false` to disable audio. |
 
-### seedance
+### `seedance`
 
-| 键 | 必填 | 说明 |
+| Key | Required | Description |
 | --- | --- | --- |
-| `prompt` | 是 | 视频提示词 |
-| `first_frame_url` / `last_frame_url` | 否 | 首尾帧参考图 |
-| `ref_image_urls` | 否 | 参考图 URL 数组 |
-| `ref_audio_urls` | 否 | 参考音频 URL 数组 |
-| `aspect_ratio` | 否 | 默认 `16:9` |
-| `duration_seconds` | 否 | 默认 5 |
-| `audio` | 否 | 显式填 `false` 时关闭声音 |
-| `watermark` | 否 | 显式填 `true` 时加水印 |
+| `prompt` | Yes | Video prompt. Include target language for dialogue or visible text. |
+| `first_frame_url` / `last_frame_url` | No | First/last-frame references. |
+| `ref_image_urls` | No | Array of reference image URLs. |
+| `ref_audio_urls` | No | Array of reference audio URLs. |
+| `aspect_ratio` | No | Defaults to `16:9`. |
+| `duration_seconds` | No | Defaults to 5. |
+| `audio` | No | Explicitly set `false` to disable audio. |
+| `watermark` | No | Explicitly set `true` to add a watermark. |
 
-### minimax
+### `minimax`
 
-| 键 | 必填 | 说明 |
+| Key | Required | Description |
 | --- | --- | --- |
-| `prompt` | 否 | 音乐描述 |
-| `lyrics` | 否 | 歌词 |
-| `instrumental` | 否 | 默认纯音乐；显式填 `false` 时唱词 |
-| `format` | 否 | 默认 `mp3`，也支持 `wav`、`pcm` |
-| `sample_rate` | 否 | 默认 44100 |
-| `bitrate` | 否 | 默认 256000 |
-| `watermark` / `lyrics_optimizer` | 否 | 显式填 `true` 时开启 |
+| `prompt` | No | Music description. |
+| `lyrics` | No | Lyrics in the requested song language. Do not translate supplied lyrics unless requested. |
+| `instrumental` | No | Defaults to instrumental; set `false` for a sung song. |
+| `format` | No | Defaults to `mp3`; also supports `wav` and `pcm`. |
+| `sample_rate` | No | Defaults to 44100. |
+| `bitrate` | No | Defaults to 256000. |
+| `watermark` / `lyrics_optimizer` | No | Explicitly set `true` to enable. |
 
-## 动作表
+## Actions
 
-| Tool | action | 必填 | 可选 | 说明 |
+| Tool | action | Required fields | Optional fields | Behavior |
 | --- | --- | --- | --- | --- |
-| aixcut_generate | quote | — | `kind`、`prompt`、`name`、`provider`、`model`、`input` | 预估积分并校验生成权限，不创建 Job |
-| aixcut_timeline | list | — | — | 列出版本时间轴 |
-| aixcut_timeline | create | — | `name`、`source_timeline_id` | 创建空白或复制时间轴 |
-| aixcut_timeline | duplicate | `source_timeline_id` | `name` | 复制完整时间轴 |
-| aixcut_timeline | rename | `timeline_id`、`name` | — | 修改版本名称 |
-| aixcut_timeline | delete | `timeline_id` | — | 删除一个版本 |
-| aixcut_timeline | reorder | `timeline_ids` | — | 调整版本顺序 |
-| aixcut_generate | submit | `idempotency_key` | `accepted_quoted_credits`、`kind`、`prompt`、`name`、`provider`、`model`、`input` | 提交一个生成 Job，返回 `status: "async"` 和 `job_id` |
-| aixcut_generate | get | `job_id` | — | 读取一个生成 Job 的进度和产物 |
-| aixcut_generate | execute | `job_id` | — | 继续推进一个未完成的生成 Job |
-| aixcut_generate | list | — | `limit` | 列出当前 Project 最近的生成 Job |
-| aixcut_generate | cancel | `job_id` | — | 取消运行中的生成 Job |
+| aixcut_generate | quote | — | `kind`, `prompt`, `name`, `provider`, `model`, `input` | Estimate credits and validate generation permission; creates no Job. |
+| aixcut_timeline | list | — | — | List version timelines. |
+| aixcut_timeline | create | — | `name`, `source_timeline_id` | Create an empty timeline or copy one. |
+| aixcut_timeline | duplicate | `source_timeline_id` | `name` | Duplicate a complete timeline. |
+| aixcut_timeline | rename | `timeline_id`, `name` | — | Rename a version. |
+| aixcut_timeline | delete | `timeline_id` | — | Delete a version. |
+| aixcut_timeline | reorder | `timeline_ids` | — | Set version order. |
+| aixcut_generate | submit | `idempotency_key` | `accepted_quoted_credits`, `kind`, `prompt`, `name`, `provider`, `model`, `input` | Submit one generation Job; returns `status: "async"` and `job_id`. |
+| aixcut_generate | get | `job_id` | — | Read one generation Job. |
+| aixcut_generate | execute | `job_id` | — | Advance one unfinished Job. |
+| aixcut_generate | list | — | `limit` | List recent Jobs in the current Project. |
+| aixcut_generate | cancel | `job_id` | — | Cancel a running Job. |
 
-## Job 状态字段
+## Job fields
 
-轮询返回的是 Envelope，顶层字段如下：
+Polling returns an envelope with these top-level fields:
 
-| 字段 | 说明 |
+| Field | Description |
 | --- | --- |
-| `status` | `async` 表示这是一次异步任务 |
-| `job_id` | 轮询时原样回传 |
-| `terminal` | 为 true 时停止轮询 |
-| `phase` | `queued`、`submitting`、`provider_waiting`、`materializing`、`finalizing`、`succeeded`、`failed`、`cancelled`、`submission_unknown` |
-| `next_action` | 未结束时为 `execute`，等待 `after_seconds` 后用相同 `job_id` 调用 `aixcut_generate execute` |
-| `retryable` | 只在失败时出现：`true` 表示稍后重试同一个请求有机会成功，`false` 表示要先改参数或检查配置 |
+| `status` | `async` indicates an asynchronous task. |
+| `job_id` | Pass this value unchanged when polling. |
+| `terminal` | Stop polling when true. |
+| `phase` | `queued`, `submitting`, `provider_waiting`, `materializing`, `finalizing`, `succeeded`, `failed`, `cancelled`, or `submission_unknown`. |
+| `next_action` | While unfinished, usually `execute`; wait `after_seconds`, then call `aixcut_generate execute` with the same `job_id`. |
+| `retryable` | Present only on failure. `true` means retrying the same request later may work; `false` means fix parameters or configuration first. |
 
-任务详情在 `result.data.job`，包含 `id`、`status`、`phase`、`error_code` 和产物信息。
+Job details are in `result.data.job`, including `id`, `status`, `phase`, `error_code`, and artifact details.
 
-## 完整请求示例
+## Request examples
+
+This video prompt intentionally requests Chinese spoken dialogue even though the parameter guidance is in English:
 
 ```json aixcut_generate
 {
   "action": "submit",
   "idempotency_key": "d4c8a1f2-6e30-4b7d-9a15-3c9f7e0b4d28",
   "kind": "video",
-  "prompt": "海边日出，镜头缓慢推进",
+  "prompt": "A calm sunrise over the ocean, slow camera push-in. A woman says in Mandarin Chinese: ‘新的一天，从海边开始。’",
   "provider": "kling",
   "input": {
     "mode": "full_reference",

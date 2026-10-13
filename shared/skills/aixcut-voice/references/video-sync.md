@@ -1,51 +1,50 @@
-# 配音与画面对齐
+# Voiceover and Visual Alignment
 
-本文件回答一件事：画面已经存在、或者画面之后还会改时，配音怎么写、什么时候渲染、改画面后怎么不跑偏。
+Use this workflow whenever the user asks for voiceover, narration, explanation, or script changes while visuals already exist or may change. Do not treat it as an audio-only task.
 
-只要用户提到"配音 / 旁白 / 讲解 / 换文案"，而项目里已经有画面，就按这里的顺序做，不要当成纯音频任务。
+## Choose the timing anchor and protect original sound
 
-## 先确定时间锚点
+Before choosing a timing anchor, inspect the timeline's original/source audio and existing voice coverage. Protect and preserve original sound by default; a new voice render or replacement must be explicitly requested and must target a confirmed range and track. If the user only asks for visual editing and the existing narration is correct, reuse that audio.
 
-两条路，先选一条：
 
-| 情况 | 谁是锚 | 做法 |
+| Situation | Anchor | Approach |
 | --- | --- | --- |
-| 画面已经定稿，配音只是配上去 | 画面 | 按每段画面的时长写文稿，一段画面配一段话 |
-| 文案先定，画面还没排或会大改 | 配音 | 先写文稿并合成，拿到每段真实时长，再按它排画面 |
+| Visuals are final and voiceover is being added | Visuals | Write one voice segment per visual segment, matching its duration. |
+| Script is final while visuals are not arranged or may change | Voiceover | Write and render the script first, use actual segment durations, then arrange visuals to fit. |
 
-拿不准时先问用户。选错了会导致返工：画面定稿后改配音要重排画面，配音定稿后改画面要重录。
+Ask the user if the anchor is unclear. Choosing incorrectly causes rework: changing voiceover after visuals are final requires visual rearrangement; changing visuals after voiceover is final may require rerecording.
 
-## 画面为锚时
+## When visuals anchor the edit
 
-1. 读 `timeline`，拿到每段画面的起止时间。
-2. 按段写文稿，字数按每秒 4 到 5 个中文字估算，不要超。宁可留半秒空白，不要把一段话压进更短的画面。
-3. 一段画面配一段配音段，方便后面单独微调。
-4. 合成后把每段配音放上音频轨，起点对齐对应画面的起点。
-5. 读回 `timeline`，确认每段配音没有跨到下一段画面上。
+1. Read `timeline` for each visual's start and end time.
+2. Write the script by segment. As a rough fit, allow about 4–5 Chinese characters per second or use an equivalent natural speaking rate for the target language. Do not force a long sentence into a short shot; a brief pause is better.
+3. Use one voice segment per visual segment so each can be tuned independently.
+4. Render and place each voice segment at the matching visual start.
+5. Read `timeline` again and confirm no segment spills into the next visual.
 
-## 配音为锚时
+## When voiceover anchors the edit
 
-1. 先完成文稿和合成，拿到每段真实时长。
-2. 按配音时长排画面，让画面长度跟着段落走。
-3. 画面排完后再读一次配音，确认总时长一致。
+1. Finalize and render the script to get each segment's actual duration.
+2. Arrange visual durations to match the voice segments.
+3. Read voice state again after arranging visuals and confirm total duration still matches.
 
-## 改画面之后
+## After visuals change
 
-画面被裁剪、重排或删除后，配音的时间轴位置会失效。处理顺序：
+Trimming, reordering, or deleting visuals can invalidate voice placement. Then:
 
-1. 先读 `timeline` 和 `voice`，把当前画面结构和配音段列出来。
-2. 判断哪些段还能对齐、哪些段错位。
-3. 错位的配音段按新的画面起点重新放置。
-4. 如果画面总时长变了，文稿要跟着增删，不要硬凑。
-5. 改完再读回确认。
+1. Read `timeline` and `voice` to list current visuals and voice segments.
+2. Identify which segments still align and which do not.
+3. Reposition only voice segments that are misaligned, using the new visual starts.
+4. If total visual duration changed, edit the script as needed; do not pad it artificially.
+5. Read back and confirm the result.
 
-字幕跟随配音时间；配音位置变了，字幕必须一起重做，不要只改配音。
+Captions follow voice timing. If voice placement changes, rebuild or realign captions too.
 
-## 容易出错的点
+## Common failures
 
-| 现象 | 原因 | 处理 |
+| Symptom | Cause | Recovery |
 | --- | --- | --- |
-| 讲解声和画面对不上 | 改画面后没重新放配音 | 按新的画面起点重放，并重做字幕 |
-| 一段话没念完画面就切了 | 文稿按印象写，没按画面时长算 | 按每秒 4 到 5 字重新收文稿 |
-| 配音总时长和成片差一截 | 画面为锚却按文稿排了画面 | 统一到同一个锚点 |
-| 片尾拖着一段没声音 | 配音比画面短 | 补一段收尾配音，或把画面缩到配音长度 |
+| Narration does not match the visuals | Visual edits were not followed by voice repositioning | Reposition to the new visual starts and update captions. |
+| A sentence continues after the shot changes | Script length was guessed instead of fitted to shot duration | Rewrite to fit a natural speaking rate for the requested language. |
+| Total voice and video lengths differ | The edit switched between visual-anchored and voice-anchored timing | Choose one anchor and realign the dependent track. |
+| The ending has picture with no sound | Voiceover is shorter than the visuals | Add an appropriate closing segment or shorten the visuals to fit. |
