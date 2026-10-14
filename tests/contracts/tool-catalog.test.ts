@@ -57,4 +57,23 @@ describe("MCP Tool Catalog compatibility", () => {
         expect(known.has(code), `${skill.skill} -> ${code}`).toBe(true);
     }
   });
+
+  it("tracks the current file and operation actions exposed by aixcut_frontend", () => {
+    const frontend = catalog().tools.find((tool) => tool.name === "aixcut_frontend");
+    expect(frontend?.actions).toEqual(expect.arrayContaining([
+      "media.add",
+      "media.analyze",
+      "media.list",
+      "media.save_to_disk",
+      "operation.get",
+      "operation.cancel",
+      "operation.retry",
+      "timeline.export_range",
+    ]));
+  });
+
+  it("keeps the Codex catalog byte-identical to its pinned core snapshot", () => {
+    expect(readFileSync(resolve(root, "contracts/mcp-tool-catalog.json"), "utf8"))
+      .toBe(readFileSync(resolve(root, "vendor/plugin-core/contracts/mcp-tool-catalog.json"), "utf8"));
+  });
 });

@@ -22,17 +22,23 @@ Call `aixcut_open` once with the target that matches the request:
 
 When later work needs the editor page (frame capture, page-based export, or asking the user to upload media), open the specific Project with `target="project"`. Opening Studio or the Project list does not bind editor actions to a Project.
 
-After a successful call, pass `result.open_in_codex` to Codex Desktop's official open capability.
+After a successful call, immediately open the complete `result.browser_handoff.url` with Codex Desktop's official browser-opening capability. This Skill supplies the Codex opening arguments locally:
+
+```javascript
+{ target: { type: "browser", url: result.browser_handoff.url }, placement: "right" }
+```
+
+Preserve the URL and its one-time `session_token` exactly. Do not compose a plain Project URL or use `editor_url` for MCP session binding. Only pass the complete handoff URL to the host opening capability; do not print or persist it.
 
 ## After creating a Project
 
 `new_project` creates the Project skeleton synchronously, including the default sequence, video/text/audio tracks, and an empty voice document. It can be read or edited immediately; the page itself may still be opening.
 
 - `result.data.project_id`, `result.data.sequence_id`, and `result.data.project` identify the created Project and sequence.
-- `result.data.page_open_requested: true` means the server requested that the page open; it does not prove the page is connected. An `open_in_codex` result of `queued` also does not mean it is connected.
+- `result.page_open_requested: true` means the server requested that the page open; it does not prove the page is connected. A host opening result of `queued` also does not mean it is connected.
 - Top-level `next_action` is usually `wait_then_read`. Wait about 5 seconds, then call `aixcut_frontend(action="page_status")` if the next operation needs the page.
 
-Only confirm page presence when the next action needs it. Timeline reads/writes and voice rendering do not require the editor page. Frame capture, page export, and user-assisted upload do. Require `presence_connections >= 1`; if it is zero, stop and ask the user to open or switch to the target Project in this MCP session. Do not call `aixcut_open` again or treat `queued` as connected. Once online, retry the original page action at most once.
+Only confirm page presence when the next action needs it. Timeline reads/writes and voice script/settings writes do not require the editor page; voice rendering, frame capture, page export, and user-assisted upload do. Require `presence_connections >= 1` and confirm that the target Project appears in `pages`; a different online Project is not sufficient. If the target is absent, stop and ask the user to open or switch to that Project in this MCP session. Do not call `aixcut_open` again or treat `queued` as connected. Once the target is online, retry the original page action at most once.
 
 ## Returned data
 

@@ -23,12 +23,12 @@ Before rendering, read the current `timeline`, audio tracks and clips, source me
 ## Workflow
 
 1. Read the current timeline, audio tracks and clips, source transcript state, and existing voice before deciding whether rendering is needed. Then call `aixcut_read(view="voice")` to read the voice segments, profiles, and defaults.
-2. Use `aixcut_voice(set/add/update/settings)` to update scripts, profiles, or settings as requested.
+2. Use `aixcut_voice(set/add/update/settings)` to update scripts, profiles, or settings as requested. These document writes do not require the Project page.
 3. If the resolved intent is an explicit new or replacement voice, call `aixcut_voice(action="render", targets=[...])`. This generates or reuses AI audio, registers the media, links it to voice segments, and waits for transcription. Otherwise reuse the existing source audio and stop before rendering.
 4. If the user explicitly asks to place newly rendered audio on the timeline, pass `place=true`; optionally set `start_ms`, `gap_ms`, and `track`. Confirm the target track and range first. Placement clears and rebuilds the selected dedicated voice track, so use this only for that voice track. Omit `place` when placement is not requested.
 5. Report segment results and `placement` separately. Successful audio generation does not prove timeline placement succeeded.
 
-Voice rendering requires the user to be signed in and the target Project page to be open. A closed, unready, or read-only page returns an explicit error. A timeout means the outcome is unknown: retry with the same `idempotency_key` and identical arguments. Use a new key only when the user explicitly asks to regenerate.
+Voice rendering requires the user to be signed in and the target Project page to be open and bound to this MCP grant. A closed, unready, read-only, or different-Project page returns an explicit error. A timeout means the outcome is unknown: retry with the same `idempotency_key` and identical arguments. Use a new key only when the user explicitly asks to regenerate.
 
 ## Script language and voice
 

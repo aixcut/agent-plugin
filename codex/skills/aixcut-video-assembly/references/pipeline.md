@@ -121,12 +121,14 @@ Run this stage only when the resolved intent is `add-music` and the user has exp
 2. Add fades at both ends using `fade_in_ms` and `fade_out_ms`; see `aixcut-timeline-editing`.
 3. When narration is present, set music `volume` to about 0.2–0.4 so speech remains clear. Normal volume may be used without narration.
 4. Confirm that music and voice use parallel audio tracks and mix together.
-5. For a music source in the Project library, call `aixcut_frontend(action=analyze_music_beats)` with its `media_id`. Use returned beat times for edit points only when `status=available` and `beat_times_ms` is present. Preserve BPM, confidence, analysis duration, and timestamps as evidence. If analysis returns `unable_to_determine` or decoding/authorization fails, report beat alignment as “unable to determine”; do not infer BPM from listening or duration.
-6. Beat analysis is read-only and does not cut the timeline. Reread the timeline after each beat-based edit.
+5. Use beat evidence only when a supported live Tool action returns it. Preserve BPM, confidence, analysis duration, and timestamps as evidence. If no supported action returns beat evidence, report beat alignment as “unable to determine”; do not infer BPM from listening or duration.
+6. Read-only analysis does not cut the timeline. Reread the timeline after each beat-based edit.
 
 ## Stage 6: Final review
 
 Read the relevant views and verify each item; do not rely on memory.
+
+Compare the result with the agreed script/shot plan and representative visual evidence. Keep full playback/listening explicitly unverified unless the finished video was actually reviewed.
 
 | Check | How to verify | Pass condition |
 | --- | --- | --- |
@@ -152,5 +154,5 @@ Use `aixcut-export` for page export and status polling. The finished file is dow
 | Voice exists but captions are missing | Render may be partial, timed out, or not placed; captions also need separate verification | Check per-segment results, placement, and `transcript_status`; regenerate and reread captions only when audio is on the timeline and transcription is available |
 | Abrupt music start or end | Music has no fades | Add fades to the music clip |
 | Narration is hard to hear | Music volume is too high | Lower music `volume` using `aixcut-timeline-editing` |
-| Beat alignment cannot be verified | `analyze_music_beats` returned `unable_to_determine` or page decoding/authorization failed | Report “unable to determine”; do not invent BPM or beat-matched shots |
+| Beat alignment cannot be verified | A supported beat-analysis action returned `unable_to_determine`, or page decoding/authorization failed | Report “unable to determine”; do not invent BPM or beat-matched shots |
 | Export fails while the page is open | Page export failed or media access expired | Check `export_timeline_status`; ask the user to click the page to restore access if required |

@@ -55,7 +55,7 @@ describe("Codex package build", () => {
         readFileSync(join(root, "shared/skills/aixcut-basics/SKILL.md"), "utf8"),
       );
       expect(readFileSync(join(out, "scripts/local-media-bridge.mjs"), "utf8")).toBe(
-        readFileSync(join(root, "shared/scripts/local-media-bridge.mjs"), "utf8"),
+        readFileSync(join(root, "vendor/plugin-core/helpers/local-media-bridge.mjs"), "utf8"),
       );
       expect(readFileSync(join(out, "assets/logo.svg"), "utf8")).toBe(
         readFileSync(join(root, "shared/assets/logo.svg"), "utf8"),
@@ -89,12 +89,30 @@ describe("Codex package build", () => {
       });
       mkdirSync(join(source, "shared/skills/aixcut-basics"), { recursive: true });
       writeFileSync(join(source, "shared/skills/aixcut-basics/private-notes.txt"), "must not ship");
+      mkdirSync(join(source, "shared/scripts"), { recursive: true });
       writeFileSync(join(source, "shared/scripts/private-helper.mjs"), "must not ship");
       const result = build(output, source);
       expect(result.status, result.stderr).toBe(0);
       expect(() => readFileSync(join(output, "skills/aixcut-basics/private-notes.txt"))).toThrow();
       expect(() => readFileSync(join(output, "scripts/private-helper.mjs"))).toThrow();
       expect(() => readFileSync(join(output, "contracts/mcp-tool-catalog.json"))).toThrow();
+    } finally {
+      rmSync(source, { recursive: true, force: true });
+    }
+  });
+
+  it("builds helpers from the pinned core snapshot without a sibling core checkout", () => {
+    const source = mkdtempSync(join(tmpdir(), "aixcut-plugin-core-isolation-"));
+    const output = join(source, "dist/package");
+    try {
+      cpSync(root, source, {
+        recursive: true,
+        filter: (path) => !path.includes("node_modules") && !path.includes("/.git") && !path.includes("/dist"),
+      });
+      const result = build(output, source);
+      expect(result.status, result.stderr).toBe(0);
+      expect(readFileSync(join(output, "scripts/local-media-bridge.mjs"), "utf8"))
+        .toBe(readFileSync(join(source, "vendor/plugin-core/helpers/local-media-bridge.mjs"), "utf8"));
     } finally {
       rmSync(source, { recursive: true, force: true });
     }

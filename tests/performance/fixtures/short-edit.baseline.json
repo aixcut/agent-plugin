@@ -1,0 +1,7 @@
+{
+  "scenario": "short-edit",
+  "phases": [
+    { "name": "read", "duration_ms": 1000, "mcp_calls": 4, "wait_ms": 300, "failures": 1, "retries": 1 },
+    { "name": "edit", "duration_ms": 800, "mcp_calls": 3, "wait_ms": 200, "failures": 0, "retries": 0 }
+  ]
+}

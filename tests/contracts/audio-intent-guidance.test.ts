@@ -72,6 +72,11 @@ describe("Audio intent gating guidance", () => {
     expect(voice).toMatch(/existing voice|已有.*(?:voice|口播|配音)/is);
   });
 
+  it("requires the bound Project page for voice rendering, while allowing script edits without it", () => {
+    expect(voice).toMatch(/voice rendering.*(?:requires|需要).*?(?:target Project page|项目页).*?(?:open|online|打开|在线)/is);
+    expect(voice).toMatch(/script.*settings.*(?:do not|无需|不需要).*?(?:Project page|项目页)/is);
+  });
+
   it("keeps render and placement scoped to explicit new or replacement voice intent", () => {
     expect(voice).toMatch(/render.*(?:only|仅).*?(?:generate|bind|link).*?(?:AI|generated).*audio/is);
     expect(voice).toMatch(/(?:does not|never|不).*?(?:replace|替换).*?(?:original|source).*?(?:audio|voice)/is);
@@ -129,6 +134,12 @@ describe("Audio intent gating guidance", () => {
       expect(verification).toMatch(new RegExp(dimension, "i"));
     }
     expect(verification).toMatch(/final review.*?(?:separately|separate).*?(?:report|reports)/is);
+  });
+
+  it("keeps verification read-only and hands visual fixes back to editing", () => {
+    expect(verification).toMatch(/verification is read-only/i);
+    expect(verification).toMatch(/return.*(?:editing|edit).*capture again|交还.*编辑.*重新截帧/i);
+    expect(verification).not.toMatch(/fix the position and capture again/i);
   });
 
   it("does not treat a passing review as proof of full playback or listening", () => {

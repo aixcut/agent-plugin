@@ -1,0 +1,12 @@
+{
+  "name": "@aixcut/plugin-core",
+  "version": "1.0.0",
+  "server_contract_version": "1.2.0",
+  "helper_schema_version": "1.0.0",
+  "files": {
+    "helpers/download-capture-artifacts.mjs": "68296d02ad0fe0699936c568ca0073c8a3905f9d7ccf0a7d77df4124a6af48fd",
+    "helpers/local-media-bridge.mjs": "9db813abc6034e8eb96b8dd8585185af6090c96333cf980325412c7dc349e28b",
+    "references/workflow-boundaries.md": "262fdd348f3e1bd4452705dffe3e114b05e930be3d8326bebf4ad4c6e732af13",
+    "contracts/mcp-tool-catalog.json": "8615a638d035ac083b02ba72b7086909c3c2c5d80c581aee8fc7007fc5bad8d3"
+  }
+}
