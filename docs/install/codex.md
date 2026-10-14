@@ -26,6 +26,10 @@ codex plugin marketplace add aixcut/agent-plugin --ref main --sparse .agents/plu
 
 在 Codex 新对话中确认 AIXCut MCP 工具已连接，再提出自然语言任务，例如“打开我的 AIXCut 项目并先检查时间轴”。Skills 会指导 Codex 选择工具和按安全顺序操作；实际工具能力以已连接服务端返回的工具列表为准。
 
+`aixcut_open` 返回后，插件会把完整的 `result.browser_handoff.url` 交给 Codex 的浏览器打开能力。浏览器返回 `queued` 只表示请求已排队；需要截帧、导入素材、导出或生成配音时，还要用 `aixcut_frontend(action="page_status")` 确认当前 MCP 会话已经绑定到目标 Project。不要手动拼接 Project URL，也不要重复创建 Project。
+
+配音文稿、音色和设置可以在没有页面时修改；真正的配音合成必须打开并绑定目标 Project 页面。
+
 ## 本机素材
 
 当工作流需要读取本机文件时，插件内的 `local-media-bridge.mjs` 会在用户电脑上启动 loopback 文件桥，并只提供本次明确选择的文件。当前官网 Origin 由已连接的 MCP 服务自动提供给流程提示词，桥只允许这个官网读取文件。桥接脚本不替代线上 MCP 服务，也不直接修改线上项目；素材导入仍通过已连接的 AIXCut 页面和服务完成。

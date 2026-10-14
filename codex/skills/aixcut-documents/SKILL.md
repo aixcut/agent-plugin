@@ -11,10 +11,10 @@ State what is being imported and what happens next when useful. Continue when th
 
 ## When to use
 
-Call `aixcut_document` only when the user provides a local document path and explicitly asks to import it into the Project document library.
+`aixcut_document` is a local-MCP-only path. A hosted MCP server cannot read a path on the user's computer. Call it only when the MCP process itself has access to that path; otherwise tell the user to upload the document through the Project Documents panel and do not send the computer path to the Tool.
 
 - If the user only wants the document read, summarized, or used to answer a question, read it yourself and do not call this Tool.
-- If no path is provided, ask for it. Do not guess paths, scan directories, or fabricate content from a filename.
+- If no locally accessible path is provided, use the Project Documents panel upload flow. Do not guess paths, scan directories, or fabricate content from a filename.
 - Images, video, and audio are media assets. Use the `aixcut_frontend` media flow, not this Tool.
 
 ## Document content
@@ -32,8 +32,10 @@ Call `aixcut_document` only when the user provides a local document path and exp
 
 ## Call
 
+The hosted MCP path does not support this call for a user-computer file. A local MCP process may use:
+
 ```json aixcut_document
-{"action":"import","file_path":"/Users/me/notes/product-overview.md"}
+{"action":"import","file_path":"/path-visible-to-the-mcp-process/notes/product-overview.md"}
 ```
 
 ```json aixcut_document

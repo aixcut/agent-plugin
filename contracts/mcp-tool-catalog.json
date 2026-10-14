@@ -1,5 +1,5 @@
 {
-  "server_contract_version": "1.0.0",
+  "server_contract_version": "1.1.0",
   "server_revision": "4bef52136767abb39d868a781471f27fb1a18737",
   "tools": [
     {
@@ -61,15 +61,35 @@
     {
       "name": "aixcut_frontend",
       "actions": [
-        "analyze_music_beats",
         "capture_source_frames",
         "capture_timeline_frames",
         "export_timeline",
         "export_timeline_status",
         "import_local_media",
         "import_status",
+        "media.add",
+        "media.analyze",
+        "media.associate_remote",
+        "media.bind_local",
+        "media.copy_to_opfs",
+        "media.delete",
+        "media.delete_cloud",
+        "media.export_range",
+        "media.extract_audio",
+        "media.inspect",
+        "media.list",
+        "media.local_status",
+        "media.prepare_local",
+        "media.replace_source",
+        "media.resolve_cloud_url",
+        "media.save_to_disk",
+        "media.upload",
+        "operation.cancel",
+        "operation.get",
+        "operation.retry",
         "page_status",
-        "prompt_add_material"
+        "prompt_add_material",
+        "timeline.export_range"
       ]
     },
     {

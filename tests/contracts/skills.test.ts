@@ -87,4 +87,12 @@ describe("shared AIXCut Skills", () => {
       expect(contents).not.toContain("https://aixcut.com/mcp");
     }
   });
+
+  it("does not instruct hosted MCP sessions to send user-computer paths to document import", () => {
+    const documents = skillText("aixcut-documents");
+    expect(documents).toMatch(/hosted MCP.*(?:cannot|cannot read|无法读取)/is);
+    expect(documents).toMatch(/local.?MCP.*(?:access|读取)/is);
+    expect(documents).toMatch(/Documents panel.*upload|页面.*上传/is);
+    expect(documents).not.toMatch(/Call `aixcut_document` only when the user provides a local document path/is);
+  });
 });

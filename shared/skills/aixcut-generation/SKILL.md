@@ -37,7 +37,7 @@ Resolve only the language choice relevant to the requested asset: visible text f
 
 ## Asset source
 
-Generation creates images, videos, and music in the Project library; it does not create Motion Graph source assets, import files, or perform post-production on existing audio. Do not use a generic video-generation Job as a substitute for an editable Motion Graph. If no supported MG asset or creation path is available, report that limitation rather than substituting captions. Use `aixcut-timeline-editing` to place, trim, mix, or fade audio, and `aixcut-timeline-editing` or `aixcut-documents` to import local media or documents. Provider-supported image editing with reference images remains a generation operation.
+Generation creates images, videos, and music in the Project library; it does not create Motion Graph source assets, import files, or perform post-production on existing audio. Do not use a generic video-generation Job as a substitute for an editable Motion Graph. If no supported MG asset or creation path is available, report that limitation rather than substituting captions. Use `aixcut-timeline-editing` to place, trim, mix, or fade audio, and use its local-media flow to import media. Documents must be uploaded through the Project page because the hosted MCP service cannot read a path on the user's computer. Provider-supported image editing with reference images remains a generation operation.
 
 Generated media does not guarantee exact beat alignment, lyric timing, or caption timing. Do not promise frame-accurate synchronization from a generation prompt; use timeline tools and read-back evidence for placement and synchronization.
 

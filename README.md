@@ -2,7 +2,7 @@
 
 Official workflow Skills and host packages for connecting Codex and other AI agents to Aixcut.
 
-The plugin package installs the official instructions and any required local helpers. Aixcut tools run in the hosted MCP service. Follow the setup guide for the Aixcut website you use to configure its matching `/mcp` endpoint and authorize your account.
+The plugin package installs the official instructions and any required local helpers. Aixcut tools run in the hosted MCP service. Follow the setup guide for the Aixcut website you use to configure its matching `/mcp` endpoint and authorize your account. Opening a Project is only a handoff request; page-bound actions must wait for `aixcut_frontend(action="page_status")` to show the target Project online. Voice script/settings writes are page-free, while voice rendering requires the bound Project page.
 
 ## Codex
 
@@ -15,4 +15,5 @@ npm install
 npm test
 npm run build
 npm run validate
+npm run check
 ```

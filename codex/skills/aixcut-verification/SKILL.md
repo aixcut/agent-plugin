@@ -54,7 +54,7 @@ Do not capture frames for timing-only edits (trim, split, move, speed), volume, 
 - `composition.frames` gives each captured frame's `index`, `times_ms`, and visible items with ref, time range, track, and `visual_position`. `index` matches the image order. Items with `enabled: false` are absent from the rendered frame.
 - If `frames` is missing, use `composition.clips` as the full timeline roster and map each image to its time.
 - The roster's `visual_position` should match the read-back: `preset` is a named position, `box` is a freeform proportional box, and `auto` means the editor is arranging it automatically.
-- If an element obscures another element or captions, fix the position and capture again. Do not infer the corrected result from the first image.
+- If an element obscures another element or captions, report the offending ref and return the change to `aixcut-timeline-editing`; after the edit, capture again. Verification is read-only and must not fix the position itself. Do not infer the corrected result from the first image.
 
 ## Pre-export checks
 
