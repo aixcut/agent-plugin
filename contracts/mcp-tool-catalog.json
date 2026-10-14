@@ -1,5 +1,5 @@
 {
-  "server_contract_version": "1.1.0",
+  "server_contract_version": "1.2.0",
   "server_revision": "4bef52136767abb39d868a781471f27fb1a18737",
   "tools": [
     {
@@ -67,10 +67,12 @@
         "export_timeline_status",
         "import_local_media",
         "import_status",
+        "list_documents",
         "media.add",
         "media.analyze",
         "media.associate_remote",
         "media.bind_local",
+        "media.capture_frame",
         "media.copy_to_opfs",
         "media.delete",
         "media.delete_cloud",
@@ -88,7 +90,9 @@
         "operation.get",
         "operation.retry",
         "page_status",
+        "prompt_add_document",
         "prompt_add_material",
+        "timeline.capture_frame",
         "timeline.export_range"
       ]
     },

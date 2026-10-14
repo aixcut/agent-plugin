@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 
 const run = promisify(execFile);
 const scriptPath = fileURLToPath(
-  new URL('../../shared/scripts/local-media-bridge.mjs', import.meta.url),
+  new URL('../../vendor/plugin-core/helpers/local-media-bridge.mjs', import.meta.url),
 );
 
 interface BridgeModule {
@@ -331,6 +331,36 @@ describe('真起一个桥', () => {
     },
     30_000,
   );
+
+  it.each([
+    ['切换官网', 'https://new.example'],
+    ['停止桥', undefined],
+  ])('%s时不会结束 PID 已被复用的其他进程', async (operation, nextOrigin) => {
+    const statePath = path.join(workspace, `stale-${operation}.json`);
+    const unrelated = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore' });
+    await new Promise<void>((resolve, reject) => {
+      unrelated.once('spawn', resolve);
+      unrelated.once('error', reject);
+    });
+    const pid = unrelated.pid;
+    expect(pid).toBeTypeOf('number');
+    bridge.writeBridgeState(statePath, {
+      base_url: 'http://127.0.0.1:1', token: 'stale-token', pid,
+      allowed_origin: 'https://old.example',
+      expires_at: new Date(Date.now() + 60_000).toISOString(), files: [],
+    });
+
+    try {
+      const result = operation === '停止桥'
+        ? await cli(['--stop', '--state-file', statePath])
+        : await cli([mediaFile, '--state-file', statePath, '--allowed-origin', nextOrigin!]);
+      expect(processIsAlive(pid!)).toBe(true);
+      if (operation === '停止桥') expect(result).toMatchObject({ stopped: false, reason: 'bridge-not-verified' });
+      else await cli(['--stop', '--state-file', statePath]);
+    } finally {
+      unrelated.kill('SIGKILL');
+    }
+  }, 30_000);
 
   it(
     '到期后自己退场，不留孤儿进程占着端口',

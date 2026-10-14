@@ -29,6 +29,8 @@ skills:
       required: [aixcut_document]
       optional: [aixcut_frontend]
       forbidden: []
+    actions:
+      aixcut_frontend: [prompt_add_document, list_documents]
     helper: null
     references: []
 
@@ -135,7 +137,7 @@ skills:
           import_local_media,
           import_status,
         ]
-    helper: scripts/download-capture-artifacts.mjs
+    helper: plugin-core/helpers/download-capture-artifacts.mjs
     references: [references/actions.md]
 
   - skill: aixcut-verification
@@ -145,7 +147,7 @@ skills:
       required: [aixcut_read, aixcut_review]
       optional: [aixcut_frontend]
       forbidden: []
-    helper: scripts/download-capture-artifacts.mjs
+    helper: plugin-core/helpers/download-capture-artifacts.mjs
     references: []
 
   - skill: aixcut-video-assembly

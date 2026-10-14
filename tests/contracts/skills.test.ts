@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 const root = process.cwd();
 const skillsRoot = resolve(root, "shared/skills");
-const sharedRoot = resolve(root, "shared");
+const coreRoot = resolve(root, "vendor/plugin-core");
 const mapPath = resolve(root, "contracts/skill-tool-map.yaml");
 
 type SkillMapEntry = {
@@ -66,7 +66,7 @@ describe("shared AIXCut Skills", () => {
     }
   });
 
-  it("resolves each declared reference and helper inside the shared package", () => {
+  it("resolves each declared reference and helper in its owned package", () => {
     for (const entry of skillMap()) {
       for (const reference of entry.references)
         expect(
@@ -74,7 +74,7 @@ describe("shared AIXCut Skills", () => {
           `${entry.skill} reference ${reference}`,
         ).toBe(true);
       if (entry.helper)
-        expect(existsSync(join(sharedRoot, entry.helper)), entry.helper).toBe(true);
+        expect(existsSync(join(coreRoot, entry.helper.replace(/^plugin-core\//, ""))), entry.helper).toBe(true);
     }
   });
 

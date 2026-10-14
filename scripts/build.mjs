@@ -2,6 +2,7 @@
 import { access, cp, mkdir, readdir, rm } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { verifyCore } from "./core.mjs";
 
 const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -43,11 +44,12 @@ const copySkillTree = async ({ source, destination, includeAgents }) => {
 const buildCodex = async () => {
   const manifest = join(root, "codex/.codex-plugin/plugin.json");
   const skills = join(root, "shared/skills");
-  const scripts = join(root, "shared/scripts");
+  const scripts = join(root, "vendor/plugin-core/helpers");
   const assets = join(root, "shared/assets");
   const sources = [manifest, skills, scripts, assets].map((path) => resolve(path));
   assertSourceNotOverwritten(sources);
   for (const path of sources) await requireSource(path);
+  await verifyCore(root);
 
   if (output === resolve(root, "codex")) {
     for (const generated of ["skills", "scripts", "assets"]) await rm(join(output, generated), { recursive: true, force: true });

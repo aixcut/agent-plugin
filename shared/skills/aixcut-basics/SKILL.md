@@ -5,36 +5,14 @@ description: "Shared Aixcut MCP rules for context, read-before-write, stable ref
 
 # Aixcut MCP Basics
 
-Load with the relevant specialist Skill.
+Load with the relevant specialist Skill. Follow [language](references/language.md), [conversation guidance](references/conversation-guidance.md), and [ownership](references/model.md).
 
-## Language
+Inspect `active_project_id`. If empty, ask for a Project name or `project_id`; never choose the first listed Project.
 
-Keep Tool names, schema fields, enums, errors, refs, and API terms unchanged. Converse in the user's current language. Create captions, scripts, titles, overlays, and generation prompts in the requested content language. Conversation and content language are independent; follow [the language policy](references/language.md).
+Read before writes; use returned refs. Reuse read evidence while Project, timeline, and revision are unchanged. Reread after writes, warnings, conflicts, or external changes; refresh before position-dependent commands.
 
-## Conversation guidance
+Keep independent read calls parallel. Structural writes on the same timeline stay serial. Group the same action on the same track into one call using `items[]` or `targets`. Only the live Tool Schema decides what may be combined. Read affected views after each atomic batch.
 
-For each turn, make the current stage and next step clear when useful. If the goal is clear and the next action is safe, inspect and continue. Pause only for a consequential missing choice, permission, cost or credits, or destructive changes. Distinguish accepted, running, complete, failed, and unknown; state the user's exact action when work is blocked on them. Follow [the conversation guidance](references/conversation-guidance.md).
+Reuse `idempotency_key` only for identical retries. For `status_unknown`, retry original parameters and UUID. For `async`, follow `job_id` and `next_action` until terminal. Business fields are in `result`; `noop` is final, `applied_with_warning` requires reporting warnings.
 
-## Read and write
-
-Read the current Project and use returned refs. Reuse an `idempotency_key` only for an identical retry; use a new key for each new write. Read affected views after writes and refresh refs after structural changes.
-
-Inspect `active_project_id`. If empty, ask for the Project name or `project_id`; never choose the first listed Project. Studio and the Project list do not bind one.
-
-## Batching and read reuse
-
-- Read the Project and the timeline once, then reuse that evidence while the Project, timeline, and revision are unchanged.
-- Reread only after a write, an external change, a surfaced warning, or a conflict.
-- Keep independent read calls parallel. Structural writes on the same timeline stay serial; a command that depends on a position or a fresh ref needs a read first.
-- Group the same action on the same track into one call: pass every item in `items[]`, or every target in `targets`, in that single call.
-- Never issue one call per label, clip, segment, or track when one supported call can carry the whole batch.
-- Only the live Tool Schema decides what may be combined. Do not invent mixed-action, mixed-track, or cross-domain batch calls.
-- Read the affected views back after each atomic batch, not after every single item.
-
-## Results and boundaries
-
-Business fields are in `result`. `noop` is final; report `warnings` for `applied_with_warning`. For `status_unknown`, retry only the original request and UUID. For `async`, follow `job_id` and `next_action` until terminal.
-
-The Host handles OAuth. Do not call `aixcut_login` first, repeat authorization, use curl, edit the database, invent results, bypass permissions, or expose tokens. Verify successful responses. Use supported local-media flows; never invent server paths.
-
-Read the role and Project model in [references/model.md](references/model.md).
+The Host handles OAuth; do not call `aixcut_login` first. Never use curl, direct database writes, invented server paths or results, bypass permissions, or expose tokens. Verify responses before reporting success.

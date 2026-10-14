@@ -148,3 +148,12 @@ flowchart TB
 - 首次项目读取 598 ms，单独记录。
 - 已识别安装包版本差异；当前结果尚不足以定位全流程主瓶颈。
 - 完整工作流基线、Plugin 提速改动和 A/B 对比尚未完成。
+
+## 九、可复现的离线评测器
+
+`npm run performance:compare -- <baseline.json> <optimized.json> [--markdown]` 接受调用者提供的 JSON trace，按
+`scenario` 和具名阶段校验输入并汇总总耗时、MCP 调用次数、等待时间、失败数和重试数，输出 JSON 或 Markdown
+表格。各项指标必须明确提供，不会静默补零。它只统计 trace 中明确记录的阶段耗时，不把模型思考时间或调用间隔推断成 MCP 延迟。
+
+fixture 是示例数据，不能作为真实 A/B 提速结论。真实结论仍需按本文第三、五节使用固定版本、
+新会话、新项目和相同素材完成可追溯对照。

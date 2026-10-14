@@ -17,4 +17,4 @@ Do not treat Plugin installation, MCP configuration, OAuth authorization, an act
 
 ## Language
 
-Follow the language rules in [the language policy](language.md): user-facing conversation follows the user's current language, while content follows the requested output language.
+User-facing conversation follows the user's current language, while content follows the requested output language.

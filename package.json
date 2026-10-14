@@ -12,6 +12,9 @@
     "build": "node scripts/build.mjs",
     "validate": "node scripts/validate.mjs",
     "validate:cross-repo": "node scripts/validate-cross-repo.mjs --server-root ../aixcut-mcp-server",
+    "core:update": "node scripts/import-core.mjs",
+    "core:verify": "node --input-type=module -e \"import { verifyCore } from './scripts/core.mjs'; await verifyCore(process.cwd()); console.log('Core snapshot verified')\"",
+    "performance:compare": "node scripts/compare-performance.mjs",
     "check": "npm test && npm run build && npm run validate"
   },
   "devDependencies": {

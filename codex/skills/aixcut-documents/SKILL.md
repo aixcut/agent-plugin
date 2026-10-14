@@ -11,10 +11,10 @@ State what is being imported and what happens next when useful. Continue when th
 
 ## When to use
 
-`aixcut_document` is a local-MCP-only path. A hosted MCP server cannot read a path on the user's computer. Call it only when the MCP process itself has access to that path; otherwise tell the user to upload the document through the Project Documents panel and do not send the computer path to the Tool.
+`aixcut_document` is a local-MCP-only path. A hosted MCP server cannot read a path on the user's computer. Call it only when the MCP process itself has access to that path; otherwise call `aixcut_frontend` with `{"action":"prompt_add_document"}` and ask the user to choose the file in the Project Documents panel. Never send the computer path to the Tool.
 
 - If the user only wants the document read, summarized, or used to answer a question, read it yourself and do not call this Tool.
-- If no locally accessible path is provided, use the Project Documents panel upload flow. Do not guess paths, scan directories, or fabricate content from a filename.
+- If no locally accessible path is provided, call `aixcut_frontend(action="prompt_add_document")`, wait for the user to choose the document, then call `aixcut_frontend(action="list_documents")` to confirm it appeared. Do not guess paths, scan directories, or fabricate content from a filename.
 - Images, video, and audio are media assets. Use the `aixcut_frontend` media flow, not this Tool.
 
 ## Document content
@@ -32,7 +32,15 @@ State what is being imported and what happens next when useful. Continue when th
 
 ## Call
 
-The hosted MCP path does not support this call for a user-computer file. A local MCP process may use:
+The hosted MCP path does not support this call for a user-computer file. Use the browser-owned upload flow:
+
+```json aixcut_frontend
+{"action":"prompt_add_document"}
+```
+
+Read `aixcut_frontend(action="list_documents")` before opening the prompt to establish the existing document IDs. The action only opens the Project Documents upload entry. It does not upload or confirm a file. The user must choose the document; call `aixcut_frontend(action="list_documents")` and confirm the selected filename and document ID before reporting success. A stored document with `parse_status=parsing` still needs parsing; `error` means parsing failed. Poll only the document list while parsing and never reopen the upload prompt to check status. Do not pass `file_path`, `content`, or a local URL to this hosted action.
+
+A local MCP process may use:
 
 ```json aixcut_document
 {"action":"import","file_path":"/path-visible-to-the-mcp-process/notes/product-overview.md"}

@@ -128,6 +128,8 @@ Run this stage only when the resolved intent is `add-music` and the user has exp
 
 Read the relevant views and verify each item; do not rely on memory.
 
+Compare the result with the agreed script/shot plan and representative visual evidence. Keep full playback/listening explicitly unverified unless the finished video was actually reviewed.
+
 | Check | How to verify | Pass condition |
 | --- | --- | --- |
 | Total duration | Read `timeline` | Matches the requested duration |

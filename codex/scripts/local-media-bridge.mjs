@@ -376,6 +376,8 @@ const runStatus = async (stateFile) => {
 const runStop = async (stateFile) => {
   const state = readBridgeState(stateFile);
   if (!state) return { stopped: false, reason: 'no-state' };
+  if (!(await probeBridgeHealth(state.base_url, state.token)))
+    return { stopped: false, reason: 'bridge-not-verified' };
   if (Number.isInteger(state.pid)) {
     try {
       process.kill(state.pid, 'SIGTERM');
@@ -409,7 +411,11 @@ export const runBridgeCommand = async (argv, { home } = {}) => {
 
   // 新桥要接着服务旧桥还在的文件，避免换桥后旧 url 全部失效。
   const originChanged = existing && (existing.allowed_origin ?? null) !== (options.allowedOrigin ?? null);
-  if (originChanged && Number.isInteger(existing.pid)) {
+  if (
+    originChanged &&
+    Number.isInteger(existing.pid) &&
+    (await probeBridgeHealth(existing.base_url, existing.token))
+  ) {
     try {
       process.kill(existing.pid, 'SIGTERM');
     } catch {

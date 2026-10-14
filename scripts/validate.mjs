@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { parse as parseYaml } from "yaml";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
+import { verifyCore } from "./core.mjs";
 
 const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -33,6 +34,7 @@ const treeHash = async (directory) => {
 };
 
 const validateCodex = async () => {
+  await verifyCore(root);
   const marketplace = await readJson(".agents/plugins/marketplace.json");
   if (marketplace.plugins?.length !== 1 || marketplace.plugins[0].source?.path !== "./codex") throw new Error("Marketplace must point to the Codex plugin at ./codex.");
   const plugin = await readJson("codex/.codex-plugin/plugin.json");
@@ -54,7 +56,7 @@ const validateCodex = async () => {
     const frontmatter = parseYaml(match[1]);
     if (frontmatter.name !== entry.skill || String(frontmatter.description ?? "").length < 20) throw new Error(`${entry.skill} has invalid name/description frontmatter.`);
     for (const reference of entry.references ?? []) await requirePath(`shared/skills/${entry.skill}/${reference}`, `${entry.skill} reference`);
-    if (entry.helper) await requirePath(`shared/${entry.helper}`, `${entry.skill} helper`);
+    if (entry.helper) await requirePath(`vendor/plugin-core/${entry.helper.replace(/^plugin-core\//, "")}`, `${entry.skill} helper`);
     for (const tool of [...(entry.tools.required ?? []), ...(entry.tools.optional ?? [])]) if (!catalogTools.has(tool)) throw new Error(`${entry.skill} references unknown Tool ${tool}.`);
     for (const [tool, actions] of Object.entries(entry.actions ?? {})) {
       const available = catalogTools.get(tool);
@@ -66,6 +68,13 @@ const validateCodex = async () => {
     for (const value of forbiddenNames) if (lower.includes(value)) throw new Error(`${entry.skill} contains host-specific or sensitive text: ${value}`);
   }
   if (!/^\d+\.\d+\.\d+$/.test(compatibility.helper_schema_version)) throw new Error("Invalid helper schema version.");
+  const coreManifest = await readJson("vendor/plugin-core/contracts/core-manifest.json");
+  if (coreManifest.helper_schema_version !== compatibility.helper_schema_version) throw new Error("Core helper schema does not match plugin compatibility metadata.");
+  const [catalogBytes, coreCatalogBytes] = await Promise.all([
+    readFile(join(root, "contracts/mcp-tool-catalog.json")),
+    readFile(join(root, "vendor/plugin-core/contracts/mcp-tool-catalog.json")),
+  ]);
+  if (!catalogBytes.equals(coreCatalogBytes)) throw new Error("Codex Tool Catalog differs from its core snapshot.");
   const out = await mkdtemp(join(tmpdir(), "aixcut-plugin-validate-"));
   try {
     const build = spawnSync(process.execPath, [join(scriptRoot, "scripts/build.mjs"), "--root", root, "--out", out], { encoding: "utf8" });

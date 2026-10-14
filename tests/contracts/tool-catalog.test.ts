@@ -71,4 +71,9 @@ describe("MCP Tool Catalog compatibility", () => {
       "timeline.export_range",
     ]));
   });
+
+  it("keeps the Codex catalog byte-identical to its pinned core snapshot", () => {
+    expect(readFileSync(resolve(root, "contracts/mcp-tool-catalog.json"), "utf8"))
+      .toBe(readFileSync(resolve(root, "vendor/plugin-core/contracts/mcp-tool-catalog.json"), "utf8"));
+  });
 });
