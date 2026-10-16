@@ -10,9 +10,9 @@ The Codex marketplace package is `aixcut-codex-plugin`. Add this repository as a
 
 ## Development
 
-`aixcut-plugin-core` 是宿主中立 Helper 与 MCP catalog 快照的唯一维护源。Codex 在 `vendor/plugin-core` 保存经校验的快照，并通过 `contracts/core-lock.json` 锁定版本与摘要；构建只读取本仓库快照。Core 是开发期源码仓库，不需部署或由用户安装。Codex Skills、manifest 与 marketplace 配置继续归本仓库，WorkBuddy 独立维护自己的宿主内容。
+`aixcut-plugin-core` is the single source of truth for host-neutral helpers and the MCP catalog snapshot. Codex stores a verified snapshot in `vendor/plugin-core` and locks its version and digest via `contracts/core-lock.json`; builds read only the snapshot in this repository. Core is a development-time source repository and does not need to be deployed or installed by users. Codex Skills, the manifest, and marketplace configuration remain in this repository, while WorkBuddy maintains its own host content independently.
 
-更新快照时显式运行 `npm run core:update -- --core-root ../aixcut-plugin-core`，审查 diff 后执行相关测试与校验。`npm run core:verify` 检查锁文件和文件摘要。Tool schema/action 的权威源仍是 MCP Server，跨仓库检查用于确认 Core 快照与服务端契约一致。
+When updating the snapshot, explicitly run `npm run core:update -- --core-root ../aixcut-plugin-core`, review the diff, and then run the relevant tests and validation. `npm run core:verify` checks the lock file and file digests. The MCP Server remains the authoritative source for tool schemas and actions; cross-repository checks verify that the Core snapshot matches the server contract.
 
 ```bash
 npm install
