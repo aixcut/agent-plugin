@@ -86,7 +86,6 @@ Defaults come from server configuration and may vary by environment. `kind` may 
 | aixcut_timeline | reorder | `timeline_ids` | — | Set version order. |
 | aixcut_generate | submit | `idempotency_key` | `accepted_quoted_credits`, `kind`, `prompt`, `name`, `provider`, `model`, `input` | Submit one generation Job; returns `status: "async"` and `job_id`. |
 | aixcut_generate | get | `job_id` | — | Read one generation Job. |
-| aixcut_generate | execute | `job_id` | — | Advance one unfinished Job. |
 | aixcut_generate | list | — | `limit` | List recent Jobs in the current Project. |
 | aixcut_generate | cancel | `job_id` | — | Cancel a running Job. |
 
@@ -100,7 +99,7 @@ Polling returns an envelope with these top-level fields:
 | `job_id` | Pass this value unchanged when polling. |
 | `terminal` | Stop polling when true. |
 | `phase` | `queued`, `submitting`, `provider_waiting`, `materializing`, `finalizing`, `succeeded`, `failed`, `cancelled`, or `submission_unknown`. |
-| `next_action` | While unfinished, usually `execute`; wait `after_seconds`, then call `aixcut_generate execute` with the same `job_id`. |
+| `next_action` | While unfinished, wait `after_seconds`, then call `aixcut_generate get` with the same `job_id`; the server advances work. |
 | `retryable` | Present only on failure. `true` means retrying the same request later may work; `false` means fix parameters or configuration first. |
 
 Job details are in `result.data.job`, including `id`, `status`, `phase`, `error_code`, and artifact details.

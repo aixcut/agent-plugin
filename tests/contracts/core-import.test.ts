@@ -16,7 +16,7 @@ const fixture = () => {
   mkdirSync(path.join(root, "contracts"), { recursive: true });
   writeFileSync(path.join(root, "contracts/compatibility.json"), JSON.stringify({
     plugin_version: "1.1.0",
-    server_contract: { min: "1.2.0", max: "1.2.0" },
+    server_contract: { min: "1.3.0", max: "1.3.0" },
     helper_schema_version: "1.0.0",
   }));
   mkdirSync(path.join(root, "vendor/plugin-core"), { recursive: true });
@@ -43,9 +43,10 @@ describe("Codex core snapshot import", () => {
 
     const manifestBytes = readFileSync(path.join(root, "vendor/plugin-core/contracts/core-manifest.json"));
     const lock = JSON.parse(readFileSync(path.join(root, "contracts/core-lock.json"), "utf8"));
+    const sourceManifest = JSON.parse(readFileSync(path.join(coreRoot, "contracts/core-manifest.json"), "utf8"));
     expect(lock).toEqual({
       name: "@aixcut/plugin-core",
-      version: "1.0.0",
+      version: sourceManifest.version,
       manifest_sha256: createHash("sha256").update(manifestBytes).digest("hex"),
     });
     expect(readFileSync(path.join(root, "contracts/mcp-tool-catalog.json"), "utf8"))

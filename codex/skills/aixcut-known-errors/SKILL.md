@@ -19,6 +19,7 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 | `resolve_input` | Correct the input or ref before retrying. |
 | `retry` | Retry the same request after `after_seconds`. |
 | `poll` | Poll the same `job_id`. |
+| `receipt` | Confirm the original mutation with its original identity before dependent writes. |
 | `open_editor` | Open the required page first. |
 | `run_helper` | Run the specified local helper first. |
 | `wait_then_read` | The action was accepted but is still running. Wait `after_seconds`, then call the specified read endpoint. Do not report completion or resubmit the action. |
@@ -41,16 +42,16 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 
 - `MCP_MUTATION_SERVER_REJECTED`: Read the latest snapshot and regenerate the operation. Do not replay the old payload unchanged.
 - `NLE_IDEMPOTENCY_CONFLICT`: The key is already bound to a different project, timeline, or action. Read the timeline and confirm whether the earlier write already achieved the intent before redoing. A same-key retry against the same target is reported as a replay instead, not as this error.
-- `MCP_TRACK_ENSURE_NOT_APPLIED`: `aixcut_track ensure` returned success, but read-back found no track (often an old UUID replayed a stale receipt). Retry `ensure` once with a new UUID.
+- `MCP_TRACK_ENSURE_NOT_APPLIED`: Read-back found no track. Confirm the original receipt and current timeline before correcting anything; an absent projection alone does not authorize a new-key write.
 - `MCP_CANVAS_DEFAULTED`: This is a warning, not a failure. A `0×0` canvas was set to `1920×1080`. If portrait or another ratio is required, use `aixcut_project action=canvas` to override it.
 - `MCP_MUTATION_LOCAL_REJECTED`: Local validation failed, usually because a ref is stale or a range is out of bounds. Read fresh data and correct the input.
 - `MCP_PROJECTION_BARRIER_TIMEOUT`, `MCP_ZERO_QUERY_UNAVAILABLE`: The read did not finish before timeout. Retry the same read parameters.
-- `MCP_MUTATION_STATUS_UNKNOWN`: The write outcome is unknown. Retry with the exact original parameters and same `idempotency_key`; do not generate a new UUID.
+- `MCP_MUTATION_STATUS_UNKNOWN`: Preserve the original identity and query `aixcut_read(view="mutation_receipt")`. Never treat a timeout or absent receipt as proof the write failed.
 
 ## Browser and local media errors
 
-- `MCP_FRONTEND_NOT_BOUND`: This grant has never been bound to a browser client. Call `aixcut_open(target="project", project_id=...)` once, immediately pass the complete `result.browser_handoff.url` to the Codex Desktop browser-opening capability, then call `page_status`. Do not compose a plain Project URL.
-- `MCP_FRONTEND_CLIENT_OFFLINE`: This is not an OAuth failure; the current MCP grant has no active browser connection. Call `aixcut_frontend action=page_status` first. Continue only when `presence_connections >= 1` and the requested Project appears in `pages` (use `requested_project_id` and `online_pages` to distinguish another Project). If the target is absent and this turn has not performed the formal handoff, call `aixcut_open(target="project", project_id=...)` once and immediately pass its complete handoff URL to the Codex Desktop browser-opening capability. The host result `queued` only means the request is queued. After the handoff, check `page_status` once; if the target remains offline, ask the user to open or switch to it in the same MCP session. Retry the original page action at most once; never resubmit imports or loop through opens.
+ - `MCP_FRONTEND_NOT_BOUND`: This grant has never been bound to a browser client. Call `aixcut_open(target="project", project_id=...)` once, immediately pass the complete `result.browser_handoff.url` to the official host browser-opening capability (Codex Desktop), then call `page_status`. Do not compose a plain Project URL.
+ - `MCP_FRONTEND_CLIENT_OFFLINE`: This is not an OAuth failure; the current MCP grant has no active browser connection. Call `aixcut_frontend action=page_status` first. Continue only when `presence_connections >= 1` and the requested Project appears in `pages` (use `requested_project_id` and `online_pages` to distinguish another Project). If the target is absent and this turn has not performed the formal handoff, call `aixcut_open(target="project", project_id=...)` once and immediately pass its complete handoff URL to the official host browser-opening capability (Codex Desktop). The host result `queued` only means the request is queued. After the handoff, check `page_status` once; if the target remains offline, ask the user to open or switch to it in the same MCP session. Retry the original page action at most once; never resubmit imports or loop through opens.
 - `MCP_FRONTEND_PAGE_NOT_ACTIVE`: The client is online, but the active page belongs to another Project or workspace. Use `details.online_pages` and `requested_project_id` to tell the user which Project to switch to.
 - `MCP_FRONTEND_CAPABILITY_UNAVAILABLE`: The page and Project are online, but the page has not reported support for this action. Wait 15–30 seconds and retry once; if still unavailable, report it.
 - `MCP_MEDIA_TYPE_MISMATCH`: The selected source is not compatible with the requested media operation. Read `aixcut_read view=sources` and choose a source whose media type matches the operation.
@@ -75,15 +76,12 @@ Page-export failures appear as `error_code` in `export_timeline_status`, not as 
 
 - `MCP_PROVIDER_TIMEOUT`, `MCP_PROVIDER_TASK_FAILED`: Report the Job's `error_code`. Do not submit a replacement job automatically.
 
-## Voice rendering errors
+## Speech generation errors
 
-- `MCP_VOICE_TARGETS_REQUIRED`: `render` needs `targets`; provide the voice segment refs to render.
-- `MCP_VOICE_NOT_INITIALIZED`: The Project has no voice document. Add voice segments before rendering.
-- If the page is not ready, or voice or segment input is invalid, fix the relevant Project state before retrying. For a timeout, retry with the same `idempotency_key`; do not report the job as cancelled.
+Read the current draft before correcting unavailable paragraph numbers or changed order. Refresh the speech catalog for unavailable voice identities. A rejected or changed quote needs a new accepted quote; an uncertain submit keeps its original frozen recovery and per-paragraph operation identities. Query known Jobs first and resume only the original recovery when needed; never regenerate successful children to repair an unknown sibling.
 
 ## Transcript and source-analysis errors
 
-- `MCP_CAPTION_VOICE_AUDIO_NOT_ON_TIMELINE`: The voice asset is bound to a voice segment but no active narration clip is on the timeline. Place it with `aixcut_audio`, reread `timeline`, then run caption `regenerate`. This does not mean the transcript is empty.
 - `MCP_CAPTION_TRANSCRIPT_PENDING`: Voice audio exists or is on the timeline, but transcription is still running. Do not render voice again or fabricate captions. Reread the source later; run caption `regenerate` only when its status is `available`.
 - `MCP_SOURCE_TRANSCRIPT_MISSING`, `MCP_SOURCE_TRANSCRIPT_OUTDATED`, `MCP_SOURCE_TRANSCRIPT_EMPTY`: The source is already in the Project, but its transcript is missing, stale, or empty. Follow `transcript_status` in the error details; re-importing is not the remedy.
 - `MCP_SOURCE_WORD_TIME_LIMIT_INVALID`: A `source_lines` request for word-level timing has more than 50 rows. Lower `limit` or narrow the request with `selectors`.
@@ -92,3 +90,7 @@ Page-export failures appear as `error_code` in `export_timeline_status`, not as 
 ## User-facing reports
 
 When a call fails, state which Tool failed, the exact error code, and what the user needs to do next. Explain in the user's current conversation language. Never present a failed action as successful or claim a fix without read-back evidence.
+
+### Unknown mutation recovery
+
+For `MCP_MUTATION_STATUS_UNKNOWN`, do not replay the payload or mint a new UUID. Preserve the returned `mutation_id`/`idempotency_key`, query `aixcut_read(view="mutation_receipt")`, and follow its `next_action`. `pending`, `unknown`, and `not_found` remain unresolved; only the receipt's authoritative `applied`, `duplicate`, `noop`, or `rejected` status permits a dependent write. A same-identity retry is allowed only when the live contract explicitly returns that recovery action.

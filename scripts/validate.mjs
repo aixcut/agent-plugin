@@ -7,6 +7,8 @@ import { parse as parseYaml } from "yaml";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { verifyCore } from "./core.mjs";
+import { validateSkillClosure } from "./skill-contract-closure.mjs";
+import { verifyRelease } from "./verify-release.mjs";
 
 const scriptRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const args = process.argv.slice(2);
@@ -45,6 +47,7 @@ const validateCodex = async () => {
   if (compatibility.server_contract.min !== catalog.server_contract_version || compatibility.server_contract.max !== catalog.server_contract_version) throw new Error("Server contract range does not match the bundled Tool Catalog.");
   const catalogTools = new Map(catalog.tools.map((tool) => [tool.name, new Set(tool.actions)]));
   const mapping = parseYaml(await readFile(join(root, "contracts/skill-tool-map.yaml"), "utf8"));
+  await validateSkillClosure({ root, mapping, catalog });
   const skillRoot = join(root, "shared/skills");
   const skillNames = (await readdir(skillRoot, { withFileTypes: true })).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
   const mappedNames = mapping.skills.map((entry) => entry.skill).sort();
@@ -80,6 +83,7 @@ const validateCodex = async () => {
     const build = spawnSync(process.execPath, [join(scriptRoot, "scripts/build.mjs"), "--root", root, "--out", out], { encoding: "utf8" });
     if (build.status !== 0) throw new Error(build.stderr || "Codex package build failed.");
     if ((await treeHash(out)) !== (await treeHash(join(root, "codex")))) throw new Error("Committed Codex package is stale; run npm run build and include the generated package.");
+    await verifyRelease(out);
     try { await access(join(out, ".mcp.json")); throw new Error("Codex plugin package must not bundle a fixed MCP endpoint."); } catch (error) { if (error?.code !== "ENOENT") throw error; }
   } finally { await rm(out, { recursive: true, force: true }); }
   console.log(`Validation passed: ${skillNames.length} Skills, ${catalogTools.size} MCP Tools, Codex package.`);

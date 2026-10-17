@@ -1,12 +1,26 @@
 {
   "name": "@aixcut/plugin-core",
-  "version": "1.0.0",
-  "server_contract_version": "1.2.0",
+  "version": "1.1.0",
+  "server_contract_version": "1.3.0",
   "helper_schema_version": "1.0.0",
   "files": {
+    "contracts/action-contract.json": "ad57d32736c707d4f0b3f7efee30e940250ffe7f38aeb719a59b826a639eb823",
+    "contracts/checkpoint.schema.json": "9200c288f8afdc704dcaa2fd8871e3c48c4cb454dd4e5c812a7800fcc9704d06",
+    "contracts/edit-plan.schema.json": "dffd24b55d65a3e6ec9e149654bc3ccc69dce1824605d99546fc7a5c77cd4de2",
+    "contracts/error-taxonomy.json": "25185402533880e07701d3e5fbcf4377e71284dba6deebacd6a4a187e8fec03c",
+    "contracts/mcp-tool-catalog.json": "9876dc2bec68953e42887c2325d21fe857f046674d01f14613958a0f6b7dc398",
+    "contracts/operation-receipt.schema.json": "f29ded34eec4078cf39693344804250c6b988058a338d79f12b6bd54845b93f6",
+    "contracts/review-evidence.schema.json": "f9a9097e98068910e49f55ac1f0650dd23baf86e12f1228f587a83d419efa678",
+    "contracts/trace-event.schema.json": "265bd89b01555b7d896a290da7bcba7871f174a8cab51a87ee0a2e990b5115f4",
     "helpers/download-capture-artifacts.mjs": "68296d02ad0fe0699936c568ca0073c8a3905f9d7ccf0a7d77df4124a6af48fd",
     "helpers/local-media-bridge.mjs": "9db813abc6034e8eb96b8dd8585185af6090c96333cf980325412c7dc349e28b",
-    "references/workflow-boundaries.md": "262fdd348f3e1bd4452705dffe3e114b05e930be3d8326bebf4ad4c6e732af13",
-    "contracts/mcp-tool-catalog.json": "8615a638d035ac083b02ba72b7086909c3c2c5d80c581aee8fc7007fc5bad8d3"
+    "helpers/skill-contract-closure.mjs": "035fc6010f3ffcada6b8928f9335e254fdd17cbc598f012bb61eb8bb2479b947",
+    "helpers/trace-events.mjs": "b8a7440575b545efd7ea14bf5f31dd23cc340534e8bbf6c9930010b9c0d69cac",
+    "helpers/workflow-state.mjs": "53f571d48826b3650537bdc503ec53e6035b4e47e20e2d90670e0112c89f1a9a",
+    "references/orchestration.md": "357c46f28d85d955949e372ff7beeb34a471e3b395d5ede9e74d1e7b1b2c80a2",
+    "references/performance-budget.md": "3c8dbee92240c08e0a60cf7b2bf0ae84828caa7909793251af301b0535f87e0a",
+    "references/quality-gates.md": "6f67543dfcbb83f7703fa057161bc03c43080db0f3255b363356d2a18c896452",
+    "references/speech-workflow.md": "e4a7d7a12d1bb20e9fa539434f793478aae75c42b70512e9104f0db232834951",
+    "references/workflow-boundaries.md": "262fdd348f3e1bd4452705dffe3e114b05e930be3d8326bebf4ad4c6e732af13"
   }
 }

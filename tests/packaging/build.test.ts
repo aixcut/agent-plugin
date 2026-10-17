@@ -29,18 +29,27 @@ const treeHash = (directory: string) => {
 };
 
 describe("Codex package build", () => {
+  it("rejects an output directory that contains package sources before deleting anything", () => {
+    const source = mkdtempSync(join(tmpdir(), "aixcut-output-source-"));
+    try {
+      cpSync(root, source, { recursive: true, filter: (path) => !path.includes("node_modules") && !path.includes("/.git") && !path.includes("/dist") });
+      const result = build(source, source);
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain("cannot overwrite package source");
+      expect(readFileSync(join(source, "shared/skills/aixcut-basics/SKILL.md"), "utf8")).toContain("aixcut-basics");
+    } finally { rmSync(source, { recursive: true, force: true }); }
+  });
+
   it("builds into the marketplace path without deleting its manifest", () => {
-    const result = spawnSync("node", [resolve(root, "scripts/build.mjs")], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    expect(result.status, result.stderr).toBe(0);
-    expect(readFileSync(join(root, "codex/.codex-plugin/plugin.json"), "utf8")).toContain(
+    const output = mkdtempSync(join(tmpdir(), "aixcut-marketplace-build-"));
+    try {
+      const result = build(output);
+      expect(result.status, result.stderr).toBe(0);
+      expect(readFileSync(join(output, ".codex-plugin/plugin.json"), "utf8")).toContain(
       '"name": "aixcut-codex-plugin"',
-    );
-    expect(readFileSync(join(root, "codex/skills/aixcut-basics/SKILL.md"), "utf8")).toContain(
-      "name: aixcut-basics",
-    );
+      );
+      expect(readFileSync(join(output, "skills/aixcut-basics/SKILL.md"), "utf8")).toContain("name: aixcut-basics");
+    } finally { rmSync(output, { recursive: true, force: true }); }
   });
 
   it("copies only the manifest and shared package assets into a portable output", () => {
@@ -95,7 +104,8 @@ describe("Codex package build", () => {
       expect(result.status, result.stderr).toBe(0);
       expect(() => readFileSync(join(output, "skills/aixcut-basics/private-notes.txt"))).toThrow();
       expect(() => readFileSync(join(output, "scripts/private-helper.mjs"))).toThrow();
-      expect(() => readFileSync(join(output, "contracts/mcp-tool-catalog.json"))).toThrow();
+      expect(readFileSync(join(output, "contracts/mcp-tool-catalog.json"), "utf8"))
+        .toBe(readFileSync(join(root, "contracts/mcp-tool-catalog.json"), "utf8"));
     } finally {
       rmSync(source, { recursive: true, force: true });
     }

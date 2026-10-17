@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "plugin": {
+    "name": "aixcut-codex-plugin",
+    "version": "1.2.0",
+    "host": "codex"
+  },
+  "server_contract": {
+    "min": "1.3.0",
+    "max": "1.3.0"
+  },
+  "core": {
+    "name": "@aixcut/plugin-core",
+    "version": "1.1.0",
+    "manifest_sha256": "6f40ac9baea8791ed9b951a7d13ea861a9534d55df99100aa9ffadbf29af050e"
+  },
+  "catalog_sha256": "9876dc2bec68953e42887c2325d21fe857f046674d01f14613958a0f6b7dc398",
+  "files": [
+    {
+      "path": ".codex-plugin/plugin.json",
+      "sha256": "8f07643aca6391fb4196fd2b8a85761ac7862a6765ac7a65b1bd2acac9ad9084"
+    },
+    {
+      "path": "assets/logo.svg",
+      "sha256": "be795a6311a41b9fd35deda78cfd4ab50c70939e1564e1f4449ef0e9afcdb47b"
+    },
+    {
+      "path": "contracts/compatibility.json",
+      "sha256": "8e92176e3cd71531ce40cc91ae08fcd0640229f6bc53b27b42b4baae2caee732"
+    },
+    {
+      "path": "contracts/core/action-contract.json",
+      "sha256": "ad57d32736c707d4f0b3f7efee30e940250ffe7f38aeb719a59b826a639eb823"
+    },
+    {
+      "path": "contracts/core/checkpoint.schema.json",
+      "sha256": "9200c288f8afdc704dcaa2fd8871e3c48c4cb454dd4e5c812a7800fcc9704d06"
+    },
+    {
+      "path": "contracts/core/core-manifest.json",
+      "sha256": "6f40ac9baea8791ed9b951a7d13ea861a9534d55df99100aa9ffadbf29af050e"
+    },
+    {
+      "path": "contracts/core/edit-plan.schema.json",
+      "sha256": "dffd24b55d65a3e6ec9e149654bc3ccc69dce1824605d99546fc7a5c77cd4de2"
+    },
+    {
+      "path": "contracts/core/error-taxonomy.json",
+      "sha256": "25185402533880e07701d3e5fbcf4377e71284dba6deebacd6a4a187e8fec03c"
+    },
+    {
+      "path": "contracts/core/mcp-tool-catalog.json",
+      "sha256": "9876dc2bec68953e42887c2325d21fe857f046674d01f14613958a0f6b7dc398"
+    },
+    {
+      "path": "contracts/core/operation-receipt.schema.json",
+      "sha256": "f29ded34eec4078cf39693344804250c6b988058a338d79f12b6bd54845b93f6"
+    },
+    {
+      "path": "contracts/core/review-evidence.schema.json",
+      "sha256": "f9a9097e98068910e49f55ac1f0650dd23baf86e12f1228f587a83d419efa678"
+    },
+    {
+      "path": "contracts/core/trace-event.schema.json",
+      "sha256": "265bd89b01555b7d896a290da7bcba7871f174a8cab51a87ee0a2e990b5115f4"
+    },
+    {
+      "path": "contracts/core-lock.json",
+      "sha256": "7875a88eb1d0a934f392e7178b43972fa8bd3bcd8e1e4572292bf55ad7a08b98"
+    },
+    {
+      "path": "contracts/core-manifest.json",
+      "sha256": "6f40ac9baea8791ed9b951a7d13ea861a9534d55df99100aa9ffadbf29af050e"
+    },
+    {
+      "path": "contracts/mcp-tool-catalog.json",
+      "sha256": "9876dc2bec68953e42887c2325d21fe857f046674d01f14613958a0f6b7dc398"
+    },
+    {
+      "path": "contracts/skill-tool-map.json",
+      "sha256": "34ecfd0c3702f90c74c02e897f08067bbb67af06eb95533c14bfc1b35bc55f1b"
+    },
+    {
+      "path": "references/core/orchestration.md",
+      "sha256": "357c46f28d85d955949e372ff7beeb34a471e3b395d5ede9e74d1e7b1b2c80a2"
+    },
+    {
+      "path": "references/core/performance-budget.md",
+      "sha256": "3c8dbee92240c08e0a60cf7b2bf0ae84828caa7909793251af301b0535f87e0a"
+    },
+    {
+      "path": "references/core/quality-gates.md",
+      "sha256": "6f67543dfcbb83f7703fa057161bc03c43080db0f3255b363356d2a18c896452"
+    },
+    {
+      "path": "references/core/speech-workflow.md",
+      "sha256": "e4a7d7a12d1bb20e9fa539434f793478aae75c42b70512e9104f0db232834951"
+    },
+    {
+      "path": "references/core/workflow-boundaries.md",
+      "sha256": "262fdd348f3e1bd4452705dffe3e114b05e930be3d8326bebf4ad4c6e732af13"
+    },
+    {
+      "path": "scripts/download-capture-artifacts.mjs",
+      "sha256": "68296d02ad0fe0699936c568ca0073c8a3905f9d7ccf0a7d77df4124a6af48fd"
+    },
+    {
+      "path": "scripts/local-media-bridge.mjs",
+      "sha256": "9db813abc6034e8eb96b8dd8585185af6090c96333cf980325412c7dc349e28b"
+    },
+    {
+      "path": "scripts/release-manifest.mjs",
+      "sha256": "d959c41b61b63f701f366d38eaccd9efd10f1da41de4fe83a46f06f025433f69"
+    },
+    {
+      "path": "scripts/skill-contract-closure.mjs",
+      "sha256": "035fc6010f3ffcada6b8928f9335e254fdd17cbc598f012bb61eb8bb2479b947"
+    },
+    {
+      "path": "scripts/trace-events.mjs",
+      "sha256": "b8a7440575b545efd7ea14bf5f31dd23cc340534e8bbf6c9930010b9c0d69cac"
+    },
+    {
+      "path": "scripts/verify-release.mjs",
+      "sha256": "07d28cfb4eb4887fd154bcbd4e53921ec48764da27c84bedd95acced34cff537"
+    },
+    {
+      "path": "scripts/workflow-state.mjs",
+      "sha256": "53f571d48826b3650537bdc503ec53e6035b4e47e20e2d90670e0112c89f1a9a"
+    },
+    {
+      "path": "skills/aixcut-basics/references/conversation-guidance.md",
+      "sha256": "47b0b9eb8f93fb09496e0b916e92aeb8db06904434413ac7c97894cc3c765962"
+    },
+    {
+      "path": "skills/aixcut-basics/references/language.md",
+      "sha256": "3f45b03e3f4d1ba93dd6b84f674603580d15ab028b6e085b0bf2fd8b1a930c38"
+    },
+    {
+      "path": "skills/aixcut-basics/references/model.md",
+      "sha256": "fe2e34a19c33e1a767e1cf32a06dcdc843c836409cfd9f34cabc90252085d8da"
+    },
+    {
+      "path": "skills/aixcut-basics/SKILL.md",
+      "sha256": "7fc4f4b939d12606366af9626bb0c0e034d5099208a41690e1865f222afcd777"
+    },
+    {
+      "path": "skills/aixcut-captions/references/actions.md",
+      "sha256": "4bf097a6559f4943f53d97e7c5acab50f9fb36a7e90e932f57518bf332f6d505"
+    },
+    {
+      "path": "skills/aixcut-captions/SKILL.md",
+      "sha256": "0d3e11090fced0d6bc0ab117421760829e3daf8be58ecb7223ee931796fa18eb"
+    },
+    {
+      "path": "skills/aixcut-documents/SKILL.md",
+      "sha256": "176283a5dd106c86e9bbfc72218bb1ad598e97d5683d660021d2f2db6d430aa8"
+    },
+    {
+      "path": "skills/aixcut-export/references/actions.md",
+      "sha256": "1caa5d7065a8a7eb1f96119097077b77852df5dffebd126034607b2f63fd2428"
+    },
+    {
+      "path": "skills/aixcut-export/SKILL.md",
+      "sha256": "f7da516793dacdd17d99c379647f1aa7384bdc04847a6ac16801b07729dd66ae"
+    },
+    {
+      "path": "skills/aixcut-generation/references/providers.md",
+      "sha256": "b670bf45eaf970dbce9405741c7ad52fce3eeec65d1ffa28e5dcdf4a40763d19"
+    },
+    {
+      "path": "skills/aixcut-generation/SKILL.md",
+      "sha256": "9b532827bb2df352a70936a82d0fa80e713a8a50eeab12359830053f9820f68a"
+    },
+    {
+      "path": "skills/aixcut-known-errors/SKILL.md",
+      "sha256": "387b3c827110e62394b145c113d47702d36a7460a1381692ade36b3a1666b9f2"
+    },
+    {
+      "path": "skills/aixcut-login/agents/openai.yaml",
+      "sha256": "ffeccf24bada92cad9c37a2f46861cc6ec870845e69a61497f6a536f45ca0df4"
+    },
+    {
+      "path": "skills/aixcut-login/SKILL.md",
+      "sha256": "7500d310f695b28b6a640bd2bcf2a988b2a5c52858bfc2c5d6f06f754b3f2bf2"
+    },
+    {
+      "path": "skills/aixcut-mcp-logout/agents/openai.yaml",
+      "sha256": "19982574e8998a6a85805f3a800d6398b06d4ca3bb2a5c3afaf362ffe7a8c8c4"
+    },
+    {
+      "path": "skills/aixcut-mcp-logout/SKILL.md",
+      "sha256": "46984444ce895d8eac38abd401080b356389d94ec4972b2ebd1de3f31b72c946"
+    },
+    {
+      "path": "skills/aixcut-projects/SKILL.md",
+      "sha256": "fec03e19b38427e8653adfca47b8c8016bbd30952b27202ea11fd531909b75a7"
+    },
+    {
+      "path": "skills/aixcut-talking-head/SKILL.md",
+      "sha256": "ffc3aff00d606df08aca87a36295554673b5a109a3317ce59c39649c9dffaa4c"
+    },
+    {
+      "path": "skills/aixcut-timeline-editing/references/actions.md",
+      "sha256": "9a73c4141cfc48182f33755fb871e71e7df15a0fb35ea4dd17ac0b034247879e"
+    },
+    {
+      "path": "skills/aixcut-timeline-editing/SKILL.md",
+      "sha256": "6b75b98b3585c828aa7af105689872fd2a941af2fa664aa1db560443f26d21fe"
+    },
+    {
+      "path": "skills/aixcut-verification/SKILL.md",
+      "sha256": "8b31513a7ddf9218349277d26a07ac12aecaf57cfeacaf471b616a44560f7954"
+    },
+    {
+      "path": "skills/aixcut-video-assembly/references/pipeline.md",
+      "sha256": "77909813fd829e42dda5328169fe3abcf0de5d757cf1f11c6d4ce7cbc4d488de"
+    },
+    {
+      "path": "skills/aixcut-video-assembly/SKILL.md",
+      "sha256": "6f8049fb3b75cf29caed1e5f3e6c1eb7dccf4959fd60e5785a9241c929bc302f"
+    },
+    {
+      "path": "skills/aixcut-voice/references/actions.md",
+      "sha256": "8c9008ebbf487badcd4c4c332f24500a43d9c4c8227b91772689667babbbd30e"
+    },
+    {
+      "path": "skills/aixcut-voice/references/video-sync.md",
+      "sha256": "ed198ecaae694f0d5b7ccace17abe55214a2b71f88a904ac1243ac082aa7e180"
+    },
+    {
+      "path": "skills/aixcut-voice/SKILL.md",
+      "sha256": "bfa774e5f058c75475935d9acab6e9632a90179303cbd2762ed5805452b703a5"
+    }
+  ]
+}

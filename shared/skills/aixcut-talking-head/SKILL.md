@@ -56,3 +56,7 @@ If an upstream stage changes, revisit dependent stages. Read back after each maj
 ## Completion
 
 Confirm the speech reflects the request, read-back positions are correct, and captions align. Report how many segments were removed and added, plus the new revision. Use `aixcut_review` when visual verification is needed.
+
+## Semantic and natural speech gate
+
+Select takes by semantic units: preserve negation, conditions, numbers, names, required steps and the intended claim. When multiple retakes exist, choose the complete correct take before removing filler. Keep natural breaths and meaningful pauses; inspect joins after each trim so silence removal does not create an audible seam. Optional B-roll, music and overlays remain off during mechanical speech cleanup unless requested. If a speech operation or transcript state is unknown, preserve its identity and read the current state before continuing; do not reapply the edit with a new UUID.
