@@ -1,59 +1,43 @@
-# Voice Action Reference
+# Speech Action Reference
 
-This reference lists fields for `aixcut_voice`. All objects use a strict Schema; extra fields are rejected.
+The `aixcut-voice` Skill keeps its user-facing name. Its MCP workflow uses `aixcut_generate` speech actions. The live Tool Schema is authoritative.
 
-## Common fields
+| Tool | action | Required fields | Meaning |
+| --- | --- | --- | --- |
+| aixcut_generate | catalog | `kind="speech"` | Discover current ready voice profiles and selectable models. |
+| aixcut_generate | speech_read | — | Read ordered paragraph numbers and effective settings. |
+| aixcut_generate | speech_edit | `operation` | Atomically add, update, delete or move paragraphs. |
+| aixcut_generate | speech_quote | exactly one of `segments` or `all=true` | Quote 1–50 nonempty paragraphs and freeze their recovery identities. |
+| aixcut_generate | speech_submit | `recovery` | Submit the exact frozen recovery after its quoted price is accepted. |
+| aixcut_audio | add | media ref | Place explicitly requested published speech audio on the timeline. |
+| aixcut_generate | get | `job_id` | Read each returned Job until terminal. |
 
-- `project_id`: optional; omitted means the current Project.
-- `idempotency_key`: generated automatically. Reuse it only for a retry of the same operation; use a new key for a new intent.
-- `target` / `targets`: Voice refs or IDs from `aixcut_read`; never guess IDs.
-- `items`: array of voice segments.
+## Paragraph edits
 
-## Voice fields
+Read before using paragraph numbers; refresh after changed order or conflicts. `items` is one batch. For add, provide `text` or structured `content`; optional `after=0` means the beginning. For update, each item has a returned `segment` number and changed settings or content. Delete takes returned paragraph numbers. Move takes `segment` and `after`; never invent UUIDs or use voice profile ordinals from another session.
 
-| Field | Meaning |
-| --- | --- |
-| `text` | Voice script in the requested content language. |
-| `speaker` | Speaker identifier. |
-| `voice_profile_id` | Voice profile ID from `Voice.profiles`. |
-| `emotion` | `auto`, `happy`, `sad`, `angry`, `fearful`, `disgusted`, `surprised`, `calm`, or `neutral`. |
-| `speed` | `0.5`, `0.75`, `1`, `1.25`, `1.5`, `1.75`, or `2`. |
-| `volume` | A value from 0 to 1. |
+`voice` is a ready voice identity from `catalog(kind="speech")`. `speed` is 0.5–2, `preview_volume` is 0–100, and emotion must be supported by the live schema/model. `inherit` clears a per-paragraph override for supported settings. `all=true` applies only to supported update/delete forms. A speech draft mutation does not require the Project page; browser placement and preview still require an active bound page.
 
-## Actions
+Read the draft:
 
-| Tool | action | Required | Optional | Description |
-| --- | --- | --- | --- | --- |
-| aixcut_voice | set | `items` | — | Replace all voice segments. |
-| aixcut_voice | add | `items` | — | Append voice segments. |
-| aixcut_voice | update | — | `target`, `targets`, `text`, `speaker`, `voice_profile_id`, `emotion`, `speed`, `volume`, `values` | Update voice segments. |
-| aixcut_voice | delete | — | `target`, `targets` | Delete voice segments. |
-| aixcut_voice | reorder | `order` | — | Reorder segments using the complete list. |
-| aixcut_voice | render | `targets` | `force`, `place`, `start_ms`, `gap_ms`, `track`, `timeout_ms` | Render voice audio; optionally rebuild the dedicated voice track. |
-| aixcut_voice | settings | — | `target`, `targets`, `default_speaker`, `default_voice_profile_id`, `default_emotion`, `default_speed`, `default_volume`, `values` | Update defaults when no target is provided, otherwise update selected segments. |
-
-## Render examples
-
-Render audio only:
-
-```json aixcut_voice
-{
-  "action": "render",
-  "targets": ["v1", "v2"]
-}
+```json aixcut_generate
+{"action":"speech_read"}
 ```
 
-Render and place on the selected track with a 300 ms gap:
+Quote selected paragraph numbers only after reading the current ordered draft:
 
-```json aixcut_voice
-{
-  "action": "render",
-  "targets": ["v1", "v2"],
-  "place": true,
-  "start_ms": 0,
-  "gap_ms": 300,
-  "track": "audio"
-}
+```json aixcut_generate
+{"action":"speech_quote","segments":[1,2]}
 ```
 
-The result contains per-segment output and `placement` status: `applied`, `not_requested`, or a failure. Partial segment failure prevents placement. After timeout, retry with the original `idempotency_key`.
+## Submit and recover
+
+Keep the exact `result.data.recovery` returned by `speech_quote`; after its total credits are accepted, supply it unchanged as `recovery` in `speech_submit`. Do not reconstruct its `operation_id`, input or per-item accepted credit amounts. A stale/changed quote requires a new quote and acceptance, rather than altering the frozen one.
+
+Submission returns per-paragraph `operationId`, `jobId`, status and any published media identity. On `submission_unknown` or a lost submit response, retry only the identical `recovery`; it preserves the original operation identities. Never mint a new quote, edit the paragraph, or create a new identity merely to escape an unknown outcome. Record and continue each known `jobId` with `get`; failed and unknown children remain separately visible. Respect returned polling delays and stop at terminal. Generation success, timeline placement and transcript availability are separate facts.
+
+## Placement
+
+Submit has no `place=true` flag. Wait for published media identities, then use `aixcut_audio` through the timeline editing Skill for explicitly requested placement. Protect existing clips; do not clear and rebuild the dedicated voice track by default. Confirm the target track and range, then reread `timeline`, `audio`, and `sources`.
+
+Automatic captions require the actually placed source to report `transcript_status=available`; a script or a successful Job is not transcription evidence.

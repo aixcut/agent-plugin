@@ -16,7 +16,7 @@ Generation creates a durable Job; it is not a synchronous operation.
 1. Confirm the target Project; read `aixcut_read(view="project")` if needed.
 2. If generation may consume credits and the user has not accepted a quoted amount, call `aixcut_generate(action="quote")`. It does not create a Job. If the quote is nonzero, explain the amount and wait for the user's acceptance before submitting; pass the accepted amount as `accepted_quoted_credits`.
 3. Submit using `aixcut_generate(action="submit")` only after required creative choices are clear and any quoted charge is accepted.
-4. If the envelope returns `status: "async"`, use its top-level `job_id` with `aixcut_generate(action="execute")` to advance the job. `get` only reads status.
+4. If the envelope returns `status: "async"`, retain its top-level `job_id` and use `aixcut_generate(action="get")` to read the durable Job; the server advances work. Never resubmit a queued or running Job.
 5. Use top-level `next_action.after_seconds` for the next poll. Stop when top-level `terminal` is true.
 6. Report top-level `phase`: `waiting` (queued), `processing` (generating), or `finalizing` (publishing to the Project). Do not report only “in progress.”
 7. After generation, place the result on a timeline when the user asked for it.
@@ -55,3 +55,9 @@ Generated media does not guarantee exact beat alignment, lyric timing, or captio
 ## Completion
 
 The Job must be terminal, the asset must be placed if requested, and a timeline read must show the corresponding clip. Report `job_id`, final status, and placed ref.
+
+## Brief, anchors, and recovery
+
+For video or image generation, keep a compact brief with subject, action, camera/composition, lighting/style, duration/aspect ratio, language-bearing text or dialogue, negative constraints, and acceptance evidence. Use stable reference media or first/last-frame anchors when continuity matters; inspect the returned asset before placing it. A `submission_unknown` result is recovered with the original idempotency identity and the same request through the durable Job state. Never submit a fresh Job to resolve an uncertain submission.
+
+After two failed attempts for the same creative goal, inspect the failure evidence and change the approach: use supported reference/edit or anchor inputs, reduce scope with the user's existing authorization, or report the capability limit. Never loop through new paid Jobs just by rewriting prompts. Each separately authorized retry preserves completed assets and records what changed.

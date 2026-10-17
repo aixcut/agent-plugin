@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { validateSkillClosure } from "./skill-contract-closure.mjs";
 
 const args = process.argv.slice(2);
 const value = (name) => {
@@ -30,4 +31,5 @@ for (const name of snapshotNames) {
 for (const [name, actions] of catalogByName) {
   if (actions.length > 0 && !Object.hasOwn(snapshot, name)) throw new Error(`Catalog contains actionful Tool ${name} missing from the server snapshot.`);
 }
+await validateSkillClosure({ root, catalog });
 console.log(`Cross-repository contract passed: ${version}, ${snapshotNames.length} actionful Tools.`);

@@ -32,7 +32,7 @@ Ask the user if the anchor is unclear. Choosing incorrectly causes rework: chang
 
 Trimming, reordering, or deleting visuals can invalidate voice placement. Then:
 
-1. Read `timeline` and `voice` to list current visuals and voice segments.
+1. Read `timeline` and `speech` to list current visuals and voice segments.
 2. Identify which segments still align and which do not.
 3. Reposition only voice segments that are misaligned, using the new visual starts.
 4. If total visual duration changed, edit the script as needed; do not pad it artificially.

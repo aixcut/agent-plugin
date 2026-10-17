@@ -25,7 +25,7 @@ Visual source clips usually do not have a usable transcript. For narrated videos
 
 ## Short path
 
-1. Read `aixcut_read(view="captions")` for current captions and stable refs. Also read `voice` or `timeline` to confirm the voiceover audio is placed.
+1. Read `aixcut_read(view="captions")` for current captions and stable refs. Also read `speech` or `timeline` to confirm the voiceover audio is placed.
 2. For narration, reread the audio source's `transcript_status`. Regenerate only when it is `available`; if pending, wait and reread; report missing, outdated, or empty transcripts accurately.
 3. Read `captions` again to confirm the count, first/last timing, and that generated text came from the transcript.
 4. Before reporting captions complete, verify the caption track has no Motion Graph, `art-text`, or other visual annotation clips. Those elements must remain on their dedicated tracks.

@@ -5,6 +5,8 @@ description: "Assemble a complete video by coordinating visuals, voiceover, capt
 
 # Aixcut Video Assembly
 
+Use the packaged shared [orchestration](../../references/core/orchestration.md) and [quality gates](../../references/core/quality-gates.md) as the common policy; keep browser handoff and local-file operations in their Codex specialist Skills.
+
 ## Conversation guidance
 
 Keep the user oriented at each stage without turning the workflow into a fixed questionnaire. If the goal is clear, inspect the Project and media, then continue safe work. Pause only for a consequential unresolved choice, permission, unaccepted cost or credits, or overwrite/deletion risk. At handoffs, state what is complete, what is next, and whether the user needs to act.
@@ -106,3 +108,9 @@ For upload, asynchronous generation, voice rendering, transcription, or export, 
 Each user requirement must map to a read-back result. Usually read `timeline`, `voice`, and `captions` with `aixcut_read`, then inspect structure with `aixcut_review`.
 
 Report total duration, visual clip count, voice segment count and duration, caption count, music track and fades, and export status. State any incomplete work plainly. If the exported file was not actually played, say “full playback/listening not verified.”
+
+## Plan and evidence artifacts
+
+Before structural writes, form an `EditPlan` with intent, constraints, audio state, transcript dependencies, requested deliverable and export authorization. Form a `ShotPlan` for visual structure with source refs, in/out ranges, output ranges, visible subject and evidence needed for each claim. After each atomic batch save a `Checkpoint` containing the latest revision and affected refs. Finish with `ReviewEvidence` that separates structure, semantic, visual and audio findings; a tool `applied` response alone is not evidence of a good cut. Export only when the user requested or explicitly authorized export.
+
+If transcript generation is queued, processing, interrupted, stale or unknown, preserve the source/media identity and resume its existing operation when the live state permits. Do not re-import or fabricate captions from a script. If a speech submission is unknown, recover its exact frozen quote and operation identities before planning dependent captions.

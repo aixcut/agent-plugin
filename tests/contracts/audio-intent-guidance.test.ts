@@ -72,8 +72,8 @@ describe("Audio intent gating guidance", () => {
     expect(voice).toMatch(/existing voice|已有.*(?:voice|口播|配音)/is);
   });
 
-  it("requires the bound Project page for voice rendering, while allowing script edits without it", () => {
-    expect(voice).toMatch(/voice rendering.*(?:requires|需要).*?(?:target Project page|项目页).*?(?:open|online|打开|在线)/is);
+  it("separates durable speech submission from browser preview and placement", () => {
+    expect(voice).toMatch(/bound Project page.*required.*preview.*not a prerequisite.*speech draft\/quote\/submit/is);
     expect(voice).toMatch(/script.*settings.*(?:do not|无需|不需要).*?(?:Project page|项目页)/is);
   });
 

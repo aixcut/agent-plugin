@@ -5,17 +5,19 @@ description: "Verify Aixcut structure, timeline, voice, captions, and renderabil
 
 # Verify Aixcut Results
 
+Apply the packaged shared [quality gates](../../references/core/quality-gates.md), binding each evidence item to the actual Project, timeline, revision and sampled interval.
+
 ## Conversation guidance
 
 Separate verified facts, unresolved checks, and the next step. Report only what the read-back or review confirms; if a check is unavailable, say what remains unverified and how to complete it.
 
 Every write needs the verification appropriate to the request. A tool result of `applied` is not by itself a final conclusion.
 
-After each atomic batch of structural writes, immediately read back every affected view before continuing. One call that carries the whole batch counts as one batch; do not reread between the items of a single batch. Timeline, audio or voice, and caption writes require rereading the affected `timeline`, audio or `voice`, and `captions` views so the returned refs and state are current.
+After each atomic batch of structural writes, immediately read back every affected view before continuing. One call that carries the whole batch counts as one batch; do not reread between the items of a single batch. Timeline, audio or voice, and caption writes require rereading the affected `timeline`, audio or `speech`, and `captions` views so the returned refs and state are current.
 
 ## Short path
 
-1. Read the affected view, such as `timeline`, `captions`, `speech`, or `voice`.
+1. Read the affected view, such as `timeline`, `captions`, `speech`.
 2. Call `aixcut_review` for structural checks.
 3. Capture frames when the user needs visual confirmation.
 4. Report what passed and what was not checked.
@@ -26,7 +28,7 @@ After each atomic batch of structural writes, immediately read back every affect
 | --- | --- |
 | `project` | Overall Project structure and tracks. |
 | `timeline` | Clip order, duration, gaps, and overlaps. |
-| `voice` | Voice script, profile, and timeline placement. |
+| `timeline` plus `speech` read-back | Voice script, effective profile, and separate timeline placement. |
 | `renderability` | Static structure, source availability, and valid duration. Do not apply removed server-renderer v1 limits. Canvases beyond the 4K UHD pixel budget produce a `CANVAS_HIGH_RESOLUTION` warning; do not change the canvas automatically. |
 
 ## Visual verification
@@ -77,3 +79,7 @@ Report each final review dimension separately: structure, transcript, voice role
 ## Completion
 
 Each user-requested change must have a matching read-back or review result, and the summary must reflect the actual result.
+
+## Evidence dimensions
+
+Final evidence is reported independently for `structure`, `semantic`, `visual`, and `audio`. Each dimension is `pass`, `fail`, or `unjudgeable`; a missing composed frame or actual playback/listening evidence is `unjudgeable`, not a pass. A structural review cannot substitute for a composed timeline frame, transcript evidence, or listening evidence.

@@ -54,6 +54,8 @@ skills:
       required: [aixcut_read, aixcut_generate]
       optional: [aixcut_review, aixcut_timeline]
       forbidden: []
+    actions:
+      aixcut_generate: [quote, submit, get, list, cancel]
     helper: null
     references: [references/providers.md]
 
@@ -154,11 +156,12 @@ skills:
     surfaces: [codex-hosted]
     requires: [aixcut-basics]
     tools:
-      required: [aixcut_read, aixcut_timeline, aixcut_primary, aixcut_voice, aixcut_audio, aixcut_caption, aixcut_review, aixcut_frontend]
+      required: [aixcut_read, aixcut_timeline, aixcut_primary, aixcut_generate, aixcut_audio, aixcut_caption, aixcut_review, aixcut_frontend]
       optional: [aixcut_generate]
       forbidden: []
     actions:
       aixcut_frontend: [export_timeline, export_timeline_status]
+      aixcut_generate: [submit, quote, get, list, cancel]
     helper: null
     references: [references/pipeline.md]
 
@@ -166,8 +169,11 @@ skills:
     surfaces: [codex-hosted]
     requires: [aixcut-basics]
     tools:
-      required: [aixcut_read, aixcut_voice]
-      optional: [aixcut_review]
+      required: [aixcut_read, aixcut_generate]
+      optional: [aixcut_review, aixcut_audio]
       forbidden: []
+    actions:
+      aixcut_generate: [catalog, speech_read, speech_edit, speech_quote, speech_submit, get]
+      aixcut_audio: [add]
     helper: null
     references: [references/actions.md, references/video-sync.md]

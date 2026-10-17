@@ -19,13 +19,6 @@ For multiple versions, call `aixcut_timeline list`, then duplicate the source ti
 | aixcut_primary | replace |
 | aixcut_primary | delete |
 | aixcut_primary | reorder |
-| aixcut_voice | set |
-| aixcut_voice | add |
-| aixcut_voice | update |
-| aixcut_voice | delete |
-| aixcut_voice | reorder |
-| aixcut_voice | render |
-| aixcut_voice | settings |
 | aixcut_audio | add |
 | aixcut_audio | update |
 | aixcut_audio | replace |
@@ -48,7 +41,6 @@ For multiple versions, call `aixcut_timeline list`, then duplicate the source ti
 | aixcut_generate | submit |
 | aixcut_generate | quote |
 | aixcut_generate | get |
-| aixcut_generate | execute |
 | aixcut_generate | list |
 | aixcut_generate | cancel |
 | aixcut_frontend | export_timeline |
@@ -64,7 +56,7 @@ For multiple versions, call `aixcut_timeline list`, then duplicate the source ti
 }
 ```
 
-2. Do not use an old server-side analysis status to decide whether a local video is available. For `import_local_media`, use `import_status` only until the import is settled, then use the returned `media_id` to match the source in `aixcut_read(view="sources")` and check `transcript_status` plus `transcription_tasks` when speech matters. If ASR is pending or running, wait briefly and reread `sources`; do not keep polling a settled import. For `prompt_add_material`, wait for the user's confirmation and match the uploaded file by `file_name` in `sources`.
+2. Do not use an old server-side analysis status to decide whether a local video is available. For `import_local_media`, use `import_status` only until the import is settled, then use the returned `media_id` to match the source in `aixcut_read(view="sources")` and check `transcript_status` plus `transcription_tasks` when speech matters. Active transcription states are `pending`, `queued`, `running`, `processing`, `submitted`, or `retrying`; wait briefly and reread `sources`. Do not keep polling a settled import. For `prompt_add_material`, wait for the user's confirmation and match the uploaded file by `file_name` in `sources`.
 3. For videos with speech, verify that source's `transcript_status` is `available` before reading `source_lines`. Import `ready` does not mean ASR is complete. Without speech or a transcript, use `capture_source_frames` or `capture_timeline_frames` as needed for visual evidence.
 4. Export the assembled video through `aixcut_frontend` page export. Do not branch on whether a complete server-side video copy exists.
 5. If media is missing or insufficient, ask the user to upload it using the “Local media” flow in `aixcut-timeline-editing`, then wait for the upload to finish.
@@ -97,17 +89,17 @@ The conditional order remains visual structure → requested voice only → capt
 
 Run this stage only when the resolved voice intent is `generate-voice` or `replace-original`. For `preserve-original`, keep the source audio and skip rendering. For `needs-clarification`, ask one concise question before rendering.
 
-1. **Render:** Call `aixcut_voice(render)` and wait for per-segment results. One call generates or reuses audio, registers the media, binds voice segments, and starts transcription; do not poll an obsolete voice Job.
-2. **Place audio:** For a full rebuild of the dedicated voice track, pass `place=true` and confirm `placement.status="applied"`. This clears and rebuilds the target voice track. To preserve existing clips or custom timing, omit `place` and place audio with `aixcut_audio`. Reread `timeline` and confirm the clips, timing, and source refs.
-3. Reread the audio source's `transcript_status`. Continue with automatic captions only when `transcript_status=available`; otherwise wait and reread, or report the pending/failed state without fabricating captions.
+1. **Quote and submit:** Follow `aixcut-voice`: read catalog/draft, edit paragraphs, quote selected paragraphs, accept total credits, and submit the exact frozen recovery. Retain every operation identity and returned `jobId`. Poll each known Job with `aixcut_generate(action="get")` until terminal; do not regenerate successful children.
+2. **Place audio:** Use published media refs with `aixcut_audio` only when placement was requested. Submission itself does not place audio or clear a track. Preserve custom timing and existing clips, confirm target range/track, then reread `timeline` and `audio` for matching source refs.
+3. **Transcript:** Reread the placed audio source's `transcript_status`. Only `transcript_status=available` permits automatic captions; report other states and follow the source's recovery guidance without fabricating captions or reimporting media.
 
-If `place` is omitted and no manual placement is done, generated audio is not part of the video. On timeout, the outcome is unknown: retry with the same idempotency key and original parameters.
+An unknown submission resumes the identical frozen recovery; do not create a new operation identity or change scripts while confirming it. Generation, placement, transcript readiness and audio quality have separate evidence.
 
 ## Stage 4: Captions
 
 1. Derive narration captions from the transcript of the voice audio that is actually on the timeline. A written script alone does not prove transcription or caption completion.
 2. When `transcript_status=available`, call `aixcut_caption(regenerate)`, then reread `captions` and check that the text and timing match the voice.
-3. If voice audio is not on the timeline (`MCP_CAPTION_VOICE_AUDIO_NOT_ON_TIMELINE`), place it and reread `timeline`. For pending transcripts (`MCP_CAPTION_TRANSCRIPT_PENDING`), missing, stale, or empty transcripts, follow the error code. Never fabricate a transcript from the script. Continue other editing if possible, but report why captions were not generated.
+3. If voice audio is not on the timeline, place it and reread `timeline`. For pending transcripts (`MCP_CAPTION_TRANSCRIPT_PENDING`), missing, stale, or empty transcripts, follow the error code. Never fabricate a transcript from the script. Continue other editing if possible, but report why captions were not generated.
 4. Captions follow the voice timing, not shot boundaries. Keep each caption to at most two lines and split long sentences at semantic boundaries.
 5. After derivation, reread `captions` and check count, first and last times, text, and mode. A manual write switches to manual mode; do not switch back to automatic mode blindly.
 6. See `aixcut-captions` for caption-specific details.
@@ -134,7 +126,7 @@ Compare the result with the agreed script/shot plan and representative visual ev
 | --- | --- | --- |
 | Total duration | Read `timeline` | Matches the requested duration |
 | Visual continuity | Read `timeline` | No unintended gaps or overlaps |
-| Voice placement | Read `voice` and `timeline` | Voice segments are ready and matching audio clips exist |
+| Voice placement | Read `speech` and `timeline` | Voice segments are ready and matching audio clips exist |
 | Caption count | Read `captions` | Count is reasonable and first/last times align with voice |
 | Music fades | Read `audio` | Music clips have the requested fades |
 | Export readiness | Check `renderability` with `aixcut_review` | No blocking issues |

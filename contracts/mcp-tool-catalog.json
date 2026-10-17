@@ -1,6 +1,6 @@
 {
-  "server_contract_version": "1.2.0",
-  "server_revision": "4bef52136767abb39d868a781471f27fb1a18737",
+  "server_contract_version": "1.3.0",
+  "server_revision": "9ac33e3+working-tree",
   "tools": [
     {
       "name": "aixcut_audio",
@@ -100,10 +100,14 @@
       "name": "aixcut_generate",
       "actions": [
         "cancel",
-        "execute",
+        "catalog",
         "get",
         "list",
         "quote",
+        "speech_edit",
+        "speech_quote",
+        "speech_read",
+        "speech_submit",
         "submit"
       ]
     },
@@ -147,6 +151,7 @@
         "audio",
         "captions",
         "clips",
+        "mutation_receipt",
         "project",
         "refs",
         "review",
@@ -157,8 +162,7 @@
         "speech",
         "text",
         "timeline",
-        "tracks",
-        "voice"
+        "tracks"
       ]
     },
     {
@@ -166,8 +170,7 @@
       "actions": [
         "project",
         "renderability",
-        "timeline",
-        "voice"
+        "timeline"
       ]
     },
     {
@@ -212,18 +215,6 @@
         "ensure",
         "update"
       ]
-    },
-    {
-      "name": "aixcut_voice",
-      "actions": [
-        "add",
-        "delete",
-        "render",
-        "reorder",
-        "set",
-        "settings",
-        "update"
-      ]
     }
   ],
   "error_codes": [
@@ -237,7 +228,6 @@
     "MCP_CAPTION_TRACK_NOT_FOUND",
     "MCP_CAPTION_TRANSCRIPT_EMPTY",
     "MCP_CAPTION_TRANSCRIPT_PENDING",
-    "MCP_CAPTION_VOICE_AUDIO_NOT_ON_TIMELINE",
     "MCP_CLIPOS_REQUEST_FAILED",
     "MCP_CLIPOS_UNAVAILABLE",
     "MCP_COMPONENT_FIELD_UNSUPPORTED",
