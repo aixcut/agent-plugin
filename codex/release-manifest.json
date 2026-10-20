@@ -12,7 +12,7 @@
   "core": {
     "name": "@aixcut/plugin-core",
     "version": "1.1.1",
-    "manifest_sha256": "6fe4b5a88f7634976182371f401ac4a10963f3c2bbfcd6dbba9db3dffdd85f71"
+    "manifest_sha256": "19ebe2084fbd696d4b12cff58016bd58ff74229a03a367a2df829d506e5111ce"
   },
   "catalog_sha256": "126b5d35f889a848ccbc0a696c019529daa2cbd72fdd55fec1dede155b3d92cd",
   "files": [
@@ -38,7 +38,7 @@
     },
     {
       "path": "contracts/core/core-manifest.json",
-      "sha256": "6fe4b5a88f7634976182371f401ac4a10963f3c2bbfcd6dbba9db3dffdd85f71"
+      "sha256": "19ebe2084fbd696d4b12cff58016bd58ff74229a03a367a2df829d506e5111ce"
     },
     {
       "path": "contracts/core/edit-plan.schema.json",
@@ -70,11 +70,11 @@
     },
     {
       "path": "contracts/core-lock.json",
-      "sha256": "f3e42233caadf65abb13e59d12dfc3a290cde24d378775f5e21d8aefff3ce1ab"
+      "sha256": "ed6dba846682e6233b541c1cd66971fa84809f029f01ee70ab18e8f63b1b4c96"
     },
     {
       "path": "contracts/core-manifest.json",
-      "sha256": "6fe4b5a88f7634976182371f401ac4a10963f3c2bbfcd6dbba9db3dffdd85f71"
+      "sha256": "19ebe2084fbd696d4b12cff58016bd58ff74229a03a367a2df829d506e5111ce"
     },
     {
       "path": "contracts/mcp-tool-catalog.json",
@@ -126,7 +126,7 @@
     },
     {
       "path": "scripts/schema-validators.mjs",
-      "sha256": "9a8d770420ce44fe438916b47586b31e3e32008f8e167ad871093f68597280aa"
+      "sha256": "26449333a067472cc7f41e281cc62a7c0c585c96f6ba233145ae4b83e2474d0e"
     },
     {
       "path": "scripts/skill-contract-closure.mjs",
