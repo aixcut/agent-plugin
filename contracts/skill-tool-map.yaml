@@ -10,7 +10,7 @@ skills:
       optional: []
       forbidden: [aixcut_login]
     helper: null
-    references: [references/model.md, references/language.md, references/conversation-guidance.md]
+    references: [references/model.md, references/language.md, references/conversation-guidance.md, references/workflow-host.md]
 
   - skill: aixcut-captions
     surfaces: [codex-hosted]

@@ -19,7 +19,8 @@
       "references": [
         "references/model.md",
         "references/language.md",
-        "references/conversation-guidance.md"
+        "references/conversation-guidance.md",
+        "references/workflow-host.md"
       ]
     },
     {

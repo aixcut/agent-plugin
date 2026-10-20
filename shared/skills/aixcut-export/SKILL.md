@@ -21,6 +21,8 @@ Local video is not uploaded in full. If it has audio, the browser may upload ext
 4. If the user cannot find the file, check the browser download list and blocked-download notice before considering another export.
 5. If the user wants a different format, resolution, or frame rate, submit one new `export_timeline` request. Only one export can run on a page at once; while one is active, query its status instead of submitting again.
 
+Before export, bind the current inspected timeline revision and pass it as `expected_revision` to `export_timeline`. Run the packaged Core `workflow-host.mjs gate` with `{evidence,current:{project_id,timeline_id,revision},deliverable:"export"}` before submitting export. Report export success only if the page status succeeded and current structural evidence still passes the gate; this gate does not prove playback or listening.
+
 The target Project page must be open and initialized. If it is offline or bound to another Project, ask the user to open the target page. If uncertain, call `aixcut_frontend(action="page_status")`.
 
 Local media also requires browser file-access permission. If export or frame capture returns `CAPTURE_PERMISSION_REQUIRED`, ask the user to click anywhere on the Project page and retry the same request. Do not reimport the media.

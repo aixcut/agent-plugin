@@ -90,6 +90,7 @@
         "operation.get",
         "operation.retry",
         "page_status",
+        "playback_check",
         "prompt_add_document",
         "prompt_add_material",
         "timeline.capture_frame",
