@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "server_contract_version": "1.3.0",
   "catalog_path": "contracts/mcp-tool-catalog.json",
-  "catalog_sha256": "9876dc2bec68953e42887c2325d21fe857f046674d01f14613958a0f6b7dc398",
+  "catalog_sha256": "126b5d35f889a848ccbc0a696c019529daa2cbd72fdd55fec1dede155b3d92cd",
   "schemas": {
     "edit_plan": {
       "path": "contracts/edit-plan.schema.json",
@@ -18,7 +18,11 @@
     },
     "review_evidence": {
       "path": "contracts/review-evidence.schema.json",
-      "sha256": "f9a9097e98068910e49f55ac1f0650dd23baf86e12f1228f587a83d419efa678"
+      "sha256": "7b0910c8d54c1ca5fef852f7f0f28bc8b2746867ee8938dd7fbcd0f5c98c9df8"
+    },
+    "plan_context": {
+      "path": "contracts/plan-context.schema.json",
+      "sha256": "c5633a9ad3609c2bd89e2e6a518ec966a9b45270defe8afd9ca3d3c05ee6446e"
     }
   },
   "actions": [

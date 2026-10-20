@@ -4,6 +4,22 @@ import { describe, expect, it } from "vitest";
 const read = (skill: string) => readFileSync(`shared/skills/${skill}/SKILL.md`, "utf8");
 
 describe("Codex intent, recovery and evidence workflow", () => {
+  it("distinguishes bounded playback process evidence from listening quality", () => {
+    const verification = read("aixcut-verification");
+    expect(verification).toContain('playback_check');
+    expect(verification).toMatch(/playback_check.*timeline_id.*expected_revision/s);
+    expect(verification).toMatch(/audio_review.*unjudgeable/s);
+  });
+  it("uses packaged executable recovery and delivery gates with a host-owned directory", () => {
+    const basics = read("aixcut-basics");
+    expect(basics).toContain("workflow-host.mjs");
+    expect(basics).toMatch(/save --directory/);
+    expect(basics).toMatch(/resume --directory/);
+    expect(basics).toMatch(/host_storage_unavailable|persisted: false/);
+    expect(read("aixcut-verification")).toMatch(/workflow-host.mjs.*gate/s);
+    expect(read("aixcut-export")).toMatch(/gate.*deliverable.*export/s);
+    expect(read("aixcut-export")).toMatch(/expected_revision/);
+  });
   it("keeps mechanical edits narrow and resumes unknown writes through a receipt", () => {
     const basics = read("aixcut-basics");
     expect(basics).toContain("intent → inspect → plan → execute → verify → deliver");
@@ -29,6 +45,14 @@ describe("Codex intent, recovery and evidence workflow", () => {
     expect(verification).toMatch(/pass.*fail.*unjudgeable/is);
     expect(verification).toMatch(/composed frame/is);
     expect(verification).toMatch(/listening.*unjudgeable/is);
+  });
+
+  it("requires visual evidence whenever timing changes alter the visible composition", () => {
+    const verification = read("aixcut-verification");
+    expect(verification).toMatch(/skip.*only when.*visible composition (?:is )?unchanged/is);
+    expect(verification).toMatch(/trim.*split.*move.*speed.*(?:visible|composition)/is);
+    expect(verification).toMatch(/volume.*fade.*audio.*(?:evidence|unjudgeable)/is);
+    expect(verification).not.toMatch(/Do not capture frames for timing-only edits \(trim, split, move, speed\), volume, fades, caption wording, or track add\/remove\)/i);
   });
 
   it("makes unknown-error recovery read-only and budgets repeated fixes", () => {

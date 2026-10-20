@@ -16,9 +16,9 @@ Generation creates a durable Job; it is not a synchronous operation.
 1. Confirm the target Project; read `aixcut_read(view="project")` if needed.
 2. If generation may consume credits and the user has not accepted a quoted amount, call `aixcut_generate(action="quote")`. It does not create a Job. If the quote is nonzero, explain the amount and wait for the user's acceptance before submitting; pass the accepted amount as `accepted_quoted_credits`.
 3. Submit using `aixcut_generate(action="submit")` only after required creative choices are clear and any quoted charge is accepted.
-4. If the envelope returns `status: "async"`, retain its top-level `job_id` and use `aixcut_generate(action="get")` to read the durable Job; the server advances work. Never resubmit a queued or running Job.
+4. If the envelope returns `status: "async"`, retain its top-level `job_id` and use `aixcut_generate(action="get")` to read the durable Job; ClipOS runs accepted Jobs independently of polling or the browser connection. Never resubmit a queued or running Job.
 5. Use top-level `next_action.after_seconds` for the next poll. Stop when top-level `terminal` is true.
-6. Report top-level `phase`: `waiting` (queued), `processing` (generating), or `finalizing` (publishing to the Project). Do not report only “in progress.”
+6. Report `result.data.job.phase`: `waiting` (queued), `processing` (generating), or `finalizing` (publishing to the Project). Do not report only “in progress.”
 7. After generation, place the result on a timeline when the user asked for it.
 
 For multiple video versions, the assembly Skill first lists and duplicates timelines with `aixcut_timeline(action="list")`. `aixcut_generate` creates Project-level assets that can be reused by multiple `timeline_id`s. Place and verify the result on each requested timeline.

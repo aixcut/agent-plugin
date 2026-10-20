@@ -39,7 +39,7 @@ Frame capture is conditional. It is required when:
 - A lower third, caption position, or caption visibility changes.
 - The user asks whether something is obscured or how it looks.
 
-Do not capture frames for timing-only edits (trim, split, move, speed), volume, fades, caption wording, or track add/remove. Those changes do not alter the image; capture would only add latency and context.
+Do not capture frames for timing-only edits (trim, split, move, or speed), volume, or fades when they do not change the visible composition; volume and fades use audio evidence instead. Skip timing-only frame capture only when the final visible composition is unchanged. If the edit changes which image is visible, subtitle placement, or the layer relationship at any sampled time, capture the affected timeline frames. Without actual playback or listening, volume and fades remain `unjudgeable`, not a quality pass.
 
 ### Capture procedure
 
@@ -57,6 +57,12 @@ Do not capture frames for timing-only edits (trim, split, move, speed), volume, 
 - If `frames` is missing, use `composition.clips` as the full timeline roster and map each image to its time.
 - The roster's `visual_position` should match the read-back: `preset` is a named position, `box` is a freeform proportional box, and `auto` means the editor is arranging it automatically.
 - If an element obscures another element or captions, report the offending ref and return the change to `aixcut-timeline-editing`; after the edit, capture again. Verification is read-only and must not fix the position itself. Do not infer the corrected result from the first image.
+
+## 有界播放检查
+
+仅当公开 Schema 包含此动作时，使用 `aixcut_frontend(action="playback_check")`，携带当前页面的 `timeline_id`、最新 `expected_revision`、`start_ms` 和 `target_ms`；一次区间最多 10 秒。它会短时播放并还原播放头，不修改工程；用户正在播放时拒绝接管。只有 `started=true`、`reached_target=true`、`interrupted=false`、`playback_error=null` 才能证明该区间的播放时钟推进。绑定过期时重新读取，用户接管时停止检查。
+
+`audio_track_present` 仅证明轨道结构，`audio_review=unjudgeable` 仍需实际试听。区间检查不能证明全片可播放、音画同步或声音质量，不能据此把音频证据改成 pass。
 
 ## Pre-export checks
 
@@ -83,3 +89,5 @@ Each user-requested change must have a matching read-back or review result, and 
 ## Evidence dimensions
 
 Final evidence is reported independently for `structure`, `semantic`, `visual`, and `audio`. Each dimension is `pass`, `fail`, or `unjudgeable`; a missing composed frame or actual playback/listening evidence is `unjudgeable`, not a pass. A structural review cannot substitute for a composed timeline frame, transcript evidence, or listening evidence.
+
+Before reporting the requested deliverable, run the packaged Core gate with `node <plugin-root>/scripts/workflow-host.mjs gate` and JSON `{evidence,current:{project_id,timeline_id,revision},deliverable:"report"|"quality"|"export"}` on stdin. `current` must be the latest inspected binding. A failed gate is a stop condition; report its reasons and the next inspection needed. This gate validates claims and revision binding; it does not itself inspect media.
