@@ -11,6 +11,29 @@ This reference lists fields for each action. Follow the main Skill for workflow,
 - `timeline_id`: Target timeline UUID. Include it in every read, edit, capture, and review for multi-version work; omit only for a single version using the default timeline.
 - Every Tool accepts a strict object. Send only fields listed here; extra fields are rejected.
 
+## Frontend request shapes
+
+`aixcut_frontend` has two input shapes; follow the live action schema rather than moving fields between them:
+
+- Shared file actions (`media.*` and `timeline.*`, including `timeline.export_range`) keep `action` at the top level and put action-specific fields inside `params`. For example, `media.list` takes an empty `params` object.
+- Fixed page actions use top-level fields as declared by their action schema. This includes `page_status`, `playback_check`, frame capture, local-media import/status, Project document actions, and `export_timeline` / `export_timeline_status`; do not wrap these fields in `params`.
+
+```json aixcut_frontend
+{"action":"media.list","params":{}}
+```
+
+```json aixcut_frontend
+{
+  "action":"playback_check",
+  "timeline_id":"<timeline id from the latest read>",
+  "expected_revision":12,
+  "start_ms":0,
+  "target_ms":2000
+}
+```
+
+Replace the playback example's timeline ID and revision with values from the current Project. `playback_check` uses `target_ms`, not `end_ms`.
+
 ## Field groups
 
 | Group | Fields |
@@ -80,6 +103,17 @@ Pass only the field needed; omitted means 0. Audio clips map to `audioFadeInMs`/
 }
 ```
 
+## Batched item fields
+
+For `aixcut_text(action="add")`, per-item `start_ms` and `duration_ms` belong in each `items[]` entry. The optional top-level `start_ms` is an action-level initial offset; use item fields when entries need their own start or duration. The live schema remains authoritative.
+
+```json aixcut_text
+{
+  "action":"add",
+  "items":[{"text":"标题","start_ms":0,"duration_ms":1500}]
+}
+```
+
 ## Action table
 
 | Tool | action | Required (besides `action`) | Optional | Description |
@@ -144,7 +178,7 @@ Pass only the field needed; omitted means 0. Audio clips map to `audioFadeInMs`/
 
 `import_local_media` and `prompt_add_material` both return acceptance, not completed library ingestion. The first returns `import_ids` for `import_status`; the second has no import ID and must be confirmed by rereading `aixcut_read(view="sources")`. A batch uses `url` for one file or `urls` for up to eight; per-file failures appear in `failures`.
 
-Page export (`export_timeline`, `export_timeline_status`) also uses `aixcut_frontend`, but belongs to `aixcut-export` and is not listed here.
+Page export (`export_timeline`, `export_timeline_status`) also uses `aixcut_frontend`, but belongs to `aixcut-export` and is not listed in this action table.
 
 ## Complete request examples
 
