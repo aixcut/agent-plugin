@@ -116,6 +116,8 @@ node "$BRIDGE" /absolute/path/a.mp4 /absolute/path/b.mp4 --allowed-origin "<MCP 
 
 The helper checks an existing bridge's health or starts a new one, waits until it is ready, and only then returns URLs. Do not call `aixcut_frontend(action="import_local_media")` until this command succeeds. Never invent the origin, URL, or port. The helper manages its own background process and port, reuses a running bridge when possible, and expires after its TTL; do not wrap it in `screen`, `nohup`, or `&`.
 
+If stale state remains after a crashed bridge, use `--no-reuse` on the helper command to start a fresh bridge. Use it only for recovery; old bridge URLs may stop working.
+
 If the helper command fails, inspect its exact error and the reported log file before deciding what to do. Do not ask the user to start the bridge or switch to manual upload after the first failure. Retry the same helper command once for a transient startup or health failure; it will recheck/restart the bridge. Do not retry missing files, unreadable paths, a missing Site origin, or a missing helper—report the specific blocker. Offer manual upload only after the bounded retry fails or a required local capability is unavailable, and explain why.
 
 After the helper succeeds, use the printed `files[].url` values in one `aixcut_frontend(action="import_local_media")` call, with `url` for one file or `urls` for up to eight. A ready bridge does not prove the Project page can fetch it. If import reports bridge-unreachable or URL failures, rerun the helper for only the failed files and retry those once with the new URLs. Report only files that still fail; offer manual upload only after that recovery fails.

@@ -282,16 +282,46 @@
       },
       "actions": {
         "aixcut_frontend": [
+          "page_status",
           "capture_source_frames",
           "capture_timeline_frames",
+          "playback_check",
           "prompt_add_material",
+          "prompt_add_document",
+          "list_documents",
           "import_local_media",
-          "import_status"
+          "import_status",
+          "export_timeline",
+          "export_timeline_status",
+          "media.list",
+          "media.inspect",
+          "media.add",
+          "media.local_status",
+          "media.prepare_local",
+          "media.bind_local",
+          "media.copy_to_opfs",
+          "media.save_to_disk",
+          "media.upload",
+          "media.delete",
+          "media.delete_cloud",
+          "media.associate_remote",
+          "media.resolve_cloud_url",
+          "media.replace_source",
+          "media.extract_audio",
+          "media.analyze",
+          "media.capture_frame",
+          "timeline.capture_frame",
+          "media.export_range",
+          "timeline.export_range",
+          "operation.get",
+          "operation.cancel",
+          "operation.retry"
         ]
       },
       "helper": "plugin-core/helpers/download-capture-artifacts.mjs",
       "references": [
-        "references/actions.md"
+        "references/actions.md",
+        "references/frontend-actions.md"
       ]
     },
     {
@@ -313,7 +343,9 @@
         "forbidden": []
       },
       "helper": "plugin-core/helpers/download-capture-artifacts.mjs",
-      "references": []
+      "references": [
+        "references/actions.md"
+      ]
     },
     {
       "skill": "aixcut-video-assembly",

@@ -77,6 +77,7 @@ Defaults come from server configuration and may vary by environment. `kind` may 
 
 | Tool | action | Required fields | Optional fields | Behavior |
 | --- | --- | --- | --- | --- |
+| aixcut_generate | catalog | — | `kind` (`image`, `video`, `music`, `speech`) | List available provider/model choices. If `kind` is omitted, the default is `speech`. |
 | aixcut_generate | quote | — | `kind`, `prompt`, `name`, `provider`, `model`, `input` | Estimate credits and validate generation permission; creates no Job. |
 | aixcut_timeline | list | — | — | List version timelines. |
 | aixcut_timeline | create | — | `name`, `source_timeline_id` | Create an empty timeline or copy one. |

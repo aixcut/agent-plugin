@@ -15,21 +15,21 @@ This reference maps each `aixcut_caption` action to its fields. Source selection
 
 | Tool | action | Required besides `action` | Optional | Description |
 | --- | --- | --- | --- | --- |
-| aixcut_caption | mode | `mode` | — | Set caption mode: `auto` follows the primary video track and rebuilds all captions, replacing manual content; `manual` allows direct editing. |
-| aixcut_caption | regenerate | — | — | Rebuild the caption track from video-clip transcripts. If no transcript exists, it returns an empty result with a warning. |
-| aixcut_caption | set | `items` | — | Replace all captions. |
-| aixcut_caption | add | `items` | `start_ms` | Append captions; if no start is supplied, append at the end. |
+| aixcut_caption | mode | `mode` | — | Set the follow flag: `auto` follows the primary video track; `manual` allows direct editing. Changing the flag does not rebuild or replace captions. |
+| aixcut_caption | regenerate | `plan_context` | — | Rebuild the caption track from video-clip transcripts. Run only when `transcript_status=available`; otherwise returns an empty result with `MCP_CAPTION_TRANSCRIPT_EMPTY`. |
+| aixcut_caption | set | `items`, `plan_context` | — | Replace all captions and switch the track to `manual`. |
+| aixcut_caption | add | `items` | `start_ms` | Append captions and switch the track to `manual`; if no start is supplied, append at the end. |
 | aixcut_caption | update | `target` | `text`, `values`, `style`, `highlight_ranges`, `x`, `y`, `enabled`, `duration_ms` | Update one caption's fields or content. |
-| aixcut_caption | delete | `target` | — | Delete one caption. |
-| aixcut_caption | split | `target` | `at_ms`, `char_index`, `to_ms` | Split one caption into two by time or character position. |
+| aixcut_caption | delete | `target`, `plan_context` | — | Delete one caption and switch the track to `manual`. |
+| aixcut_caption | split | `target` | At least one of `at_ms`, `char_index`, `to_ms` | Split one caption into two by time or character position. Existing `highlightRanges` are copied, not remapped; reread and correct highlights after splitting. |
 | aixcut_caption | style | `target` | `style`, `highlight_ranges`, `x`, `y` | Update caption style or position. |
 | aixcut_caption | highlight | `target` | `highlight_ranges` | Set highlights as an array of `{ start, end }` character ranges. |
 
 ## Caption mode
 
-- Manual writes, wording changes, splits, deletions, styling, and highlights switch the track to `manual`; no additional `mode` action is needed.
+- `set`, `add`, wording changes, splits, deletions, styling, and highlights switch the track to `manual`; no additional `mode` action is needed.
 - `regenerate` does not change the mode; it rebuilds the track from transcripts.
-- Use `mode="auto"` only when restoring automatic following. It rebuilds all captions and overwrites manual content.
+- `mode="auto"` only toggles automatic following; it does not rebuild or overwrite manual content. Use `regenerate` when an actual rebuild is requested and the transcript is available.
 - Read the current mode from `aixcut_read`'s `captions` view; the value is `auto` or `manual`.
 
 ## Full replacement example

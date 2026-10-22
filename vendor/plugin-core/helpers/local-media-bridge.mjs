@@ -117,6 +117,16 @@ export const clearBridgeState = (stateFile) => {
 };
 
 /**
+ * 桥的服务进程必须拿干净的环境起。
+ *
+ * 宿主会给子进程注入 NODE_OPTIONS（沙箱文件代理之类的 --require）。桥继承它以后，
+ * 读用户文件走的就是宿主代理；会话一结束代理失效，第一次取文件就报
+ * connect failed: Connection refused。清掉它，桥只用自己的 node 读盘。
+ */
+export const bridgeChildEnv = (env = process.env) =>
+  Object.fromEntries(Object.entries(env).filter(([key]) => key !== 'NODE_OPTIONS'));
+
+/**
  * 已在跑的桥能不能直接服务这次的文件。
  * 只要过期、或有一个文件它没在服务，就必须起新的。
  */
@@ -155,6 +165,17 @@ export const probeBridgeHealth = async (baseUrl, token, timeoutMs = PROBE_TIMEOU
     return null;
   } finally {
     clearTimeout(timer);
+  }
+};
+
+/** 只探活，不真的发信号；PID 已经被回收或不存在时返回 false。 */
+export const processIsRunning = (pid) => {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error?.code === 'EPERM';
   }
 };
 
@@ -273,18 +294,70 @@ const runServer = (options, stateFile) => {
       sendJson(res, 404, { error: 'not-found' }, origin, options.allowedOrigin);
       return;
     }
-    res.writeHead(200, {
+    // 起桥之后文件可能被删掉、换掉或变成目录。这时必须回一个可读的 500，
+    // 不能把异常抛进请求处理里——桥是长驻进程，崩掉以后页面只会看到连接被重置，
+    // 于是导入被误判成「被取消」，真实原因反而查不到。
+    let lastModified = '';
+    try {
+      const stats = fs.statSync(entry.path);
+      if (!stats.isFile()) throw new Error('not a regular file');
+      lastModified = String(stats.mtimeMs);
+    } catch (error) {
+      sendJson(
+        res,
+        500,
+        {
+          error: 'file-unreadable',
+          message: `bridge cannot read ${entry.name}: ${error instanceof Error ? error.message : String(error)}`,
+        },
+        origin,
+        options.allowedOrigin,
+      );
+      return;
+    }
+    const responseHeaders = {
       ...corsHeaders(origin, options.allowedOrigin),
       'Content-Type': 'application/octet-stream',
       'Content-Length': entry.size,
       'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(entry.name)}`,
-      'X-Aixcut-Last-Modified': String(fs.statSync(entry.path).mtimeMs),
-    });
+      'X-Aixcut-Last-Modified': lastModified,
+    };
     if (req.method === 'HEAD') {
+      res.writeHead(200, responseHeaders);
       res.end();
       return;
     }
-    fs.createReadStream(entry.path).pipe(res);
+
+    // 等文件确实打开后再发 200。权限在桥启动后被收回时，createReadStream 会
+    // 异步报错；若先写响应头，调用方只能得到断开的 200，无法区分读盘失败。
+    const stream = fs.createReadStream(entry.path);
+    stream.once('open', () => {
+      if (res.destroyed) {
+        stream.destroy();
+        return;
+      }
+      res.writeHead(200, responseHeaders);
+      stream.pipe(res);
+    });
+    stream.once('error', (error) => {
+      console.error(
+        JSON.stringify({
+          at: new Date().toISOString(),
+          event: 'media-read-failed',
+          name: entry.name,
+          message: error instanceof Error ? error.message : String(error),
+        }),
+      );
+      if (!res.headersSent) {
+        sendJson(res, 500, {
+          error: 'file-unreadable',
+          message: `bridge cannot read ${entry.name}: ${error instanceof Error ? error.message : String(error)}`,
+        }, origin);
+      } else {
+        res.destroy();
+      }
+    });
+    res.on('close', () => stream.destroy());
   });
 
   server.listen(options.port, '127.0.0.1', () => {
@@ -349,7 +422,7 @@ const startDetachedBridge = async (options, stateFile) => {
       stateFile,
       ...(options.allowedOrigin ? ['--allowed-origin', options.allowedOrigin] : []),
     ],
-    { detached: true, stdio: ['ignore', logFd, logFd] },
+    { detached: true, stdio: ['ignore', logFd, logFd], env: bridgeChildEnv() },
   );
   child.unref();
   fs.closeSync(logFd);
@@ -376,8 +449,17 @@ const runStatus = async (stateFile) => {
 const runStop = async (stateFile) => {
   const state = readBridgeState(stateFile);
   if (!state) return { stopped: false, reason: 'no-state' };
-  if (!(await probeBridgeHealth(state.base_url, state.token)))
+  if (!(await probeBridgeHealth(state.base_url, state.token))) {
+    // 桥崩掉以后端口已经失效，健康检查必然失败。这时还拒绝清理状态文件，
+    // 只会把一条死掉的端口和 URL 一直留在磁盘上，下一次起桥也跟着不干净。
+    // 只有确认记录的进程真的不在了才清理；进程还活着但探不通时不动它，
+    // 免得把 PID 被复用的无关进程连带清掉。
+    if (Number.isInteger(state.pid) && !processIsRunning(state.pid)) {
+      clearBridgeState(stateFile);
+      return { stopped: true, reason: 'process-exited' };
+    }
     return { stopped: false, reason: 'bridge-not-verified' };
+  }
   if (Number.isInteger(state.pid)) {
     try {
       process.kill(state.pid, 'SIGTERM');
@@ -399,7 +481,9 @@ export const runBridgeCommand = async (argv, { home } = {}) => {
   if (options.mode === 'stop') return runStop(stateFile);
   if (options.foreground) return runServer(options, stateFile);
   if (options.files.length === 0)
-    throw new Error('usage: local-media-bridge.mjs <file...> [--port N] [--ttl-ms N]');
+    throw new Error(
+      'usage: local-media-bridge.mjs <file...> [--allowed-origin HTTPS_ORIGIN] [--port N] [--ttl-ms N] [--state-file PATH] [--no-reuse]',
+    );
 
   const absoluteFiles = options.files.map((file) => path.resolve(file));
   const existing = readBridgeState(stateFile);
