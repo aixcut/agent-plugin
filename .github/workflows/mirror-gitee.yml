@@ -1,0 +1,43 @@
+name: Mirror main to Gitee
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mirror-gitee-main
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    env:
+      GITEE_USERNAME: ${{ secrets.GITEE_USERNAME }}
+      GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Require Gitee credentials
+        run: |
+          test -n "$GITEE_USERNAME"
+          test -n "$GITEE_TOKEN"
+
+      - name: Mirror main and tags
+        run: |
+          git config credential.helper '!f() { printf "%s\n" "$GITEE_USERNAME" "$GITEE_TOKEN"; }; f'
+          git remote add gitee https://gitee.com/aixcut/agent-plugin.git
+          git push gitee HEAD:main
+          git push gitee --tags
+
+      - name: Verify the Gitee mirror is anonymously readable
+        run: |
+          GIT_TERMINAL_PROMPT=0 git -c credential.helper= ls-remote https://gitee.com/aixcut/agent-plugin.git HEAD

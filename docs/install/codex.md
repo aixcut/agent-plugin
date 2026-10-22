@@ -10,6 +10,12 @@
 codex plugin marketplace add aixcut/agent-plugin --ref main --sparse .agents/plugins --sparse codex
 ```
 
+中国大陆网络可从 Gitee 镜像安装同一份 `main` 分支：
+
+```bash
+codex plugin marketplace add https://gitee.com/aixcut/agent-plugin.git --ref main --sparse .agents/plugins --sparse codex
+```
+
 然后打开 Codex 插件目录：
 
 ```text
