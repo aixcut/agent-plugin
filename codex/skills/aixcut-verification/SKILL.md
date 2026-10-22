@@ -7,6 +7,8 @@ description: "Verify Aixcut structure, timeline, voice, captions, and renderabil
 
 Apply the packaged shared [quality gates](../../references/core/quality-gates.md), binding each evidence item to the actual Project, timeline, revision and sampled interval.
 
+For the `aixcut_review` view parameters and result fields, see [Review Action Reference](references/actions.md).
+
 ## Conversation guidance
 
 Separate verified facts, unresolved checks, and the next step. Report only what the read-back or review confirms; if a check is unavailable, say what remains unverified and how to complete it.

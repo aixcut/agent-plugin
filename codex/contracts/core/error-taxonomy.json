@@ -33,9 +33,13 @@
       "next_action": "reinspect",
       "codes": [
         "MCP_FRONTEND_TIMELINE_STALE",
+        "MCP_PLAN_ACTION_UNAUTHORIZED",
+        "MCP_PLAN_REQUIRED",
+        "MCP_PLAN_REVISION_STALE",
+        "MCP_PLAN_SCOPE_CONFLICT",
         "MCP_SOURCE_TRANSCRIPT_OUTDATED"
       ],
-      "policy": "只重新读取并重算受影响计划，不盲重放旧 refs"
+      "policy": "重新读取当前 Project/Timeline 并重建最小计划；不得扩大用户授权，也不得带着 stale refs 重放"
     },
     {
       "id": "pending",

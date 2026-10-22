@@ -30,3 +30,7 @@ Clarify these two common ambiguities:
 - The Studio page is the user's final review surface. A data write alone is not proof that the visible edit is correct.
 - Live server schemas and source code are authoritative. Use the live Tool Schema for parameters; Skills describe workflow and boundaries.
 - If a Tool is unavailable, a page is offline, or authorization fails, report that state plainly. Never imply another Tool completed the unavailable operation.
+
+## Mutation references
+
+After a successful write, use the **values** in `ref_map` as the refs for later calls; keys are labels scoped to that response, not durable IDs. Clip additions use `new:1`, `new:2`, and so on in the order of that one batch. Track ensure uses the requested name, role, or kind as its key. Duplicate/replace results key the new clip by the old clip ref; a split uses `<old-clip-ref>:right` for the new right-hand clip. Returned values such as `clip:<id>` and `track:<id>` are the stable refs to pass as later targets. Do not carry a `new:N` key across batches, infer refs from names, or expect a track key to survive a rename; reread the timeline when a ref is no longer current.

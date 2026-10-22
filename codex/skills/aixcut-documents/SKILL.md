@@ -68,7 +68,8 @@ A local MCP process may use:
 
 | Error | Recovery |
 | --- | --- |
-| `MCP_DOCUMENT_PATH_INVALID`, `MCP_DOCUMENT_NOT_FOUND` | Confirm the path with the user, then retry. |
+| `MCP_DOCUMENT_PATH_INVALID` | Confirm that the path is absolute and visible to the MCP process, then retry once. |
+| `MCP_DOCUMENT_NOT_FOUND` | If this is a hosted MCP and the file exists only on the user's computer, do not retry or send that path again. Use `aixcut_frontend(action="prompt_add_document")`, then verify with `list_documents`. For a local MCP process, confirm the path is visible to that process before retrying. |
 | `MCP_DOCUMENT_EMPTY`, `MCP_DOCUMENT_TOO_LARGE` | Report that the file is empty or over the limit and ask for another file. |
 | `MCP_DOCUMENT_MIME_UNSUPPORTED` | Report that the type is unsupported; do not relabel it to force an upload. |
 | `MCP_DOCUMENT_CONTENT_REQUIRED`, `MCP_DOCUMENT_ENCODING_INVALID`, `MCP_DOCUMENT_CONTENT_TOO_LARGE` | Supply actual `content` or reduce the extracted text, then retry. |

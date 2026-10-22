@@ -31,7 +31,7 @@ Resolve only the language choice relevant to the requested asset: visible text f
 
 ## Generation types
 
-- `kind` is `image`, `video`, or `music`; the server processes music as audio.
+- Generation Jobs use `kind=image`, `video`, or `music`; the server processes music as audio. To discover providers/models, `aixcut_generate(action="catalog")` also supports `kind=speech`. If `kind` is omitted from `catalog`, the server returns speech models by default.
 - If the user does not specify a provider, use the server default. Override only on explicit request.
 - Prompt, style, duration, and language-bearing content should follow the user's brief; do not rewrite the creative direction without reason.
 

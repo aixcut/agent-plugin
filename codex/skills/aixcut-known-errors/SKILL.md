@@ -40,6 +40,11 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 
 ## Mutation conflicts and uncertain state
 
+- `MCP_PLAN_REQUIRED`: This mutation is protected by the plan guard. Read the current Project and timeline, build a fresh `plan_context` for the intended action, and retry; do not reuse a stale revision or broaden `authorized_actions` beyond the user's request.
+- `MCP_PLAN_REVISION_STALE`: The Project changed after it was read. Confirm the original mutation receipt, reread the current timeline, and rebuild the plan; do not replay stale refs.
+- `MCP_PLAN_SCOPE_CONFLICT`: The plan's Project/Timeline, refs, preserve/delete lists, or declared deletions do not match the mutation. Reread and rebuild the exact scope; do not remove protections just to make the mutation pass.
+- `MCP_PLAN_ACTION_UNAUTHORIZED`: The action is outside `authorized_actions` or the mechanical plan's allowed operations. Do not broaden the plan; ask the user if the requested result requires additional scope.
+- `MCP_TRACK_LOCKED`: The target track is locked. Read its current state. If unlocking is part of the user's authorized request, call `aixcut_track(action="update", locked=false)`, reread, then retry the intended clear/delete with a fresh `plan_context`.
 - `MCP_MUTATION_SERVER_REJECTED`: Read the latest snapshot and regenerate the operation. Do not replay the old payload unchanged.
 - `NLE_IDEMPOTENCY_CONFLICT`: The key is already bound to a different project, timeline, or action. Read the timeline and confirm whether the earlier write already achieved the intent before redoing. A same-key retry against the same target is reported as a replay instead, not as this error.
 - `MCP_TRACK_ENSURE_NOT_APPLIED`: Read-back found no track. Confirm the original receipt and current timeline before correcting anything; an absent projection alone does not authorize a new-key write.
@@ -83,6 +88,7 @@ Read the current draft before correcting unavailable paragraph numbers or change
 ## Transcript and source-analysis errors
 
 - `MCP_CAPTION_TRANSCRIPT_PENDING`: Voice audio exists or is on the timeline, but transcription is still running. Do not render voice again or fabricate captions. Reread the source later; run caption `regenerate` only when its status is `available`.
+- `MCP_CAPTION_TRANSCRIPT_EMPTY`: No usable transcript is available for caption regeneration. Do not retry unchanged or report that captions were rebuilt. Inspect the source transcript state; continue only after a transcript becomes available or ask the user for subtitle copy.
 - `MCP_SOURCE_TRANSCRIPT_MISSING`, `MCP_SOURCE_TRANSCRIPT_OUTDATED`, `MCP_SOURCE_TRANSCRIPT_EMPTY`: The source is already in the Project, but its transcript is missing, stale, or empty. Follow `transcript_status` in the error details; re-importing is not the remedy.
 - `MCP_SOURCE_WORD_TIME_LIMIT_INVALID`: A `source_lines` request for word-level timing has more than 50 rows. Lower `limit` or narrow the request with `selectors`.
 - `MCP_SOURCE_LINES_RESPONSE_TOO_LARGE`: A single transcript record exceeds the safe response size. Do not repeat the request. Continue any steps that can use text and timing, then report the oversized record.

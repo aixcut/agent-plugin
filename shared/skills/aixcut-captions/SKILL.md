@@ -58,7 +58,8 @@ Use the language the user requested for the finished captions, not the language 
 
 Writing or editing captions changes the caption track to manual mode, so the browser no longer rebuilds it from the transcript. This is expected; manual captions must be protected from automatic replacement.
 
-- To resume automatic following, confirm with the user first. `aixcut_caption(action="mode", mode="auto")` rebuilds the entire track from the transcript and overwrites manual captions.
+- `aixcut_caption(action="mode", mode="auto")` only restores the automatic-following flag; it does not rebuild the track or overwrite manual captions. Confirm with the user before changing the mode.
+- Rebuilding is a separate `aixcut_caption(action="regenerate")` operation. Use it only when the relevant source has `transcript_status=available`; otherwise report the transcript state and do not imply captions were rebuilt.
 - Read `aixcut_read(view="captions").mode`; do not rely on memory.
 - Do not switch back to `auto` after a write unless the user asks; it would make the new captions eligible for replacement.
 
