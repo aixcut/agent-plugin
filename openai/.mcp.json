@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "aixcut": {
+      "type": "http",
+      "oauth_resource": "https://web.aixcut.com/mcp",
+      "url": "https://web.aixcut.com/mcp"
+    }
+  }
+}

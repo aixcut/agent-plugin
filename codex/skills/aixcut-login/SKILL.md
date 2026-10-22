@@ -1,0 +1,24 @@
+---
+name: aixcut-login
+description: "Check the current Aixcut MCP OAuth login state without opening a web page. Use only when the user explicitly asks to sign in, restore authorization, or check login status. Do not use for opening a Project or signing out."
+---
+
+# Check Aixcut MCP Login
+
+## Conversation guidance
+
+Report the verified authorization state and the next step in the user's setup. Keep MCP availability, Plugin installation, and Project readiness distinct. If authorization is missing, let the Codex Host handle OAuth and explain what the user will see.
+
+Call `aixcut_login` once with `{}`. Success requires the envelope `status` to be `ok` and the business result `result.status` to be `authenticated`.
+
+## Result handling
+
+- **Already authorized:** the Tool returns `result.status="authenticated"`.
+- **Authorization missing or expired:** the Codex Host opens the Aixcut OAuth page and resumes this call after completion. Do not operate the authorization page or call the Tool again.
+- **Authorization denied, cancelled, failed, or timed out:** stop and report that login did not complete.
+
+## Constraints
+
+- This Skill does not handle page-opening requests. Use `aixcut-projects` for opening a page.
+- Do not add `project_id` or any business argument to `aixcut_login`.
+- For other Tools, the Codex Host resumes the original call when authorization is required; do not call `aixcut_login` first.

@@ -1,0 +1,46 @@
+{
+  "name": "aixcut",
+  "version": "0.2.0",
+  "description": "Edit video projects in Aixcut through Codex and the hosted Aixcut MCP service.",
+  "author": {
+    "name": "CSEQ Labs",
+    "url": "https://aixcut.cn"
+  },
+  "homepage": "https://aixcut.cn",
+  "repository": "https://github.com/aixcut/agent-plugin",
+  "license": "MIT",
+  "keywords": [
+    "aixcut",
+    "video",
+    "video-editing",
+    "editor",
+    "timeline",
+    "captions",
+    "dubbing",
+    "codex",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Aixcut",
+    "shortDescription": "Edit videos with Aixcut",
+    "longDescription": "Open Aixcut Studio, import local media and documents into the project, read a project before editing, apply verified timeline edits, generate image/video/music assets, render voice, export the finished cut, and check durable jobs through the hosted Aixcut MCP server.",
+    "developerName": "CSEQ Labs",
+    "category": "Creativity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://aixcut.cn",
+    "supportURL": "https://github.com/aixcut/agent-plugin/issues",
+    "brandColor": "#0B5CFF",
+    "composerIcon": "./assets/logo.svg",
+    "logo": "./assets/logo.svg",
+    "defaultPrompt": [
+      "Open Aixcut Studio.",
+      "Show the Add material prompt in my current project.",
+      "Read my Aixcut project before editing it."
+    ]
+  }
+}

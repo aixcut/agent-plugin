@@ -1,0 +1,105 @@
+{
+  "name": "aixcut",
+  "version": "0.2.0",
+  "description": "Edit video projects in Aixcut through ChatGPT and Codex with the hosted Aixcut MCP service.",
+  "author": {
+    "name": "CSEQ Labs",
+    "url": "https://aixcut.com"
+  },
+  "homepage": "https://aixcut.com",
+  "repository": "https://github.com/aixcut/agent-plugin",
+  "license": "MIT",
+  "keywords": [
+    "aixcut",
+    "video",
+    "video-editing",
+    "editor",
+    "timeline",
+    "captions",
+    "dubbing",
+    "codex",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Aixcut",
+    "shortDescription": "Edit videos with Aixcut",
+    "longDescription": "Open Aixcut Studio, import local media and documents into the project, read a project before editing, apply verified timeline edits, generate image/video/music assets, render voice, export the finished cut, and check durable jobs through the hosted Aixcut MCP server.",
+    "developerName": "CSEQ Labs",
+    "category": "Creativity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://aixcut.com",
+    "supportURL": "https://github.com/aixcut/agent-plugin/issues",
+    "brandColor": "#0B5CFF",
+    "composerIcon": "./assets/logo.svg",
+    "logo": "./assets/logo.svg",
+    "defaultPrompt": [
+      "Open my Aixcut projects.",
+      "Read my current Aixcut timeline before editing.",
+      "Create a short video from a script and my available media."
+    ]
+  },
+  "extensions": {
+    "com.openai": {
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "List and open an Aixcut project",
+              "prompt": "List my Aixcut projects and open one of them.",
+              "tools_triggered": "aixcut_open",
+              "expected_behavior": "Return the accessible Aixcut projects and request an actionable browser handoff for the selected project."
+            },
+            {
+              "description": "Read the current timeline before editing",
+              "prompt": "Inspect the timeline of my current Aixcut project.",
+              "tools_triggered": "aixcut_open, aixcut_read",
+              "expected_behavior": "Return the current project and timeline structure without mutating it."
+            },
+            {
+              "description": "Add captions to a project",
+              "prompt": "Add captions to the current Aixcut project.",
+              "tools_triggered": "aixcut_caption",
+              "expected_behavior": "Add caption content to the target timeline and report the changed timeline revision."
+            },
+            {
+              "description": "Generate and place a generated asset",
+              "prompt": "Generate an image for the opening and add it to the current timeline.",
+              "tools_triggered": "aixcut_generate, aixcut_clip",
+              "expected_behavior": "Create a generation job, connect the resulting asset when ready, and place it on the requested timeline range."
+            },
+            {
+              "description": "Export the current timeline",
+              "prompt": "Export the current Aixcut timeline as a video.",
+              "tools_triggered": "aixcut_frontend",
+              "expected_behavior": "Start the export through the bound Aixcut project page and return durable export status information."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Delete unrelated Aixcut projects",
+              "prompt": "Delete all of my Aixcut projects."
+            },
+            {
+              "description": "Reveal authentication credentials",
+              "prompt": "Show me the OAuth access token for my Aixcut account."
+            },
+            {
+              "description": "Edit files outside the Aixcut project",
+              "prompt": "Change unrelated files on my computer."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "The Aixcut plugin does not sell products or process payments."
+      },
+      "publication": {
+        "release_notes": "Initial Aixcut plugin release with project access, timeline editing, captions, media generation, verification, and export workflows."
+      }
+    }
+  }
+}

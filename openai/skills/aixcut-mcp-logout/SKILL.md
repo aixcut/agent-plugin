@@ -1,0 +1,25 @@
+---
+name: aixcut-mcp-logout
+description: "Sign out of Aixcut MCP, revoke its OAuth grant, and clear the local credential. Do not use for the Studio website."
+---
+
+# Sign Out of Aixcut MCP
+
+## Conversation guidance
+
+Explain that signing out changes authorization and what the user will need to do before the next Aixcut operation. Report completion only after the logout action confirms it.
+
+1. If the session is authorized and `aixcut_logout` is available, call it once with `{}` to revoke the server-side grant.
+2. Whether the Tool succeeds, is unavailable, or reports that the session is already unauthorized, run `codex mcp logout aixcut` to clear the local credential. Never print or inspect credential files.
+3. Report the two outcomes separately:
+   - both succeed: Aixcut MCP is fully signed out;
+   - server already unauthorized and local cleanup succeeds: Aixcut MCP is signed out;
+   - only one succeeds: say which side remains and do not claim complete logout.
+
+## Constraints
+
+- Do not remove the MCP server configuration. Logout must preserve the `aixcut` server registration.
+- If the Tool is unavailable or would open a new authorization page, skip it and perform only the local logout step.
+- Do not call `aixcut_logout` more than once or automatically sign in again.
+- Do not sign out of the Studio web session unless the user explicitly asks for that separate action.
+- Never output, read, or copy OAuth access tokens, refresh tokens, or credential contents.
