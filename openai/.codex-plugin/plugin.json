@@ -34,6 +34,8 @@
     ],
     "websiteURL": "https://aixcut.com",
     "supportURL": "https://github.com/aixcut/agent-plugin/issues",
+    "privacyPolicyURL": "https://aixcut.com/privacy/",
+    "termsOfServiceURL": "https://aixcut.com/terms/",
     "brandColor": "#0B5CFF",
     "composerIcon": "./assets/logo.svg",
     "logo": "./assets/logo.svg",
