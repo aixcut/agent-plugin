@@ -25,7 +25,7 @@
   "interface": {
     "displayName": "Aixcut",
     "shortDescription": "Edit videos with Aixcut",
-    "longDescription": "Open Aixcut Studio, import local media and documents into the project, read a project before editing, apply verified timeline edits, generate image/video/music assets, render voice, export the finished cut, and check durable jobs through the hosted Aixcut MCP server.",
+    "longDescription": "Open Aixcut, import local media and documents into the project, read a project before editing, apply verified timeline edits, generate image/video/music assets, render voice, export the finished cut, and check durable jobs through the hosted Aixcut MCP server.",
     "developerName": "CSEQ Labs",
     "category": "Creativity",
     "capabilities": [
