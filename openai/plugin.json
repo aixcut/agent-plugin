@@ -1,4 +1,5 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "aixcut",
   "version": "0.2.0",
   "description": "Edit video projects in Aixcut through ChatGPT and Codex with the hosted Aixcut MCP service.",
@@ -20,31 +21,6 @@
     "codex",
     "mcp"
   ],
-  "skills": "./skills/",
-  "mcpServers": "./.mcp.json",
-  "interface": {
-    "displayName": "Aixcut",
-    "shortDescription": "Edit videos with Aixcut",
-    "longDescription": "Open Aixcut, import local media and documents into the project, read a project before editing, apply verified timeline edits, generate image/video/music assets, render voice, export the finished cut, and check durable jobs through the hosted Aixcut MCP server.",
-    "developerName": "CSEQ Labs",
-    "category": "Creativity",
-    "capabilities": [
-      "Read",
-      "Write"
-    ],
-    "websiteURL": "https://aixcut.com",
-    "supportURL": "https://github.com/aixcut/agent-plugin/issues",
-    "privacyPolicyURL": "https://aixcut.com/privacy/",
-    "termsOfServiceURL": "https://aixcut.com/terms/",
-    "brandColor": "#0B5CFF",
-    "composerIcon": "./assets/logo.svg",
-    "logo": "./assets/logo.svg",
-    "defaultPrompt": [
-      "Open my Aixcut projects.",
-      "Read my current Aixcut timeline before editing.",
-      "Create a short video from a script and my available media."
-    ]
-  },
   "extensions": {
     "com.openai": {
       "review": {
@@ -101,6 +77,29 @@
       },
       "publication": {
         "release_notes": "Initial Aixcut plugin release with project access, timeline editing, captions, media generation, verification, and export workflows."
+      },
+      "interface": {
+        "displayName": "Aixcut",
+        "shortDescription": "Edit videos with Aixcut",
+        "longDescription": "Open Aixcut, import local media and documents into the project, read a project before editing, apply verified timeline edits, generate image/video/music assets, render voice, export the finished cut, and check durable jobs through the hosted Aixcut MCP server.",
+        "developerName": "CSEQ Labs",
+        "category": "Creativity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://aixcut.com",
+        "supportURL": "https://github.com/aixcut/agent-plugin/issues",
+        "privacyPolicyURL": "https://aixcut.com/privacy/",
+        "termsOfServiceURL": "https://aixcut.com/terms/",
+        "brandColor": "#0B5CFF",
+        "composerIcon": "./assets/logo.svg",
+        "logo": "./assets/logo.svg",
+        "defaultPrompt": [
+          "Open my Aixcut projects.",
+          "Read my current Aixcut timeline before editing.",
+          "Create a short video from a script and my available media."
+        ]
       }
     }
   }
