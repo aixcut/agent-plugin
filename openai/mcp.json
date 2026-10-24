@@ -1,0 +1,27 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "aixcut": {
+      "type": "streamable-http",
+      "url": "https://web.aixcut.com/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "oauth",
+            "client": {
+              "mode": "dcr"
+            },
+            "registrationUrl": "https://web.aixcut.com/api/v1/mcp/oauth/register",
+            "resource": "https://web.aixcut.com/mcp",
+            "baseScopes": [
+              "aixcut:read",
+              "aixcut:edit",
+              "aixcut:assets",
+              "aixcut:generate"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
