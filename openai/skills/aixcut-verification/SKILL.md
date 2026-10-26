@@ -1,13 +1,11 @@
 ---
 name: aixcut-verification
-description: "Verify Aixcut structure, timeline, voice, captions, and renderability. Read-only: never edit."
+description: "Verify Aixcut structure, timeline, voice, captions, and renderability. Read-only: never edit. Chinese triggers: 检查改动、核对结果、能否导出、导出前检查."
 ---
 
 # Verify Aixcut Results
 
 Apply the packaged shared [quality gates](../../references/core/quality-gates.md), binding each evidence item to the actual Project, timeline, revision and sampled interval.
-
-For the `aixcut_review` view parameters and result fields, see [Review Action Reference](references/actions.md).
 
 ## Conversation guidance
 
@@ -20,7 +18,7 @@ After each atomic batch of structural writes, immediately read back every affect
 ## Short path
 
 1. Read the affected view, such as `timeline`, `captions`, `speech`.
-2. Call `aixcut_review` for structural checks.
+2. Call a published review operation for structural checks.
 3. Capture frames when the user needs visual confirmation.
 4. Report what passed and what was not checked.
 
@@ -45,7 +43,7 @@ Do not capture frames for timing-only edits (trim, split, move, or speed), volum
 
 ### Capture procedure
 
-- Use `aixcut_frontend(capture_source_frames)` for source footage and `capture_timeline_frames` for the timeline composition.
+- Use `aixcut_frontend_capture_source_frames()` for source footage and `capture_timeline_frames` for the timeline composition.
 - `selections` contains 1–8 entries. Each entry must use exactly one form: `{"times_ms":[2000,7000]}` (up to 16 timeline points or 24 source points) or `{"start_ms":0,"end_ms":6000,"count":3}`. Do not mix forms within an entry.
 - Capture 1–8 frames in one call and stop when sufficient; do not keep capturing.
 - Pass `expected_revision` when the latest revision matters. `MCP_FRONTEND_TIMELINE_STALE` means the timeline changed; reread it before deciding whether to capture again.
@@ -62,7 +60,7 @@ Do not capture frames for timing-only edits (trim, split, move, or speed), volum
 
 ## 有界播放检查
 
-仅当公开 Schema 包含此动作时，使用 `aixcut_frontend(action="playback_check")`，携带当前页面的 `timeline_id`、最新 `expected_revision`、`start_ms` 和 `target_ms`；一次区间最多 10 秒。它会短时播放并还原播放头，不修改工程；用户正在播放时拒绝接管。只有 `started=true`、`reached_target=true`、`interrupted=false`、`playback_error=null` 才能证明该区间的播放时钟推进。绑定过期时重新读取，用户接管时停止检查。
+仅当公开 Schema 包含此动作时，使用 `aixcut_frontend_playback_check()`，携带当前页面的 `timeline_id`、最新 `expected_revision`、`start_ms` 和 `target_ms`；一次区间最多 10 秒。它会短时播放并还原播放头，不修改工程；用户正在播放时拒绝接管。只有 `started=true`、`reached_target=true`、`interrupted=false`、`playback_error=null` 才能证明该区间的播放时钟推进。绑定过期时重新读取，用户接管时停止检查。
 
 `audio_track_present` 仅证明轨道结构，`audio_review=unjudgeable` 仍需实际试听。区间检查不能证明全片可播放、音画同步或声音质量，不能据此把音频证据改成 pass。
 
@@ -72,11 +70,11 @@ Do not capture frames for timing-only edits (trim, split, move, or speed), volum
 
 Warn the user to confirm the target resolution when the canvas exceeds the 4K pixel budget because this can increase render time and file size. Do not change it without instruction.
 
-Structural review cannot prove that the output plays fully, has synchronized audio/video, or sounds correct. MCP has no complete playback/listening check. If there is no playback or listening evidence, state “full playback/listening not verified”; do not present a passing `review` as proof of finished media quality. Caption verification must distinguish a voice script from a real transcript: the automatic caption path is complete only when the audio source has `transcript_status=available` and `aixcut_read(view="captions")` returns captions.
+Structural review cannot prove that the output plays fully, has synchronized audio/video, or sounds correct. MCP has no complete playback/listening check. If there is no playback or listening evidence, state “full playback/listening not verified”; do not present a passing `review` as proof of finished media quality. Caption verification must distinguish a voice script from a real transcript: the automatic caption path is complete only when the audio source has `transcript_status=available` and `aixcut_read_captions()` returns captions.
 
 ### Final review report
 
-Report each final review dimension separately: structure, transcript, voice roles, captions, visual annotations, and double human voice risk. A passing `aixcut_review` does not prove full playback or listening; when the output was not actually played or heard, state “full playback/listening not verified.”
+Report each final review dimension separately: structure, transcript, voice roles, captions, visual annotations, and double human voice risk. A passing review operation does not prove full playback or listening; when the output was not actually played or heard, state “full playback/listening not verified.”
 
 ## Boundaries
 

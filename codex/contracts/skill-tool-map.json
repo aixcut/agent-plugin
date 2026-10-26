@@ -285,6 +285,7 @@
           "page_status",
           "capture_source_frames",
           "capture_timeline_frames",
+          "activate_timeline",
           "playback_check",
           "prompt_add_material",
           "prompt_add_document",
