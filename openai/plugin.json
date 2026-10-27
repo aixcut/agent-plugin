@@ -5,10 +5,10 @@
   "description": "Edit video projects in Aixcut through ChatGPT and Codex with the hosted Aixcut MCP service.",
   "author": {
     "name": "CSEQ Labs",
-    "url": "https://aixcut.com"
+    "url": "https://aixcut.cn"
   },
-  "homepage": "https://aixcut.com",
-  "repository": "https://github.com/aixcut/agent-plugin",
+  "homepage": "https://aixcut.cn",
+  "repository": "https://gitee.com/aixcut/agent-plugin",
   "license": "MIT",
   "keywords": [
     "aixcut",
@@ -88,10 +88,10 @@
           "Read",
           "Write"
         ],
-        "websiteURL": "https://aixcut.com",
-        "supportURL": "https://github.com/aixcut/agent-plugin/issues",
-        "privacyPolicyURL": "https://aixcut.com/privacy/",
-        "termsOfServiceURL": "https://aixcut.com/terms/",
+        "websiteURL": "https://aixcut.cn",
+        "supportURL": "https://gitee.com/aixcut/agent-plugin/issues",
+        "privacyPolicyURL": "https://aixcut.cn/privacy/",
+        "termsOfServiceURL": "https://aixcut.cn/terms/",
         "brandColor": "#0B5CFF",
         "composerIcon": "./assets/logo.svg",
         "logo": "./assets/logo.svg",
