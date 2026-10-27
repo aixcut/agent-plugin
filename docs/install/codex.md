@@ -25,7 +25,7 @@ codex
 codex plugin marketplace add https://gitee.com/aixcut/agent-plugin.git --ref main --sparse .agents/plugins --sparse codex
 ```
 
-国内 `codex/` 分发包连接 `https://web.aixcut.cn/mcp`。用于 OpenAI 正式提交的国际包位于 `openai/`，连接 `https://web.aixcut.com/mcp`，不是国内安装路径。
+国内 `codex/` 分发包连接 `https://web.aixcut.cn/mcp`。OpenAI 格式包位于 `openai/`，同样连接 `https://web.aixcut.cn/mcp`。
 
 然后打开 Codex 插件目录：
 
