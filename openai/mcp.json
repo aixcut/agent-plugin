@@ -3,7 +3,7 @@
   "mcpServers": {
     "aixcut": {
       "type": "streamable-http",
-      "url": "https://web.aixcut.com/mcp",
+      "url": "https://web.aixcut.cn/mcp",
       "extensions": {
         "com.openai": {
           "auth": {
@@ -11,8 +11,8 @@
             "client": {
               "mode": "dcr"
             },
-            "registrationUrl": "https://web.aixcut.com/api/v1/mcp/oauth/register",
-            "resource": "https://web.aixcut.com/mcp",
+            "registrationUrl": "https://web.aixcut.cn/api/v1/mcp/oauth/register",
+            "resource": "https://web.aixcut.cn/mcp",
             "baseScopes": [
               "aixcut:read",
               "aixcut:edit",
