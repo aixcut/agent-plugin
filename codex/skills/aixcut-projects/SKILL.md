@@ -9,6 +9,10 @@ description: "List, create, open, switch, or exit an Aixcut Project. Do not use 
 
 State whether the user is selecting, opening, creating, or leaving a Project and what happens next. After an open or create request, verify the page and active Project state before saying the user is ready to edit. If a required choice is missing, ask one concise question and recommend an option.
 
+## Session availability
+
+If the current session has no Aixcut tools because OAuth completed after its tool catalog was created, or the host still reports `Not logged in`, let the host finish OAuth and start a new host session before calling `aixcut_open`. Never use `codex exec`, a subagent, another MCP client, or a plain Project URL as a substitute; `browser_handoff` is bound to the host session that opens it. If the tools remain unavailable, stop before creating a Project.
+
 ## Open a page
 
 Call `aixcut_open` once with the target that matches the request:

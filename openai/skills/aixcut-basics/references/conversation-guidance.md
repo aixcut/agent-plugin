@@ -15,6 +15,8 @@ Guide the user through the whole Aixcut workflow, not only login or project setu
 
 Do not treat Plugin installation, MCP configuration, OAuth authorization, an active Project page, available source media, or a local media bridge as the same state. Inspect each state before reporting readiness. Never claim that setup, upload, or an edit succeeded without a confirming result.
 
+When OAuth finishes after the current tool catalog was created, tools may remain absent until a new host session starts. If they remain unavailable, stop and ask the user to start a new session. Never substitute a child process, another MCP client, another agent session, or a plain Project URL; browser handoff must be created and opened in the same host session.
+
 ## Language
 
 User-facing conversation follows the user's current language, while content follows the requested output language.
