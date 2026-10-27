@@ -5,7 +5,7 @@ This reference lists parameters only. Follow the main Skill for polling, termina
 ## Common fields
 
 - `project_id`: optional; omitted means the current Project.
-- `idempotency_key`: optional for `aixcut_generate_submit()`; the server creates and returns one if omitted. Reuse it only when retrying the same submission.
+- `idempotency_key`: optional for `aixcut_generate(action="submit")`; the server creates and returns one if omitted. Reuse it only when retrying the same submission.
 - `provider` and `model`: use server defaults when omitted; override only when explicitly requested.
 - `input`: provider-specific parameters. Unknown keys may be ignored by the provider rather than rejected.
 
@@ -77,21 +77,18 @@ Defaults come from server configuration and may vary by environment. `kind` may 
 
 | Tool | action | Required fields | Optional fields | Behavior |
 | --- | --- | --- | --- | --- |
-| aixcut_generate_quote | — | — | `kind`, `prompt`, `name`, `provider`, `model`, `input` | Estimate credits and validate generation permission; creates no Job. |
-| aixcut_timeline_list | — | — | — | List version timelines. |
-| aixcut_timeline_history | — | — | — | Read the Project edit stack. |
-| aixcut_timeline_receipt | — | `idempotency_key` | — | Check the original request after lost confirmation. |
-| aixcut_timeline_undo | — | `operation_id` | — | Undo only the Project stack head. |
-| aixcut_timeline_redo | — | `operation_id` | — | Redo only the Project stack head. |
-| aixcut_timeline_create | — | — | `name`, `source_timeline_id` | Create an empty timeline or copy one. |
-| aixcut_timeline_duplicate | — | `source_timeline_id` | `name` | Duplicate a complete timeline. |
-| aixcut_timeline_rename | — | `timeline_id`, `name` | — | Rename a version. |
-| aixcut_timeline_delete | — | `timeline_id` | — | Delete a version. |
-| aixcut_timeline_reorder | — | `timeline_ids` | — | Set version order. |
-| aixcut_generate_submit | — | `idempotency_key` | `accepted_quoted_credits`, `kind`, `prompt`, `name`, `provider`, `model`, `input` | Submit one generation Job; returns `status: "async"` and `job_id`. |
-| aixcut_generate_get | — | `job_id` | — | Read one generation Job. |
-| aixcut_generate_list | — | — | `limit` | List recent Jobs in the current Project. |
-| aixcut_generate_cancel | — | `job_id` | — | Cancel a running Job. |
+| aixcut_generate | catalog | — | `kind` (`image`, `video`, `music`, `speech`) | List available provider/model choices. If `kind` is omitted, the default is `speech`. |
+| aixcut_generate | quote | — | `kind`, `prompt`, `name`, `provider`, `model`, `input` | Estimate credits and validate generation permission; creates no Job. |
+| aixcut_timeline | list | — | — | List version timelines. |
+| aixcut_timeline | create | — | `name`, `source_timeline_id` | Create an empty timeline or copy one. |
+| aixcut_timeline | duplicate | `source_timeline_id` | `name` | Duplicate a complete timeline. |
+| aixcut_timeline | rename | `timeline_id`, `name` | — | Rename a version. |
+| aixcut_timeline | delete | `timeline_id` | — | Delete a version. |
+| aixcut_timeline | reorder | `timeline_ids` | — | Set version order. |
+| aixcut_generate | submit | `idempotency_key` | `accepted_quoted_credits`, `kind`, `prompt`, `name`, `provider`, `model`, `input` | Submit one generation Job; returns `status: "async"` and `job_id`. |
+| aixcut_generate | get | `job_id` | — | Read one generation Job. |
+| aixcut_generate | list | — | `limit` | List recent Jobs in the current Project. |
+| aixcut_generate | cancel | `job_id` | — | Cancel a running Job. |
 
 ## Job fields
 
@@ -103,7 +100,7 @@ Polling returns an envelope with these top-level fields:
 | `job_id` | Pass this value unchanged when polling. |
 | `terminal` | Stop polling when true. |
 | `phase` | `queued`, `submitting`, `provider_waiting`, `materializing`, `finalizing`, `succeeded`, `failed`, `cancelled`, or `submission_unknown`. |
-| `next_action` | While unfinished, wait `after_seconds`, then call `aixcut_generate_get` with the same `job_id`; the server advances work. |
+| `next_action` | While unfinished, wait `after_seconds`, then call `aixcut_generate get` with the same `job_id`; the server advances work. |
 | `retryable` | Present only on failure. `true` means retrying the same request later may work; `false` means fix parameters or configuration first. |
 
 Job details are in `result.data.job`, including `id`, `status`, `phase`, `error_code`, and artifact details.
@@ -112,8 +109,9 @@ Job details are in `result.data.job`, including `id`, `status`, `phase`, `error_
 
 This video prompt intentionally requests Chinese spoken dialogue even though the parameter guidance is in English:
 
-```json aixcut_generate_submit
+```json aixcut_generate
 {
+  "action": "submit",
   "idempotency_key": "d4c8a1f2-6e30-4b7d-9a15-3c9f7e0b4d28",
   "kind": "video",
   "prompt": "A calm sunrise over the ocean, slow camera push-in. A woman says in Mandarin Chinese: ‘新的一天，从海边开始。’",
@@ -128,8 +126,9 @@ This video prompt intentionally requests Chinese spoken dialogue even though the
 }
 ```
 
-```json aixcut_generate_get
+```json aixcut_generate
 {
+  "action": "get",
   "job_id": "7a2f5c91-4b8e-4d36-9f21-58c0e7a3b904"
 }
 ```

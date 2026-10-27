@@ -63,7 +63,6 @@
       "actions": [
         "capture_source_frames",
         "capture_timeline_frames",
-        "activate_timeline",
         "export_timeline",
         "export_timeline_status",
         "import_local_media",
@@ -204,13 +203,9 @@
         "create",
         "delete",
         "duplicate",
-        "history",
         "list",
         "rename",
-        "reorder",
-        "receipt",
-        "undo",
-        "redo"
+        "reorder"
       ]
     },
     {

@@ -1,6 +1,6 @@
 # Export Action Reference
 
-Project export uses `aixcut_frontend_export_timeline` and `aixcut_frontend_export_timeline_status`; do not submit a server-side render job.
+Project export uses `aixcut_frontend`; do not submit a server-side render job.
 
 ## Common fields
 
@@ -13,13 +13,14 @@ Project export uses `aixcut_frontend_export_timeline` and `aixcut_frontend_expor
 
 | Tool | action | Required fields besides `action` | Optional fields | Behavior |
 | --- | --- | --- | --- | --- |
-| aixcut_frontend_export_timeline | — | — | `timeline_id`, `expected_revision`, `format`, `width`, `height`, `frame_rate`, `timeout_ms`, `workspace_id` | Render and download from the open Project page. A supplied `timeline_id` does not switch the current page tab. Returns when accepted. |
-| aixcut_frontend_export_timeline_status | — | — | `timeout_ms`, `workspace_id` | Read export status from the page. |
+| aixcut_frontend | export_timeline | — | `timeline_id`, `expected_revision`, `format`, `width`, `height`, `frame_rate`, `timeout_ms`, `workspace_id` | Render and download from the open Project page. A supplied `timeline_id` does not switch the current page tab. Returns when accepted. |
+| aixcut_frontend | export_timeline_status | — | `timeout_ms`, `workspace_id` | Read export status from the page. |
 
 ## Submit example
 
-```json aixcut_frontend_export_timeline
+```json aixcut_frontend
 {
+  "action": "export_timeline",
   "timeline_id": "00000000-0000-4000-8000-000000000001",
   "expected_revision": 12,
   "format": "mp4",
@@ -29,8 +30,9 @@ Project export uses `aixcut_frontend_export_timeline` and `aixcut_frontend_expor
 }
 ```
 
-```json aixcut_frontend_export_timeline_status
+```json aixcut_frontend
 {
+  "action": "export_timeline_status"
 }
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: aixcut-talking-head
-description: "Edit speech-led videos such as interviews, courses, or podcasts, especially to remove mistakes and pauses. Do not use for music montages or full assembly. Chinese triggers: 口播、访谈、课程、播客、去口癖."
+description: "Edit speech-led videos such as interviews, courses, or podcasts, especially to remove mistakes and pauses. Do not use for music montages or full assembly."
 ---
 
 # Speech-Led Editing in Aixcut
@@ -11,10 +11,10 @@ State the current editing stage and next step when useful. Reuse the user's stat
 
 ## Short path
 
-1. Read `aixcut_read_source_lines()` in pages. The default is 200 rows; follow `next_offset` until `has_more=false` to get the full speech text and timing. Do not request all `word-time` data at once.
+1. Read `aixcut_read(view="source_lines")` in pages. The default is 200 rows; follow `next_offset` until `has_more=false` to get the full speech text and timing. Do not request all `word-time` data at once.
 2. After identifying the lines to edit, use `selectors` with `include=["word-time"]` for word-level timing; request at most 50 rows per page.
-3. Apply the requested edit with the appropriate published speech operation.
-4. Captions follow the primary speech track. When needed, synchronize or regenerate them with `aixcut_caption_regenerate`.
+3. Apply the requested edit with `aixcut_speech`.
+4. Captions follow the primary speech track. When needed, synchronize or regenerate them with `aixcut_caption`.
 5. Read back `timeline` or `speech` to confirm the result.
 
 ## Required order
@@ -43,8 +43,8 @@ If an upstream stage changes, revisit dependent stages. Read back after each maj
 
 ## Boundaries
 
-- Speech operations edit only the primary speech track. Use `aixcut_clip_add` for B-roll and visuals, and `aixcut_audio_add` for music or sound effects.
-- Do not use text operations to edit captions.
+- `aixcut_speech` edits only the primary speech track. Use `aixcut_clip` for B-roll and visuals, and `aixcut_audio` for music or sound effects.
+- Do not use `aixcut_text` to edit captions.
 - Use a fresh UUID for each batch. Do not reuse one key across distinct batches.
 
 ## Common misses
@@ -55,7 +55,7 @@ If an upstream stage changes, revisit dependent stages. Read back after each maj
 
 ## Completion
 
-Confirm the speech reflects the request, read-back positions are correct, and captions align. Report how many segments were removed and added, plus the new revision. Use `aixcut_review_timeline` when visual verification is needed.
+Confirm the speech reflects the request, read-back positions are correct, and captions align. Report how many segments were removed and added, plus the new revision. Use `aixcut_review` when visual verification is needed.
 
 ## Semantic and natural speech gate
 

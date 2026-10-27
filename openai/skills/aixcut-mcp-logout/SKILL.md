@@ -1,6 +1,6 @@
 ---
 name: aixcut-mcp-logout
-description: "Sign out of Aixcut MCP, revoke its OAuth grant, and clear the local credential. Do not use for the Studio website. Chinese triggers: 退出登录、注销、切换账号、清除授权."
+description: "Sign out of Aixcut MCP, revoke its OAuth grant, and clear the local credential. Do not use for the Studio website."
 ---
 
 # Sign Out of Aixcut MCP

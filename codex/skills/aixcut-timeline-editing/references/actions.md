@@ -6,10 +6,34 @@ This reference lists fields for each action. Follow the main Skill for workflow,
 
 - `project_id`: Optional; defaults to the active Project.
 - `idempotency_key`: Optional; the server generates one when omitted. Reuse it only for an identical retry. A new write intent needs a new key.
-- `target` / `targets`: Stable refs or IDs returned by a read operation such as `aixcut_read_clips`; never guess UUIDs.
+- `target` / `targets`: Stable refs or IDs returned by `aixcut_read`; never guess UUIDs.
 - `items`: Array whose item fields are checked by the live Tool Schema.
 - `timeline_id`: Target timeline UUID. Include it in every read, edit, capture, and review for multi-version work; omit only for a single version using the default timeline.
+- `plan_context`: Required on the protected actions marked in the Required column. Pass it at the Tool's top level, not inside `params`. Build it from the latest read with `project_id`, `timeline_id`, `base_revision`, `mode`, `preserve`, `delete_refs`, and the exact `authorized_actions`; see [workflow-host](../../aixcut-basics/references/workflow-host.md).
 - Every Tool accepts a strict object. Send only fields listed here; extra fields are rejected.
+
+## Frontend request shapes
+
+`aixcut_frontend` has two input shapes; follow the live action schema rather than moving fields between them:
+
+- Shared file actions (`media.*` and `timeline.*`, including `timeline.export_range`) keep `action` at the top level and put action-specific fields inside `params`. For example, `media.list` takes an empty `params` object.
+- Fixed page actions use top-level fields as declared by their action schema. This includes `page_status`, `playback_check`, frame capture, local-media import/status, Project document actions, and `export_timeline` / `export_timeline_status`; do not wrap these fields in `params`.
+
+```json aixcut_frontend
+{"action":"media.list","params":{}}
+```
+
+```json aixcut_frontend
+{
+  "action":"playback_check",
+  "timeline_id":"<timeline id from the latest read>",
+  "expected_revision":12,
+  "start_ms":0,
+  "target_ms":2000
+}
+```
+
+Replace the playback example's timeline ID and revision with values from the current Project. `playback_check` uses `target_ms`, not `end_ms`.
 
 ## Field groups
 
@@ -44,7 +68,7 @@ Omit `style` to preserve existing styles. Include only keys to change; omitted k
 
 ## Visual layout
 
-Use `aixcut_clip_layout()` and provide exactly one of `preset` or `box`:
+Use `aixcut_clip(action="layout")` and provide exactly one of `preset` or `box`:
 
 | Field | Meaning |
 | --- | --- |
@@ -57,7 +81,7 @@ Use `aixcut_clip_layout()` and provide exactly one of `preset` or `box`:
 
 Read `visual_position` before changing layout. A preset may look like `{ "preset": "pip-bottom-right", "fit": "contain", "opacity": 1 }`; a custom placement has a `box`; `{ "auto": true }` means automatic placement is still active. Do not reverse-engineer stored pixels.
 
-After a layout change, call `aixcut_frontend_capture_timeline_frames()` once. Match its `composition` entries (clip ref, time range, `visual_position`) to the visible elements and adjust if the subject or captions are covered. Captures are unnecessary for timing, volume, fade, or caption-text-only changes.
+After a layout change, call `aixcut_frontend(capture_timeline_frames)` once. Match its `composition` entries (clip ref, time range, `visual_position`) to the visible elements and adjust if the subject or captions are covered. Captures are unnecessary for timing, volume, fade, or caption-text-only changes.
 
 Zoom, rotation, and anchor controls are not exposed because preview and export would diverge. Change size with `box.width`/`height` or another preset.
 
@@ -70,8 +94,9 @@ Zoom, rotation, and anchor controls are not exposed because preview and export w
 
 Pass only the field needed; omitted means 0. Audio clips map to `audioFadeInMs`/`audioFadeOutMs`, and video clips map to `videoFadeInMs`/`videoFadeOutMs`; callers do not provide storage keys. Text and caption clips reject fades. Their `purpose` is assigned from the target track (`caption` or `art-text`). For music covering the full video, set both fades.
 
-```json aixcut_audio_fade
+```json aixcut_audio
 {
+  "action": "fade",
   "idempotency_key": "b7f0c2a4-9d31-4e6b-8c2f-1a5d3e7b9c01",
   "target": "clip:12",
   "fade_in_ms": 300,
@@ -79,80 +104,94 @@ Pass only the field needed; omitted means 0. Audio clips map to `audioFadeInMs`/
 }
 ```
 
+## Batched item fields
+
+For `aixcut_text(action="add")`, per-item `start_ms` and `duration_ms` belong in each `items[]` entry. The optional top-level `start_ms` is an action-level initial offset; use item fields when entries need their own start or duration. The live schema remains authoritative.
+
+```json aixcut_text
+{
+  "action":"add",
+  "items":[{"text":"标题","start_ms":0,"duration_ms":1500}]
+}
+```
+
 ## Action table
+
+For `aixcut_frontend` action fields and required parameters, see [Frontend Action Reference](frontend-actions.md).
+
+## Track kinds and roles
+
+Track `kind` is constrained to `video`, `audio`, `text`, `motion-graph`, `graphic`, `effect`, or `composition`; when omitted, `ensure` defaults to `video`. `role` is an open string, not a closed enum. When omitted it defaults to `generic`; `caption` is a conventional role for subtitle tracks, not the complete allowed-value list. Use the role returned by the latest timeline read rather than inventing a supposedly exhaustive enum.
 
 | Tool | action | Required (besides `action`) | Optional | Description |
 | --- | --- | --- | --- | --- |
-| aixcut_primary_set | — | `items` | — | Replace the primary video track |
-| aixcut_primary_add | — | `items` | — | Append to the primary video track |
-| aixcut_primary_replace | — | `target`, `source` | Time fields | Replace a primary clip source |
-| aixcut_primary_delete | — | — | `target` or `targets` | Delete primary clips |
-| aixcut_primary_reorder | — | `order` | — | Reorder all primary clips; `order` is the complete list |
-| aixcut_speech_set | — | `items` | — | Replace the speech sequence |
-| aixcut_speech_insert | — | `items` | — | Append to the speech sequence |
-| aixcut_speech_delete | — | — | Target | Delete speech clips |
-| aixcut_speech_replace | — | `target`, `source` | Time fields | Replace a speech clip source |
-| aixcut_speech_trim | — | — | Target and time fields | Trim speech clips; without a target, trim all video clips |
-| aixcut_speech_reset | — | — | Target | Restore a speech clip to its full source range |
-| aixcut_clip_add | — | `items` | `kind`, `start_ms`, track | Add video, image, or Motion Graph clips |
-| aixcut_clip_duplicate | — | `target` | `start_ms` | Duplicate a clip and its components |
-| aixcut_clip_replace | — | `target`, `source` | — | Replace a clip source |
-| aixcut_clip_delete | — | `target` | — | Delete a clip and its components |
-| aixcut_clip_trim | — | `target` | Time fields | Trim a clip within its source range |
-| aixcut_clip_split | — | `target` | `at_ms`, `char_index`, `to_ms` | Split a clip into two |
-| aixcut_clip_move | — | `target` | Track, time, columns | Move a clip to another time or track |
-| aixcut_clip_time | — | `target` | Track, time, columns | Change a clip’s timeline position |
-| aixcut_clip_retime | — | `target` | `rate` | Change playback rate without changing timeline duration |
-| aixcut_clip_fade | — | `target` | Fade fields | Update clip fades |
-| aixcut_clip_layout | — | `target` | `preset` or `box`, `fit`, `opacity` | Set visual placement and size |
-| aixcut_clip_update | — | `target` | Columns, time, fades | Update clip fields and overrides |
-| aixcut_text_add | — | `items` | `start_ms`, track | Add text clips |
-| aixcut_text_update | — | `target` | Columns, time, text | Update text fields and content |
-| aixcut_text_delete | — | `target` | — | Delete a text clip |
-| aixcut_text_split | — | `target` | `at_ms`, `char_index`, `to_ms` | Split text by time or character position |
-| aixcut_text_style | — | `target` | Text fields | Update text style, highlights, or position |
-| aixcut_text_duplicate | — | `target` | `start_ms` | Duplicate a text clip |
-| aixcut_text_move | — | `target` | Track, time, columns | Move text to another time or track |
-| aixcut_audio_add | — | `items` | `start_ms`, `duration_ms`, fades, track | Add audio clips; top-level values are item defaults |
-| aixcut_audio_update | — | `target` | Columns, time, `volume` | Update audio fields and volume |
-| aixcut_audio_replace | — | `target`, `source` | — | Replace an audio source |
-| aixcut_audio_delete | — | `target` | — | Delete an audio clip |
-| aixcut_audio_trim | — | `target` | Time fields | Trim an audio clip |
-| aixcut_audio_split | — | `target` | `at_ms`, `to_ms` | Split an audio clip |
-| aixcut_audio_move | — | `target` | Track, time, columns | Move an audio clip |
-| aixcut_audio_time | — | `target` | Track, time, columns | Change an audio clip’s timeline position |
-| aixcut_audio_retime | — | `target` | `rate` | Change playback rate without changing timeline duration |
-| aixcut_audio_fade | — | `target` | Fade fields | Update audio fades |
-| aixcut_track_ensure | — | — | `kind`, `role`, `name` | Ensure a track exists |
-| aixcut_track_update | — | — | `target`, track, `kind`, `role`, `name`, `enabled`, `locked`, `muted` | Update editable track fields |
-| aixcut_track_clear | — | — | `target`, track | Clear clips while keeping the track |
-| aixcut_track_delete | — | — | `target`, track | Delete a track and its clips/components |
-| aixcut_project_canvas | — | — | `preset`, `width`, `height`, `fps` | Update canvas settings; explicit dimensions take precedence |
-| aixcut_project_clear | — | — | — | Delete all clips and voice segments from the active Project |
-| aixcut_timeline_list | — | — | — | List independent Project timelines |
-| aixcut_timeline_history | — | — | — | Read the Project edit stack |
-| aixcut_timeline_receipt | — | `idempotency_key` | — | Check the original creation/duplication request after a lost confirmation |
-| aixcut_timeline_undo | — | `operation_id` | — | Undo only the Project stack head |
-| aixcut_timeline_redo | — | `operation_id` | — | Redo only the Project stack head |
-| aixcut_timeline_create | — | — | `name`, `source_timeline_id` | Create blank or source-copied timeline |
-| aixcut_timeline_duplicate | — | `source_timeline_id` | `name` | Duplicate a timeline as a new version |
-| aixcut_timeline_rename | — | `timeline_id`, `name` | — | Rename a timeline |
-| aixcut_timeline_delete | — | `timeline_id` | — | Delete a timeline; retain at least one |
-| aixcut_timeline_reorder | — | `timeline_ids` | — | Reorder timelines using the complete list |
-| aixcut_frontend_capture_source_frames | — | `media_id`, `selections` | `timeout_ms`, `workspace_id` | Capture 1–8 JPEG frames from a source |
-| aixcut_frontend_capture_timeline_frames | — | `selections` | `timeline_id`, `expected_revision`, `timeout_ms`, `workspace_id` | Capture 1–8 JPEG frames from a timeline |
-| aixcut_frontend_import_local_media | — | `url` or `urls` | `timeout_ms`, `workspace_id` | Import 1–8 local assets; returns `import_ids` |
-| aixcut_frontend_import_status | — | `import_ids` | `timeout_ms`, `workspace_id` | Check imports until settled and `private_copy` is not `copying` |
-| aixcut_frontend_prompt_add_material | — | — | `timeout_ms`, `workspace_id` | Show the user upload area |
+| aixcut_primary | set | `items`, `plan_context` | — | Replace the primary video track |
+| aixcut_primary | add | `items` | — | Append to the primary video track |
+| aixcut_primary | replace | `target`, `source`, `plan_context` | Time fields | Replace a primary clip source |
+| aixcut_primary | delete | `plan_context` | `target` or `targets` | Delete primary clips |
+| aixcut_primary | reorder | `order` | — | Reorder all primary clips; `order` is the complete list |
+| aixcut_speech | set | `items`, `plan_context` | — | Replace the speech sequence |
+| aixcut_speech | insert | `items` | — | Append to the speech sequence |
+| aixcut_speech | delete | `plan_context` | Target | Delete speech clips and remove their segments from the main timeline |
+| aixcut_speech | replace | `target`, `source`, `plan_context` | Time fields | Replace a speech clip source |
+| aixcut_speech | trim | — | Target and time fields | Trim speech clips; without a target, trim all video clips |
+| aixcut_speech | reset | `plan_context` | Target | Restore a speech clip to its full source range |
+| aixcut_clip | add | `items` | `kind`, `start_ms`, track | Add video, image, or Motion Graph clips |
+| aixcut_clip | duplicate | `target` | `start_ms` | Duplicate a clip and its components |
+| aixcut_clip | replace | `target`, `source`, `plan_context` | — | Replace a clip source |
+| aixcut_clip | delete | `target`, `plan_context` | — | Delete a clip and its components |
+| aixcut_clip | trim | `target` | Time fields | Trim a clip within its source range |
+| aixcut_clip | split | `target` | At least one of `at_ms`, `char_index`, `to_ms` | Split a clip into two |
+| aixcut_clip | move | `target` | Track, time, columns | Move a clip to another time or track |
+| aixcut_clip | time | `target` | Track, time, columns | Change a clip’s timeline position |
+| aixcut_clip | retime | `target` | `rate` | Change playback rate without changing timeline duration |
+| aixcut_clip | fade | `target` | Fade fields | Update clip fades |
+| aixcut_clip | layout | `target` | `preset` or `box`, `fit`, `opacity` | Set visual placement and size |
+| aixcut_clip | update | `target` | Columns, time, fades | Update clip fields and overrides |
+| aixcut_text | add | `items` | `start_ms`, track | Add text clips |
+| aixcut_text | update | `target` | Columns, time, text | Update text fields and content |
+| aixcut_text | delete | `target`, `plan_context` | — | Delete a text clip |
+| aixcut_text | split | `target` | At least one of `at_ms`, `char_index`, `to_ms` | Split text by time or character position |
+| aixcut_text | style | `target` | Text fields | Update text style, highlights, or position |
+| aixcut_text | duplicate | `target` | `start_ms` | Duplicate a text clip |
+| aixcut_text | move | `target` | Track, time, columns | Move text to another time or track |
+| aixcut_audio | add | `items` | `start_ms`, `duration_ms`, fades, track | Add audio clips; top-level values are item defaults |
+| aixcut_audio | update | `target` | Columns, time, `volume` | Update audio fields and volume |
+| aixcut_audio | replace | `target`, `source`, `plan_context` | — | Replace an audio source |
+| aixcut_audio | delete | `target`, `plan_context` | — | Delete an audio clip |
+| aixcut_audio | trim | `target` | Time fields | Trim an audio clip |
+| aixcut_audio | split | `target` | At least one of `at_ms`, `to_ms` | Split an audio clip |
+| aixcut_audio | move | `target` | Track, time, columns | Move an audio clip |
+| aixcut_audio | time | `target` | Track, time, columns | Change an audio clip's timeline position |
+| aixcut_audio | retime | `target` | `rate` | Change playback rate without changing timeline duration |
+| aixcut_audio | fade | `target` | Fade fields | Update audio fades |
+| aixcut_track | ensure | — | `kind`, `role`, `name` | Ensure a track exists |
+| aixcut_track | update | — | `target`, track, `kind`, `role`, `name`, `enabled`, `locked`, `muted` | Update editable track fields; `locked=true` blocks `clear` and `delete` with `MCP_TRACK_LOCKED` until unlocked |
+| aixcut_track | clear | `plan_context` | `target`, track | Clear clips while keeping the track |
+| aixcut_track | delete | `plan_context` | `target`, track | Delete the track and all its clips/components. This destructive action also applies to the primary/main video track; verify the target before deleting. |
+| aixcut_project | canvas | — | `preset`, `width`, `height`, `fps` | Update canvas settings; explicit dimensions take precedence |
+| aixcut_project | clear | `plan_context` | — | Delete all clips and voice segments from the active Project |
+| aixcut_timeline | list | — | — | List independent Project timelines |
+| aixcut_timeline | create | — | `name`, `source_timeline_id` | Create blank or source-copied timeline |
+| aixcut_timeline | duplicate | `source_timeline_id` | `name` | Duplicate a timeline as a new version |
+| aixcut_timeline | rename | `timeline_id`, `name` | — | Rename a timeline |
+| aixcut_timeline | delete | `timeline_id` | — | Delete a timeline; retain at least one |
+| aixcut_timeline | reorder | `timeline_ids` | — | Reorder timelines using the complete list |
+| aixcut_frontend | capture_source_frames | `media_id`, `selections` | `timeout_ms`, `workspace_id` | Capture 1–8 JPEG frames from a source |
+| aixcut_frontend | capture_timeline_frames | `selections` | `timeline_id`, `expected_revision`, `timeout_ms`, `workspace_id` | Capture 1–8 JPEG frames from a timeline |
+| aixcut_frontend | import_local_media | `url` or `urls` | `timeout_ms`, `workspace_id` | Import 1–8 local assets; returns `import_ids` |
+| aixcut_frontend | import_status | `import_ids` | `timeout_ms`, `workspace_id` | Check imports until settled and `private_copy` is not `copying` |
+| aixcut_frontend | prompt_add_material | — | `timeout_ms`, `workspace_id` | Show the user upload area |
 
-`import_local_media` and `prompt_add_material` both return acceptance, not completed library ingestion. The first returns `import_ids` for `import_status`; the second has no import ID and must be confirmed by rereading `aixcut_read_sources()`. A batch uses `url` for one file or `urls` for up to eight; per-file failures appear in `failures`.
+`import_local_media` and `prompt_add_material` both return acceptance, not completed library ingestion. The first returns `import_ids` for `import_status`; the second has no import ID and must be confirmed by rereading `aixcut_read(view="sources")`. A batch uses `url` for one file or `urls` for up to eight; per-file failures appear in `failures`.
 
-Page export uses `aixcut_frontend_export_timeline` and `aixcut_frontend_export_timeline_status`, but belongs to `aixcut-export` and is not listed here.
+Page export (`export_timeline`, `export_timeline_status`) also uses `aixcut_frontend`, but belongs to `aixcut-export` and is not listed in this action table.
 
 ## Complete request examples
 
-```json aixcut_clip_trim
+```json aixcut_clip
 {
+  "action": "trim",
   "idempotency_key": "8c1f0b6e-3d2a-4c9f-9d5c-6a1b2c3d4e5f",
   "target": "clip:3",
   "source_start_ms": 1200,
@@ -160,6 +199,8 @@ Page export uses `aixcut_frontend_export_timeline` and `aixcut_frontend_export_t
 }
 ```
 
-```json aixcut_frontend_prompt_add_material
-{}
+```json aixcut_frontend
+{
+  "action": "prompt_add_material"
+}
 ```

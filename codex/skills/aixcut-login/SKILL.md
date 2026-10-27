@@ -1,6 +1,6 @@
 ---
 name: aixcut-login
-description: "Check the current Aixcut MCP OAuth login state without opening a web page. Use only when the user explicitly asks to sign in, restore authorization, or check login status. Do not use for opening a Project or signing out. Chinese triggers include 登录、恢复授权、检查登录状态."
+description: "Check the current Aixcut MCP OAuth login state without opening a web page. Use only when the user explicitly asks to sign in, restore authorization, or check login status. Do not use for opening a Project or signing out."
 ---
 
 # Check Aixcut MCP Login

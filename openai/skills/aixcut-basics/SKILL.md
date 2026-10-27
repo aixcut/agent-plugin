@@ -1,6 +1,6 @@
 ---
 name: aixcut-basics
-description: "Shared Aixcut MCP rules for context, read-before-write, stable refs, idempotency, async jobs, envelopes, and host boundaries. Load as fallback when no specialist Skill applies; do not use instead of a specialist workflow. Chinese triggers: 项目、时间轴、字幕、配音、生成、导出、报错."
+description: "Shared Aixcut MCP rules for context, read-before-write, stable refs, idempotency, async jobs, envelopes, and host boundaries. Load as fallback when no specialist Skill applies; do not use instead of a specialist workflow."
 ---
 
 # Aixcut MCP Basics
@@ -23,7 +23,7 @@ The Host handles OAuth; do not call `aixcut_login` first. Never use curl, direct
 
 For every request use the short state machine `intent → inspect → plan → execute → verify → deliver`. Mechanical edits remain narrow: do not add voice, music, B-roll, Motion Graphics, or export unless explicitly requested. An assembly request may expand scope only after its `EditPlan` names the requested stages.
 
-When a mutation returns `status_unknown`, preserve its original `idempotency_key`/`mutation_id` and query `aixcut_read_mutation_receipt()` with that identity. Treat `pending`, `unknown`, and `not_found` as unresolved until the receipt says `applied`, `duplicate`, `noop`, or `rejected`; never create a new key merely because a response was lost. Save a `Checkpoint` containing Project, timeline, revision, mutation identity and next action before leaving a recoverable stage.
+When a mutation returns `status_unknown`, preserve its original `idempotency_key`/`mutation_id` and query `aixcut_read(view="mutation_receipt")` with that identity. Treat `pending`, `unknown`, and `not_found` as unresolved until the receipt says `applied`, `duplicate`, `noop`, or `rejected`; never create a new key merely because a response was lost. Save a `Checkpoint` containing Project, timeline, revision, mutation identity and next action before leaving a recoverable stage.
 
 Use the packaged Core executable `node <plugin-root>/scripts/workflow-host.mjs`. Validate the EditPlan before structural writes, attach `plan_context` to each planned mutation, and follow [executable workflow](references/workflow-host.md). After each atomic batch, create and save a Checkpoint with `save --directory <host-owned-workflow-directory>` and `{checkpoint}` on stdin; only `persisted: true` confirms cross-turn storage. On resume, inspect the current Project/timeline/revision first, then pass `{plan_id,current:{project_id,timeline_id,revision}}` to `resume --directory <same-directory>`. Follow `next_step`; never replay `completed_steps`. Without an available host-owned directory, the helper returns `persisted: false` and the workflow is not durable across sessions.
 

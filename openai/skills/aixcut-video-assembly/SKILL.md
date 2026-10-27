@@ -1,6 +1,6 @@
 ---
 name: aixcut-video-assembly
-description: "Assemble a complete video by coordinating visuals, voiceover, captions, music, and export. Do not use for a single edit. Chinese triggers: 宣传片、成片、短片、Vlog、混剪、卡点视频."
+description: "Assemble a complete video by coordinating visuals, voiceover, captions, music, and export. Do not use for a single edit."
 ---
 
 # Aixcut Video Assembly
@@ -31,7 +31,7 @@ Keep spoken captions and visual annotations as separate requirements. Captions f
 
 Visual annotations are a separate stage before caption generation. Classify each requested element as a spoken caption, static art text, or Motion Graph, place it on its dedicated track, and verify its clip kind and track before moving to captions.
 
-If the user requests multiple versions, A/B, portrait/landscape, or platform variants, first call `aixcut_timeline_list()` and duplicate a timeline per version. Include each version's `timeline_id` in later reads/writes. Generated assets are Project-scoped and can be reused; do not regenerate them for each version.
+If the user requests multiple versions, A/B, portrait/landscape, or platform variants, first call `aixcut_timeline(action="list")` and duplicate a timeline per version. Include each version's `timeline_id` in later reads/writes. Generated assets are Project-scoped and can be reused; do not regenerate them for each version.
 
 Ask one concise question at a time. If the user requests uninterrupted end-to-end execution, use reasonable reversible defaults for non-blocking choices and report them. Still resolve choices that materially change the content language, incur an unaccepted charge, or risk overwriting existing work.
 
@@ -99,13 +99,13 @@ For upload, asynchronous generation, voice rendering, transcription, or export, 
 - **Voice generation does not imply captions exist.** Wait for `transcript_status=available`, regenerate captions, and read them back.
 - **A complete assembly request does not imply voice or music.** Honor the resolved intent state and keep optional or unmentioned music off.
 - **Music needs fades.** Without fades, it can start or stop abruptly.
-- **Do not invent beat-analysis actions.** Use only the published frontend operations. If beat evidence is unavailable, report that beats could not be determined; do not estimate BPM by ear.
+- **Do not invent beat-analysis actions.** Use only the actions in the live `aixcut_frontend` schema. If beat evidence is unavailable, report that beats could not be determined; do not estimate BPM by ear.
 - **Balance voice and music.** Music overpowering narration is a common quality issue.
 - **The browser owns local source files.** Full local video is not uploaded. Audio may be extracted for transcription and visual understanding uses on-demand frame capture. The Project page performs final export; do not treat local originals as missing.
 
 ## Completion
 
-Each user requirement must map to a read-back result. Usually call `aixcut_read_timeline`, `aixcut_read_speech`, and `aixcut_read_captions`, then inspect structure with `aixcut_review_timeline`.
+Each user requirement must map to a read-back result. Usually read `timeline`, `voice`, and `captions` with `aixcut_read`, then inspect structure with `aixcut_review`.
 
 Report total duration, visual clip count, voice segment count and duration, caption count, music track and fades, and export status. State any incomplete work plainly. If the exported file was not actually played, say “full playback/listening not verified.”
 
