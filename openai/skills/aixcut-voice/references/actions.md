@@ -1,16 +1,16 @@
 # Speech Action Reference
 
-The `aixcut-voice` Skill keeps its user-facing name. Its MCP workflow uses `aixcut_generate` speech actions. The live Tool Schema is authoritative.
+The `aixcut-voice` Skill keeps its user-facing name. Its MCP workflow uses the published speech generation operations. The live Tool Schema is authoritative.
 
 | Tool | action | Required fields | Meaning |
 | --- | --- | --- | --- |
-| aixcut_generate | catalog | `kind="speech"` | Discover current ready voice profiles and selectable models. |
-| aixcut_generate | speech_read | — | Read ordered paragraph numbers and effective settings. |
-| aixcut_generate | speech_edit | `operation` | Atomically add, update, delete or move paragraphs. |
-| aixcut_generate | speech_quote | exactly one of `segments` or `all=true` | Quote 1–50 nonempty paragraphs and freeze their recovery identities. |
-| aixcut_generate | speech_submit | `recovery` | Submit the exact frozen recovery after its quoted price is accepted. |
-| aixcut_audio | add | media ref | Place explicitly requested published speech audio on the timeline. |
-| aixcut_generate | get | `job_id` | Read each returned Job until terminal. |
+| aixcut_generate_catalog | — | `kind="speech"` | Discover current ready voice profiles and selectable models. |
+| aixcut_generate_speech_read | — | — | Read ordered paragraph numbers and effective settings. |
+| aixcut_generate_speech_edit | — | `operation` | Atomically add, update, delete or move paragraphs. |
+| aixcut_generate_speech_quote | — | exactly one of `segments` or `all=true` | Quote 1–50 nonempty paragraphs and freeze their recovery identities. |
+| aixcut_generate_speech_submit | — | `recovery` | Submit the exact frozen recovery after its quoted price is accepted. |
+| aixcut_audio_add | — | media ref | Place explicitly requested published speech audio on the timeline. |
+| aixcut_generate_get | — | `job_id` | Read each returned Job until terminal. |
 
 ## Paragraph edits
 
@@ -20,14 +20,14 @@ Read before using paragraph numbers; refresh after changed order or conflicts. `
 
 Read the draft:
 
-```json aixcut_generate
-{"action":"speech_read"}
+```json aixcut_generate_speech_read
+{}
 ```
 
 Quote selected paragraph numbers only after reading the current ordered draft:
 
-```json aixcut_generate
-{"action":"speech_quote","segments":[1,2]}
+```json aixcut_generate_speech_quote
+{"segments":[1,2]}
 ```
 
 ## Submit and recover
@@ -38,6 +38,6 @@ Submission returns per-paragraph `operationId`, `jobId`, status and any publishe
 
 ## Placement
 
-Submit has no `place=true` flag. Wait for published media identities, then use `aixcut_audio` through the timeline editing Skill for explicitly requested placement. Protect existing clips; do not clear and rebuild the dedicated voice track by default. Confirm the target track and range, then reread `timeline`, `audio`, and `sources`.
+Submit has no `place=true` flag. Wait for published media identities, then use `aixcut_audio_add` through the timeline editing Skill for explicitly requested placement. Protect existing clips; do not clear and rebuild the dedicated voice track by default. Confirm the target track and range, then reread `timeline`, `audio`, and `sources`.
 
 Automatic captions require the actually placed source to report `transcript_status=available`; a script or a successful Job is not transcription evidence.

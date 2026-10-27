@@ -1,13 +1,13 @@
 # Frontend Action Reference
 
-This reference covers the complete `aixcut_frontend` action catalog. The live Tool Schema remains authoritative; send only fields accepted by the selected action.
+This reference covers the complete frontend action catalog. Each action is published as its own model-callable MCP Tool; the live Tool Schema remains authoritative; send only fields accepted by the selected Tool.
 
 ## Request shapes
 
-Every call may include `project_id`, `workspace_id`, and `timeout_ms` when supported. Page actions take their fields at the top level. Shared file actions (`media.*` and `timeline.*`) take `action` at the top level and their action-specific fields inside `params`:
+Every call may include `project_id`, `workspace_id`, and `timeout_ms` when supported. Each action has its own model-facing Tool name. Page actions take their fields at the top level; shared file actions (`media.*` and `timeline.*`) keep their operation arguments inside `params`:
 
-```json aixcut_frontend
-{"action":"media.list","params":{}}
+```json aixcut_frontend_media_list
+{"params":{}}
 ```
 
 ## Page and Project actions
@@ -17,8 +17,9 @@ Every call may include `project_id`, `workspace_id`, and `timeout_ms` when suppo
 | `page_status` | — | Read-only page and Project presence check. |
 | `capture_source_frames` | `media_id`, `selections` | `timeout_ms`, `workspace_id`; 1–8 selections, each using `times_ms` or `{start_ms,end_ms,count}`. |
 | `capture_timeline_frames` | `selections` | `timeline_id`, `expected_revision`, `timeout_ms`, `workspace_id`; 1–8 selections. |
+| `activate_timeline` | `timeline_id` | Switches the active timeline in the bound Project page. |
 | `playback_check` | `timeline_id`, `expected_revision`, `start_ms`, `target_ms` | Plays at most 10 seconds and restores the playhead; `target_ms` must follow `start_ms`. |
-| `prompt_add_material` | — | Opens the Project media upload area. The user selects files; verify the result with `aixcut_read(view="sources")`. |
+| `prompt_add_material` | — | Opens the Project media upload area. The user selects files; verify the result with `aixcut_read_sources()`. |
 | `import_local_media` | Exactly one of `url` or `urls` | `timeout_ms`, `workspace_id`; only use loopback bridge URLs for paths the user explicitly named. Returns `import_ids`, not completion. |
 | `import_status` | `import_ids` | `timeout_ms`, `workspace_id`; poll these same IDs until settled; never resend the import. |
 | `prompt_add_document` | — | Opens the Project Documents picker. The user selects the document. |
