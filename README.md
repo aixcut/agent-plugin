@@ -5,7 +5,7 @@ Official Codex and OpenAI plugin distribution for Aixcut.
 The repository publishes the Aixcut Skills and local helpers used with the hosted Aixcut MCP service.
 
 - `codex/` is the China distribution connected to `https://web.aixcut.cn/mcp`.
-- `openai/` is the international package prepared for OpenAI submission and connected to `https://web.aixcut.com/mcp`.
+- `openai/` is the OpenAI-format China distribution connected to `https://web.aixcut.cn/mcp`.
 
 ## Install
 
