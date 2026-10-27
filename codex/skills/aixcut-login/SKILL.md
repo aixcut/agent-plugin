@@ -7,13 +7,14 @@ description: "Check the current Aixcut MCP OAuth login state without opening a w
 
 ## Conversation guidance
 
-Report the verified authorization state and the next step in the user's setup. Keep MCP availability, Plugin installation, and Project readiness distinct. If authorization is missing, let the Codex Host handle OAuth and explain what the user will see.
+Report the server-validated authorization state and the next step in the user's setup. Keep MCP availability, Plugin installation, and Project readiness distinct. If authorization is missing or the grant is inactive, let the Codex Host clear the stale local credential and complete OAuth; explain what the user will see.
 
 Call `aixcut_login` once with `{}`. Success requires the envelope `status` to be `ok` and the business result `result.status` to be `authenticated`.
 
 ## Result handling
 
-- **Already authorized:** the Tool returns `result.status="authenticated"`.
+- **Already authorized:** the Tool has validated the grant with Aixcut and returns `result.status="authenticated"`.
+- **Grant inactive or revoked:** the Tool returns `MCP_AUTH_GRANT_INACTIVE`. Clear the stale local credential with the host, reauthorize once, and do not retry the rejected business call with the old token.
 - **Authorization missing or expired:** the Codex Host opens the Aixcut OAuth page and resumes this call after completion. Do not operate the authorization page or call the Tool again.
 - **Authorization denied, cancelled, failed, or timed out:** stop and report that login did not complete.
 

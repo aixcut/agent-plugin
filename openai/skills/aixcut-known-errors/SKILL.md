@@ -21,6 +21,7 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 | `poll` | Poll the same `job_id`. |
 | `receipt` | Confirm the original mutation with its original identity before dependent writes. |
 | `open_editor` | Open the required page first. |
+| `reauthorize` | Clear the host's stale local OAuth credential, complete OAuth once, then retry only when the live contract explicitly allows it. Do not repeat business calls with the inactive grant. |
 | `run_helper` | Run the specified local helper first. |
 | `wait_then_read` | The action was accepted but is still running. Wait `after_seconds`, then call the specified read endpoint. Do not report completion or resubmit the action. |
 
@@ -35,6 +36,7 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 ## Authorization and project context
 
 - `MCP_SCOPE_REQUIRED`: The current grant lacks a required scope. Let the Codex Host reauthorize; do not bypass the scope with another Tool.
+- `MCP_AUTH_GRANT_INACTIVE` (normalized from `CLIPOS_401001`): The OAuth grant was revoked or expired. Clear the local credential, let the Codex Host reauthorize once, and do not retry the rejected business call with the old token.
 - `MCP_PROJECT_CONTEXT_REQUIRED`: No Project is active. Ask the user to select one or use `aixcut_open_project` to enter a Project.
 - `MCP_PROJECT_NOT_FOUND`, `MCP_PROJECT_NOT_INITIALIZED`: Confirm the target Project before continuing.
 
