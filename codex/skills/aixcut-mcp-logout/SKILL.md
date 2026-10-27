@@ -9,8 +9,8 @@ description: "Sign out of Aixcut MCP, revoke its OAuth grant, and clear the loca
 
 Explain that signing out changes authorization and what the user will need to do before the next Aixcut operation. Report completion only after the logout action confirms it.
 
-1. If the session is authorized and `aixcut_logout` is available, call it once with `{}` to revoke the server-side grant.
-2. Whether the Tool succeeds, is unavailable, or reports that the session is already unauthorized, run `codex mcp logout aixcut` to clear the local credential. Never print or inspect credential files.
+1. If the session is authorized and `aixcut_logout` is available, call it once with `{}` to revoke the server-side grant. A successful result includes `local_cleanup_required: true`.
+2. Clear the local credential with `codex mcp logout aixcut`, regardless of whether `aixcut_logout` succeeds, is unavailable, or reports that the server session is already unauthorized. Never print or inspect credential files.
 3. Report the two outcomes separately:
    - both succeed: Aixcut MCP is fully signed out;
    - server already unauthorized and local cleanup succeeds: Aixcut MCP is signed out;
