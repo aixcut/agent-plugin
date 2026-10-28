@@ -20,7 +20,8 @@
         "references/model.md",
         "references/language.md",
         "references/conversation-guidance.md",
-        "references/workflow-host.md"
+        "references/workflow-host.md",
+        "references/plugin-maintenance.md"
       ]
     },
     {
