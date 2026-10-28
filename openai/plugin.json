@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "aixcut",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Edit video projects in Aixcut through ChatGPT and Codex with the hosted Aixcut MCP service.",
   "author": {
     "name": "CSEQ Labs",
