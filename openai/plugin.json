@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "aixcut",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Edit video projects in Aixcut through ChatGPT and Codex with the hosted Aixcut MCP service.",
   "author": {
     "name": "CSEQ Labs",
@@ -29,31 +29,31 @@
             {
               "description": "List and open an Aixcut project",
               "prompt": "List my Aixcut projects and open one of them.",
-              "tools_triggered": "aixcut_open_project_list, aixcut_open_project",
+              "tools_triggered": "aixcut_open (target=project_list), aixcut_open (target=project)",
               "expected_behavior": "Return the accessible Aixcut projects and request an actionable browser handoff for the selected project."
             },
             {
               "description": "Read the current timeline before editing",
               "prompt": "Inspect the timeline of my current Aixcut project.",
-              "tools_triggered": "aixcut_open_project, aixcut_read_timeline",
+              "tools_triggered": "aixcut_open (target=project), aixcut_read (view=timeline)",
               "expected_behavior": "Return the current project and timeline structure without mutating it."
             },
             {
               "description": "Add captions to a project",
               "prompt": "Add captions to the current Aixcut project.",
-              "tools_triggered": "aixcut_caption_regenerate",
+              "tools_triggered": "aixcut_caption (action=regenerate)",
               "expected_behavior": "Add caption content to the target timeline and report the changed timeline revision."
             },
             {
               "description": "Generate and place a generated asset",
               "prompt": "Generate an image for the opening and add it to the current timeline.",
-              "tools_triggered": "aixcut_generate_submit, aixcut_generate_get, aixcut_clip_add",
+              "tools_triggered": "aixcut_generate (action=submit), aixcut_generate (action=get), aixcut_clip (action=add)",
               "expected_behavior": "Create a generation job, connect the resulting asset when ready, and place it on the requested timeline range."
             },
             {
               "description": "Export the current timeline",
               "prompt": "Export the current Aixcut timeline as a video.",
-              "tools_triggered": "aixcut_frontend_export_timeline, aixcut_frontend_export_timeline_status",
+              "tools_triggered": "aixcut_frontend (action=export_timeline), aixcut_frontend (action=export_timeline_status)",
               "expected_behavior": "Start the export through the bound Aixcut project page and return durable export status information."
             }
           ],
