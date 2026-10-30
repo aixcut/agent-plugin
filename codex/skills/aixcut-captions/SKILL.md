@@ -17,7 +17,7 @@ The caption track contains spoken or user-supplied subtitle copy only. Ingredien
 
 | Video type | Caption source | Action |
 | --- | --- | --- |
-| Narrated video (visuals + voiceover) | Transcript of the voiceover audio already placed on the timeline | Confirm the audio source has `transcript_status=available`, call `aixcut_caption_regenerate()`, then read the result back. |
+| Narrated video (visuals + voiceover) | Transcript of the voiceover audio already placed on the timeline | Confirm the audio source has `transcript_status=available`, call `aixcut_caption(action="regenerate")`, then read the result back. |
 | Talking-head video | The speech script/transcript | Captions may be derived from the speech track. |
 | User supplied copy | The user's copy | Use that copy and align timing to the visuals or voiceover. |
 
@@ -25,7 +25,7 @@ Visual source clips usually do not have a usable transcript. For narrated videos
 
 ## Short path
 
-1. Read `aixcut_read_captions()` for current captions and stable refs. Also read `speech` or `timeline` to confirm the voiceover audio is placed.
+1. Read `aixcut_read(view="captions")` for current captions and stable refs. Also read `speech` or `timeline` to confirm the voiceover audio is placed.
 2. For narration, reread the audio source's `transcript_status`. Regenerate only when it is `available`; if pending, wait and reread; report missing, outdated, or empty transcripts accurately.
 3. Read `captions` again to confirm the count, first/last timing, and that generated text came from the transcript.
 4. Before reporting captions complete, verify the caption track has no Motion Graph, `art-text`, or other visual annotation clips. Those elements must remain on their dedicated tracks.
@@ -58,8 +58,8 @@ Use the language the user requested for the finished captions, not the language 
 
 Writing or editing captions changes the caption track to manual mode, so the browser no longer rebuilds it from the transcript. This is expected; manual captions must be protected from automatic replacement.
 
-- To resume automatic following, confirm with the user first. `aixcut_caption_mode(mode="auto")` rebuilds the entire track from the transcript and overwrites manual captions.
-- Read `aixcut_read_captions().mode`; do not rely on memory.
+- To resume automatic following, confirm with the user first. `aixcut_caption(action="mode", mode="auto")` rebuilds the entire track from the transcript and overwrites manual captions.
+- Read `aixcut_read(view="captions").mode`; do not rely on memory.
 - Do not switch back to `auto` after a write unless the user asks; it would make the new captions eligible for replacement.
 
 ## Do not rebuild an already valid track

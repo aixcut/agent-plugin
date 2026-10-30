@@ -15,15 +15,15 @@ Local video is not uploaded in full. If it has audio, the browser may upload ext
 
 ## Workflow
 
-1. Call `aixcut_frontend_export_timeline`. Pass `timeline_id` to export a non-current version; the page reads that timeline without changing the user's current tab. The call returns `export_id` and the actual `format`, `width`, `height`, and `frame_rate`. It does not return a file URL; the browser downloads the file.
-2. Accepted does not mean complete. Wait for top-level `next_action.after_seconds`, then call `aixcut_frontend_export_timeline_status` until `state` is `succeeded` or `failed`.
+1. Call `aixcut_frontend(action="export_timeline")`. Pass `timeline_id` to export a non-current version; the page reads that timeline without changing the user's current tab. The call returns `export_id` and the actual `format`, `width`, `height`, and `frame_rate`. It does not return a file URL; the browser downloads the file.
+2. Accepted does not mean complete. Wait for top-level `next_action.after_seconds`, then call `aixcut_frontend(action="export_timeline_status")` until `state` is `succeeded` or `failed`.
 3. `succeeded` means the file was handed to the browser download flow. Report `file_name`, `byte_size`, `mime_type`, and `elapsed_ms`; do not promise a server download link.
 4. If the user cannot find the file, check the browser download list and blocked-download notice before considering another export.
 5. If the user wants a different format, resolution, or frame rate, submit one new `export_timeline` request. Only one export can run on a page at once; while one is active, query its status instead of submitting again.
 
 Before export, bind the current inspected timeline revision and pass it as `expected_revision` to `export_timeline`. Run the packaged Core `workflow-host.mjs gate` with `{evidence,current:{project_id,timeline_id,revision},deliverable:"export"}` before submitting export. Report export success only if the page status succeeded and current structural evidence still passes the gate; this gate does not prove playback or listening.
 
-The target Project page must be open and initialized. If it is offline or bound to another Project, ask the user to open the target page. If uncertain, call `aixcut_frontend_page_status()`.
+The target Project page must be open and initialized. If it is offline or bound to another Project, ask the user to open the target page. If uncertain, call `aixcut_frontend(action="page_status")`.
 
 Local media also requires browser file-access permission. If export or frame capture returns `CAPTURE_PERMISSION_REQUIRED`, ask the user to click anywhere on the Project page and retry the same request. Do not reimport the media.
 
