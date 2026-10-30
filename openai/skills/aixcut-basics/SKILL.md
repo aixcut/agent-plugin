@@ -1,11 +1,13 @@
 ---
 name: aixcut-basics
-description: "Shared Aixcut MCP rules for context, read-before-write, stable refs, idempotency, async jobs, envelopes, and host boundaries. Load as fallback when no specialist Skill applies; do not use instead of a specialist workflow."
+description: "Shared Aixcut MCP rules for context, read-before-write, stable refs, idempotency, async jobs, envelopes, and host boundaries. Load as fallback when no specialist Skill applies; do not use instead of a specialist workflow. Chinese triggers: 项目、时间轴、字幕、配音、生成、导出、报错."
 ---
 
 # Aixcut MCP Basics
 
 Load with the relevant specialist Skill. Follow [language](references/language.md), [conversation guidance](references/conversation-guidance.md), and [ownership](references/model.md).
+
+At the start of the first Aixcut workflow in each new Codex task, follow [plugin maintenance](references/plugin-maintenance.md) once. Check the configured GitHub or Gitee marketplace, ask before upgrading, preserve the existing MCP configuration and authorization, and start a fresh task after a successful upgrade.
 
 The release package supplies shared Core policy at [orchestration](../../references/core/orchestration.md) and [workflow boundaries](../../references/core/workflow-boundaries.md). Use these for phase budgets, Checkpoint recovery, state ownership and host fallbacks; live schemas and current user authorization remain authoritative.
 
@@ -21,7 +23,7 @@ The Host handles OAuth; do not call `aixcut_login` first. Never use curl, direct
 
 ## Intent and recovery contract
 
-For every request use the short state machine `intent → inspect → plan → execute → verify → deliver`. Mechanical edits remain narrow: do not add voice, music, B-roll, Motion Graphics, or export unless explicitly requested. An assembly request may expand scope only after its `EditPlan` names the requested stages.
+For every request use the short state machine `intent → inspect → plan → execute → verify → deliver`. Mechanical edits remain narrow: do not add voice, music, B-roll, Motion Graphics, or export unless explicitly requested. Heavyweight actions — export, generation or submission, deletion, and overwrite — run only when the user requested or explicitly authorized them, and never as a checkpoint between steps. An assembly request may expand scope only after its `EditPlan` names the requested stages.
 
 When a mutation returns `status_unknown`, preserve its original `idempotency_key`/`mutation_id` and query `aixcut_read(view="mutation_receipt")` with that identity. Treat `pending`, `unknown`, and `not_found` as unresolved until the receipt says `applied`, `duplicate`, `noop`, or `rejected`; never create a new key merely because a response was lost. Save a `Checkpoint` containing Project, timeline, revision, mutation identity and next action before leaving a recoverable stage.
 

@@ -1,6 +1,6 @@
 ---
 name: aixcut-video-assembly
-description: "Assemble a complete video by coordinating visuals, voiceover, captions, music, and export. Do not use for a single edit."
+description: "Assemble a complete video by coordinating visuals, voiceover, captions, music, and export. Do not use for a single edit. Chinese triggers: 宣传片、成片、短片、Vlog、混剪、卡点视频."
 ---
 
 # Aixcut Video Assembly
@@ -78,15 +78,15 @@ The effective order is visual structure → conditional voice → captions from 
 3. **Voice intent and script:** For `preserve-original`, reuse the source voice and skip synthesis. For `generate-voice` or `replace-original`, write the script in the requested content language, choose a voice profile, and submit synthesis. If the state is `needs-clarification`, pause for the one missing decision.
 4. **Place and transcribe voice:** Run this stage only for a requested generated or replacement voice. Successful synthesis only means the audio asset exists. Place it on the timeline, then read the source `transcript_status`. Only `available` is ready for automatic captions; report pending or failed status accurately.
 5. **Captions:** Generate captions only when the audio that is actually on the timeline has `transcript_status=available`. Never use the voice script as a transcript or claim transcription is complete from the script alone. If the status is not `available`, skip automatic captions and report the returned state.
-6. **Background music:** Add a separate audio track only for `add-music` after explicit user request or confirmation. For `no-music` and `optional-music`, do not generate or add music. When enabled, add fades at both ends and lower `volume` so narration remains clear.
+6. **Background music:** Add a separate audio track only for `add-music` after explicit user request or confirmation. For `no-music` and `optional-music`, do not generate or add music. When enabled, add fades at both ends; after read-back, lower the created clip with `aixcut_audio(action="update", target="clip:...", volume=0.2–0.4)` so narration remains clear.
 7. **Review:** Read the timeline, source audio, voice state, transcript status, captions, and music state and check each stated requirement. Verify captions and visual annotations independently; the caption track must contain only spoken subtitle clips, while art text and Motion Graphs remain on their dedicated tracks.
-8. **Export:** Use `aixcut-export` to export from the Project page and poll status. The browser downloads the file; report its filename and size.
+8. **Export (only when requested):** Run this stage once, after every requested stage is finished, and only when the user requested or explicitly authorized an export; never export between stages. Use `aixcut-export` to export from the Project page and poll status. The browser downloads the file; report its filename and size.
 
 Detailed stage instructions are in [references/pipeline.md](references/pipeline.md).
 
 ## Stage handoffs
 
-Stage changes are status updates, not confirmation gates. After laying out visuals, report pacing and continue to the resolved voice branch. Do not synthesize when `preserve-original` applies. After placing requested voice, report the script and voice profile, then continue to captions only after a real `transcript_status=available` read. Add music only after `add-music` is explicitly requested or confirmed. Before export, summarize the structure and verified checks.
+Stage changes are status updates, not confirmation gates. After laying out visuals, report pacing and continue to the resolved voice branch. Do not synthesize when `preserve-original` applies. After placing requested voice, report the script and voice profile, then continue to captions only after a real `transcript_status=available` read. Add music only after `add-music` is explicitly requested or confirmed. Intermediate stages never export; the single optional export happens after the resolved stages. Before export, summarize the structure and verified checks.
 
 Pause only when available media cannot meet the goal, different interpretations would produce materially different edits, a generation charge or credits have not been accepted, existing work may be overwritten or deleted, or the user asked to review before continuing. Ask only about the most important unresolved choice and recommend an option.
 
@@ -99,15 +99,15 @@ For upload, asynchronous generation, voice rendering, transcription, or export, 
 - **Voice generation does not imply captions exist.** Wait for `transcript_status=available`, regenerate captions, and read them back.
 - **A complete assembly request does not imply voice or music.** Honor the resolved intent state and keep optional or unmentioned music off.
 - **Music needs fades.** Without fades, it can start or stop abruptly.
-- **Do not invent beat-analysis actions.** Use only the actions in the live `aixcut_frontend` schema. If beat evidence is unavailable, report that beats could not be determined; do not estimate BPM by ear.
+- **Do not invent beat-analysis actions.** Use only the published frontend operations. If beat evidence is unavailable, report that beats could not be determined; do not estimate BPM by ear.
 - **Balance voice and music.** Music overpowering narration is a common quality issue.
 - **The browser owns local source files.** Full local video is not uploaded. Audio may be extracted for transcription and visual understanding uses on-demand frame capture. The Project page performs final export; do not treat local originals as missing.
 
 ## Completion
 
-Each user requirement must map to a read-back result. Usually read `timeline`, `voice`, and `captions` with `aixcut_read`, then inspect structure with `aixcut_review`.
+Each user requirement must map to a read-back result. Usually call `aixcut_read(view="timeline")`, `aixcut_read(view="speech")`, and `aixcut_read(view="captions")`, then inspect structure with `aixcut_review(view="timeline")`.
 
-Report total duration, visual clip count, voice segment count and duration, caption count, music track and fades, and export status. State any incomplete work plainly. If the exported file was not actually played, say “full playback/listening not verified.”
+Report total duration, visual clip count, voice segment count and duration, caption count, and music track and fades. Report export status only when the user requested an export. State any incomplete work plainly. If the exported file was not actually played, say “full playback/listening not verified.”
 
 ## Plan and evidence artifacts
 
