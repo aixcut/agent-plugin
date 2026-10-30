@@ -63,4 +63,19 @@ for (const host of hosts) {
       .join("\n");
     assert.match(assembly, /aixcut_audio\(action="update",[^)]*target[^)]*volume/i);
   });
+
+  test(`${host}: does not reference retired MCP tool names outside retirement notes`, () => {
+    const retirementNote = /旧\s*`aixcut_[a-z_]+`\s*Tool 已退役/;
+    const offenders = [];
+    for (const file of walk(hostRoot)) {
+      if (!/\.(md|mjs|json|yaml)$/.test(file)) continue;
+      for (const line of readFileSync(file, "utf8").split("\n")) {
+        if (retirementNote.test(line)) continue;
+        for (const match of line.matchAll(/\baixcut_[a-z_]+\b/g)) {
+          if (!tools.has(match[0])) offenders.push(`${relative(root, file)}: ${match[0]}`);
+        }
+      }
+    }
+    assert.deepEqual(offenders, [], `retired MCP tool names: ${offenders.join(", ")}`);
+  });
 }

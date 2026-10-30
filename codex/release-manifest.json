@@ -2,7 +2,7 @@
   "schema_version": 1,
   "plugin": {
     "name": "aixcut",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "host": "codex"
   },
   "server_contract": {
@@ -12,13 +12,13 @@
   "core": {
     "name": "@aixcut/plugin-core",
     "version": "1.1.2",
-    "manifest_sha256": "6a87ba04637edc4c42c3dc0ff659f7e11c4e3e646d7b111d8d5110d0490713b4"
+    "manifest_sha256": "9c44ace05846c6f6338f9518d2e05edea837c5b7e08977a7e6279e233a7eeff0"
   },
   "catalog_sha256": "7dbdb485fe84ce8d662af571218cb84b4aeb0cdc45d042210dd62994537541df",
   "files": [
     {
       "path": ".codex-plugin/plugin.json",
-      "sha256": "7aad8b78165f32cd8e49048f1f63f77ce288947ba94347262311078b426e5382"
+      "sha256": "15621ac0243fc8fb0044dec06760c01ed0715c67f232f6c11cfcf11ad04c52a5"
     },
     {
       "path": ".mcp.json",
@@ -30,7 +30,7 @@
     },
     {
       "path": "contracts/compatibility.json",
-      "sha256": "a4d67d286520d4fed813a19103296521e6ced47f77b8af7107bd6f55a4842a34"
+      "sha256": "c1ee6b1c92a82c920171a81c9ccdcafd32a191fdc09e8efecbadeaf6259e5ff7"
     },
     {
       "path": "contracts/core/action-contract.json",
@@ -42,7 +42,7 @@
     },
     {
       "path": "contracts/core/core-manifest.json",
-      "sha256": "6a87ba04637edc4c42c3dc0ff659f7e11c4e3e646d7b111d8d5110d0490713b4"
+      "sha256": "9c44ace05846c6f6338f9518d2e05edea837c5b7e08977a7e6279e233a7eeff0"
     },
     {
       "path": "contracts/core/edit-plan.schema.json",
@@ -74,11 +74,11 @@
     },
     {
       "path": "contracts/core-lock.json",
-      "sha256": "2dc0594e1eb6c0facfa9095631ef7531f8f101c0e689ba40afa3d71d662053ce"
+      "sha256": "d57f0c9d6d1dec975aa84cddeccf69fcf315448c2c170fc9e13b49d6bf16d8bc"
     },
     {
       "path": "contracts/core-manifest.json",
-      "sha256": "6a87ba04637edc4c42c3dc0ff659f7e11c4e3e646d7b111d8d5110d0490713b4"
+      "sha256": "9c44ace05846c6f6338f9518d2e05edea837c5b7e08977a7e6279e233a7eeff0"
     },
     {
       "path": "contracts/mcp-tool-catalog.json",
@@ -90,7 +90,7 @@
     },
     {
       "path": "references/core/orchestration.md",
-      "sha256": "3dd36c8665652cec8a6d6adc12f2e04e9c57b4500d3121469706e99495748e23"
+      "sha256": "357c46f28d85d955949e372ff7beeb34a471e3b395d5ede9e74d1e7b1b2c80a2"
     },
     {
       "path": "references/core/performance-budget.md",
@@ -102,7 +102,7 @@
     },
     {
       "path": "references/core/speech-workflow.md",
-      "sha256": "fd490fa56362e077041a8496da5286f6bb7f306ec4e8b1ad1b7c7cf702a986ab"
+      "sha256": "e4a7d7a12d1bb20e9fa539434f793478aae75c42b70512e9104f0db232834951"
     },
     {
       "path": "references/core/workflow-boundaries.md",
@@ -114,7 +114,7 @@
     },
     {
       "path": "scripts/download-capture-artifacts.mjs",
-      "sha256": "76cdf3c0d0ace7e67642b205743cabc9cedfcd893dba6b1e0de4ea51154fcc00"
+      "sha256": "68296d02ad0fe0699936c568ca0073c8a3905f9d7ccf0a7d77df4124a6af48fd"
     },
     {
       "path": "scripts/local-media-bridge.mjs",
@@ -158,7 +158,7 @@
     },
     {
       "path": "scripts/workflow-state.mjs",
-      "sha256": "915d68a7076548c756c67e66484725e09c443ebfc5afbd8b5361b50f8ef2eadb"
+      "sha256": "f532e460da92b671792e0c160bea7cae9e0e3a227eddd54de075f40690585a32"
     },
     {
       "path": "scripts/workflow-trace-adapter.mjs",

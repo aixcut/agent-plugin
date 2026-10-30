@@ -1,6 +1,6 @@
 {
   "name": "aixcut",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Edit video projects in Aixcut through Codex and the hosted Aixcut MCP service.",
   "author": {
     "name": "CSEQ Labs",
