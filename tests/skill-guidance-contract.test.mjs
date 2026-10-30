@@ -54,6 +54,8 @@ for (const host of hosts) {
     const timeline = readFileSync(join(skillsRoot, "aixcut-timeline-editing/SKILL.md"), "utf8");
     assert.match(timeline, /aixcut_audio\(action="update",[^)]*target[^)]*volume/i);
     assert.match(timeline, /aixcut_frontend\(action="media\.extract_audio"/);
+    assert.match(timeline, /action="media\.extract_audio", params=\{media_id/);
+    assert.match(timeline, /action="operation\.get", params=\{operation_id/);
 
     const assembly = [
       "aixcut-video-assembly/SKILL.md",
