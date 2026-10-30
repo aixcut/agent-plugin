@@ -4,13 +4,13 @@ The `aixcut-voice` Skill keeps its user-facing name. Its MCP workflow uses the p
 
 | Tool | action | Required fields | Meaning |
 | --- | --- | --- | --- |
-| aixcut_generate_catalog | — | `kind="speech"` | Discover current ready voice profiles and selectable models. |
-| aixcut_generate_speech_read | — | — | Read ordered paragraph numbers and effective settings. |
-| aixcut_generate_speech_edit | — | `operation` | Atomically add, update, delete or move paragraphs. |
-| aixcut_generate_speech_quote | — | exactly one of `segments` or `all=true` | Quote 1–50 nonempty paragraphs and freeze their recovery identities. |
-| aixcut_generate_speech_submit | — | `recovery` | Submit the exact frozen recovery after its quoted price is accepted. |
-| aixcut_audio_add | — | media ref | Place explicitly requested published speech audio on the timeline. |
-| aixcut_generate_get | — | `job_id` | Read each returned Job until terminal. |
+| aixcut_generate(action="catalog") | — | `kind="speech"` | Discover current ready voice profiles and selectable models. |
+| aixcut_generate(action="speech_read") | — | — | Read ordered paragraph numbers and effective settings. |
+| aixcut_generate(action="speech_edit") | — | `operation` | Atomically add, update, delete or move paragraphs. |
+| aixcut_generate(action="speech_quote") | — | exactly one of `segments` or `all=true` | Quote 1–50 nonempty paragraphs and freeze their recovery identities. |
+| aixcut_generate(action="speech_submit") | — | `recovery` | Submit the exact frozen recovery after its quoted price is accepted. |
+| aixcut_audio(action="add") | — | media ref | Place explicitly requested published speech audio on the timeline. |
+| aixcut_generate(action="get") | — | `job_id` | Read each returned Job until terminal. |
 
 ## Paragraph edits
 
@@ -20,13 +20,13 @@ Read before using paragraph numbers; refresh after changed order or conflicts. `
 
 Read the draft:
 
-```json aixcut_generate_speech_read
+```json
 {}
 ```
 
 Quote selected paragraph numbers only after reading the current ordered draft:
 
-```json aixcut_generate_speech_quote
+```json
 {"segments":[1,2]}
 ```
 
@@ -38,6 +38,6 @@ Submission returns per-paragraph `operationId`, `jobId`, status and any publishe
 
 ## Placement
 
-Submit has no `place=true` flag. Wait for published media identities, then use `aixcut_audio_add` through the timeline editing Skill for explicitly requested placement. Protect existing clips; do not clear and rebuild the dedicated voice track by default. Confirm the target track and range, then reread `timeline`, `audio`, and `sources`.
+Submit has no `place=true` flag. Wait for published media identities, then use `aixcut_audio(action="add")` through the timeline editing Skill for explicitly requested placement. Protect existing clips; do not clear and rebuild the dedicated voice track by default. Confirm the target track and range, then reread `timeline`, `audio`, and `sources`.
 
 Automatic captions require the actually placed source to report `transcript_status=available`; a script or a successful Job is not transcription evidence.

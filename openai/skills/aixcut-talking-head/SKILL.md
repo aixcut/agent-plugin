@@ -11,10 +11,10 @@ State the current editing stage and next step when useful. Reuse the user's stat
 
 ## Short path
 
-1. Read `aixcut_read_source_lines()` in pages. The default is 200 rows; follow `next_offset` until `has_more=false` to get the full speech text and timing. Do not request all `word-time` data at once.
+1. Read `aixcut_read(view="source_lines")` in pages. The default is 200 rows; follow `next_offset` until `has_more=false` to get the full speech text and timing. Do not request all `word-time` data at once.
 2. After identifying the lines to edit, use `selectors` with `include=["word-time"]` for word-level timing; request at most 50 rows per page.
 3. Apply the requested edit with the appropriate published speech operation.
-4. Captions follow the primary speech track. When needed, synchronize or regenerate them with `aixcut_caption_regenerate`.
+4. Captions follow the primary speech track. When needed, synchronize or regenerate them with `aixcut_caption(action="regenerate")`.
 5. Read back `timeline` or `speech` to confirm the result.
 
 ## Required order
@@ -43,7 +43,7 @@ If an upstream stage changes, revisit dependent stages. Read back after each maj
 
 ## Boundaries
 
-- Speech operations edit only the primary speech track. Use `aixcut_clip_add` for B-roll and visuals, and `aixcut_audio_add` for music or sound effects.
+- Speech operations edit only the primary speech track. Use `aixcut_clip(action="add")` for B-roll and visuals, and `aixcut_audio(action="add")` for music or sound effects.
 - Do not use text operations to edit captions.
 - Use a fresh UUID for each batch. Do not reuse one key across distinct batches.
 
@@ -55,7 +55,7 @@ If an upstream stage changes, revisit dependent stages. Read back after each maj
 
 ## Completion
 
-Confirm the speech reflects the request, read-back positions are correct, and captions align. Report how many segments were removed and added, plus the new revision. Use `aixcut_review_timeline` when visual verification is needed.
+Confirm the speech reflects the request, read-back positions are correct, and captions align. Report how many segments were removed and added, plus the new revision. Use `aixcut_review(view="timeline")` when visual verification is needed.
 
 ## Semantic and natural speech gate
 

@@ -1,6 +1,6 @@
 # Review Action Reference
 
-`aixcut_review_timeline` is read-only. Its required `view` is exactly one of `project`, `timeline`, or `renderability`. `project_id` is optional when a Project is already active; `timeline_id` and `expected_revision` can be supplied when the caller needs a particular current timeline, following the live Tool Schema.
+`aixcut_review(view="timeline")` is read-only. Its required `view` is exactly one of `project`, `timeline`, or `renderability`. `project_id` is optional when a Project is already active; `timeline_id` and `expected_revision` can be supplied when the caller needs a particular current timeline, following the live Tool Schema.
 
 The result includes `view`, `ok`, `renderable`, `summary`, and `issues`, plus the Project/timeline identity and revision. `summary` reports error and warning counts and track/clip counts. Each issue reports severity, code, message, and an optional ref.
 
