@@ -57,11 +57,16 @@ for (const pkg of packages) {
     assert.match(maintenance, /gitee\.com\/aixcut\/agent-plugin/);
     assert.match(maintenance, /不要.*删除|不要.*覆盖|不得.*删除|不得.*覆盖/);
     assert.match(mcp, new RegExp(expectedEndpoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-    assert.equal(plugin.repository, 'https://github.com/aixcut/agent-plugin');
+    // 区域分发包可以把仓库地址指到自己的站点；官网地址必须跟仓库区域一致。
+    const regional = plugin.repository.includes('gitee.com');
+    assert.equal(
+      plugin.repository,
+      regional ? 'https://gitee.com/aixcut/agent-plugin' : 'https://github.com/aixcut/agent-plugin',
+    );
     if (pkg.name === 'codex') {
       assert.equal(plugin.homepage, 'https://aixcut.cn');
     } else {
-      assert.equal(plugin.homepage, 'https://aixcut.com');
+      assert.equal(plugin.homepage, regional ? 'https://aixcut.cn' : 'https://aixcut.com');
     }
   });
 
