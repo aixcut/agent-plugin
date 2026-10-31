@@ -1,6 +1,6 @@
 ---
 name: aixcut-projects
-description: "List, create, open, switch, or exit an Aixcut Project. Do not use for timeline edits."
+description: "List, create, open, switch, or exit an Aixcut Project. Do not use for timeline edits. Chinese triggers: 打开项目、新建项目、切换项目、退出项目."
 ---
 
 # Aixcut Projects
@@ -9,18 +9,22 @@ description: "List, create, open, switch, or exit an Aixcut Project. Do not use 
 
 State whether the user is selecting, opening, creating, or leaving a Project and what happens next. After an open or create request, verify the page and active Project state before saying the user is ready to edit. If a required choice is missing, ask one concise question and recommend an option.
 
+## Session availability
+
+If the current session has no Aixcut tools because OAuth completed after its tool catalog was created, or the host still reports `Not logged in`, let the host finish OAuth and start a new host session before calling `aixcut_open`. Never use `codex exec`, a subagent, another MCP client, or a plain Project URL as a substitute; `browser_handoff` is bound to the host session that opens it. If the tools remain unavailable, stop before creating a Project.
+
 ## Open a page
 
-Call `aixcut_open` once with the target that matches the request:
+Call the one open operation that matches the request:
 
 | Intent | Arguments |
 | --- | --- |
-| Open Studio | `{"target":"studio"}` |
-| Open the Project list | `{"target":"project_list"}` |
-| Create and enter a Project | `{"target":"new_project","title":"...","description":"optional"}` |
-| Open a specific Project | `{"target":"project","project_id":"..."}` |
+| Open Studio | `aixcut_open(target="studio")` |
+| Open the Project list | `aixcut_open(target="project_list")` |
+| Create and enter a Project | `aixcut_open(target="new_project", title="...", description="optional")` |
+| Open a specific Project | `aixcut_open(target="project", project_id="...")` |
 
-When later work needs the editor page (frame capture, page-based export, or asking the user to upload media), open the specific Project with `target="project"`. Opening Studio or the Project list does not bind editor actions to a Project.
+When later work needs the editor page (frame capture, page-based export, or asking the user to upload media), use `aixcut_open(target="project")`. Opening Studio or the Project list does not bind editor actions to a Project.
 
 After a successful call, immediately open the complete `result.browser_handoff.url` with Codex Desktop's official browser-opening capability. This Skill supplies the Codex opening arguments locally:
 
@@ -38,7 +42,7 @@ Preserve the URL and its one-time `session_token` exactly. Do not compose a plai
 - `result.page_open_requested: true` means the server requested that the page open; it does not prove the page is connected. A host opening result of `queued` also does not mean it is connected.
 - Top-level `next_action` is usually `wait_then_read`. Wait about 5 seconds, then call `aixcut_frontend(action="page_status")` if the next operation needs the page.
 
-Only confirm page presence when the next action needs it. Timeline reads/writes and voice script/settings writes do not require the editor page; voice rendering, frame capture, page export, and user-assisted upload do. Require `presence_connections >= 1` and confirm that the target Project appears in `pages`; a different online Project is not sufficient. If the target is absent, stop and ask the user to open or switch to that Project in this MCP session. Do not call `aixcut_open` again or treat `queued` as connected. Once the target is online, retry the original page action at most once.
+Only confirm page presence when the next action needs it. Timeline reads/writes and voice script/settings writes do not require the editor page; voice rendering, frame capture, page export, and user-assisted upload do. Require `presence_connections >= 1` and confirm that the target Project appears in `pages`; a different online Project is not sufficient. If the target is absent, stop and ask the user to open or switch to that Project in this MCP session. Do not call an open operation again or treat `queued` as connected. Once the target is online, retry the original page action at most once.
 
 ## Returned data
 
@@ -58,6 +62,6 @@ Only confirm page presence when the next action needs it. Timeline reads/writes 
 
 - If authorization is missing, the Codex Host completes OAuth and resumes the original call. Do not call `aixcut_login` first, repeat `aixcut_open`, or operate the authorization page.
 - If authorization is denied, cancelled, fails, or times out, stop and report that the page was not opened.
-- Use only the declared `target` values. Do not pass arbitrary URLs, `return_to`, undeclared fields, or guessed IDs.
+- Use only the fields declared by the selected open operation. Do not pass arbitrary URLs, `return_to`, undeclared fields, or guessed IDs.
 - `title` is required for a new Project. Do not pass `idempotency_key` when creating one; each call creates a new Project.
 - Never output, record, or copy a complete returned URL containing `session_token`.

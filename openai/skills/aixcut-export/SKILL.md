@@ -1,6 +1,6 @@
 ---
 name: aixcut-export
-description: "Export an Aixcut Project as MP4, MOV, or WebM and check the page-based export status and result. Use when the user asks to export, render, download, or check an export. Do not use for editing, voiceover, or captions."
+description: "Export an Aixcut Project as MP4, MOV, or WebM and check the page-based export status and result. Use when the user asks to export, render, download, or check an export. Do not use for editing, voiceover, or captions. Chinese triggers include 导出、渲染、下载成片."
 ---
 
 # Export from Aixcut
@@ -42,6 +42,7 @@ Local media also requires browser file-access permission. If export or frame cap
 ## Boundaries
 
 - Export does not change timeline content. Do not make unrequested edits.
+- Export only when the user asked for the file. Never export to report progress, to close out an intermediate stage, or to verify a partial edit.
 - The finished file does not pass through MCP. Do not promise a later server link.
 - For local media and asynchronous recovery, see `aixcut-timeline-editing`. For a full production workflow, see `aixcut-video-assembly`.
 
