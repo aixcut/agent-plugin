@@ -1,7 +1,7 @@
 {
   "name": "aixcut",
   "version": "0.3.2",
-  "description": "Edit video projects in Aixcut through Codex and the hosted Aixcut MCP service.",
+  "description": "All-in-one AI video editing across talking-head cuts, livestream clips, e-commerce feed ads, TV commercials, and batch content production. Aixcut Studio supports project-file export to major post-production software.",
   "author": {
     "name": "CSEQ Labs",
     "url": "https://aixcut.cn"
@@ -24,8 +24,8 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Aixcut",
-    "shortDescription": "Edit videos with Aixcut",
-    "longDescription": "Open Aixcut Studio, import local media and documents into the project, read a project before editing, apply verified timeline edits, generate image/video/music assets, render voice, export the finished cut, and check durable jobs through the hosted Aixcut MCP server.",
+    "shortDescription": "AI video editing, made faster",
+    "longDescription": "Create videos faster with Aixcut, your all-in-one AI video editing expert for talking-head fine cuts, livestream clips, e-commerce feed ads, TV commercials, and batch content production. Aixcut Studio supports exporting project files to major post-production software.",
     "developerName": "CSEQ Labs",
     "category": "Creativity",
     "capabilities": [

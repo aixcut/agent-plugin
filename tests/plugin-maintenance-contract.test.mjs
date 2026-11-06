@@ -89,3 +89,21 @@ test('maintenance rules keep region-specific marketplace sources explicit', asyn
   assert.match(maintenance, /Gitee.*国内|国内.*Gitee/i);
   assert.match(maintenance, /regional MCP configuration/i);
 });
+
+test('Codex and OpenAI plugin listings share the five-scenario editing position', async () => {
+  const [codex, openai] = await Promise.all([
+    json('codex/.codex-plugin/plugin.json'),
+    json('openai/plugin.json'),
+  ]);
+  const codexInterface = codex.interface;
+  const openaiInterface = openai.extensions['com.openai'].interface;
+
+  for (const [plugin, pluginInterface] of [[codex, codexInterface], [openai, openaiInterface]]) {
+    assert.match(plugin.description, /AI video editing.*talking-head cuts.*livestream clips.*e-commerce feed ads.*TV commercials.*batch content production/i);
+    assert.match(pluginInterface.shortDescription, /AI video editing/i);
+    assert.match(pluginInterface.longDescription, /Aixcut Studio supports exporting project files to major post-production software/i);
+    assert.ok(pluginInterface.shortDescription.length <= 30);
+  }
+  assert.equal(codexInterface.longDescription, openaiInterface.longDescription);
+  assert.equal(codexInterface.shortDescription, openaiInterface.shortDescription);
+});

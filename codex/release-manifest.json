@@ -18,7 +18,7 @@
   "files": [
     {
       "path": ".codex-plugin/plugin.json",
-      "sha256": "15621ac0243fc8fb0044dec06760c01ed0715c67f232f6c11cfcf11ad04c52a5"
+      "sha256": "dc541bbe667be2489c4e8db9bcb55a9f0dabef97f33d343be6180dfa1a58c738"
     },
     {
       "path": ".mcp.json",
@@ -186,7 +186,7 @@
     },
     {
       "path": "skills/aixcut-basics/SKILL.md",
-      "sha256": "176e3f915a43cb037e79131d2bc6d33056d57bd3eb0febd7c0a1b7011fbc3018"
+      "sha256": "17c736812e3d14968267b6582b9b2b979f7eea4c385014660bdd5901b14871fe"
     },
     {
       "path": "skills/aixcut-captions/references/actions.md",
@@ -206,7 +206,7 @@
     },
     {
       "path": "skills/aixcut-export/SKILL.md",
-      "sha256": "d78785fb70b291d8d10799253e3f9c88f6fc1ef2a796582f8f1e579d98203d4a"
+      "sha256": "b2ffe1548f798c08ec25c4b714ce4b424d60804cd48438dff62bd695c4d39bb6"
     },
     {
       "path": "skills/aixcut-generation/references/providers.md",
@@ -254,7 +254,7 @@
     },
     {
       "path": "skills/aixcut-timeline-editing/SKILL.md",
-      "sha256": "c5300e1410dc1301406f51d96730707546538485cd65f1786fd17fbe5cbf9997"
+      "sha256": "09b80aca7f209deb3680cc86f57732f134e3bbc98e071a53476a69190371a81d"
     },
     {
       "path": "skills/aixcut-verification/references/actions.md",
@@ -266,11 +266,11 @@
     },
     {
       "path": "skills/aixcut-video-assembly/references/pipeline.md",
-      "sha256": "2041badddcafe12d7336ee6c2482a74dce7920d497070688b82278995cbd4942"
+      "sha256": "7731e0313a5e93b77ccefeb618461447ad2087259bc7fd2fcc05f99e5d0b6630"
     },
     {
       "path": "skills/aixcut-video-assembly/SKILL.md",
-      "sha256": "2720e7414f7b73034e132ca95da1f481dc4e5079a464a4245dbe2d99dd8e3c6d"
+      "sha256": "e10944074b799b64964235707cbeda808ad739001b2c23fee933136e9171dffd"
     },
     {
       "path": "skills/aixcut-voice/references/actions.md",
