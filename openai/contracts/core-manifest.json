@@ -4,7 +4,7 @@
   "server_contract_version": "1.4.0",
   "helper_schema_version": "1.0.0",
   "files": {
-    "contracts/action-contract.json": "6157727e3182c15229c92999ca383b99d87731e172ee3abbac551da4c92eed19",
+    "contracts/action-contract.json": "d93d5ed54c0243228aaac904327da2a542f659c4f9dca6937cf87ada96aeab9f",
     "contracts/checkpoint.schema.json": "9200c288f8afdc704dcaa2fd8871e3c48c4cb454dd4e5c812a7800fcc9704d06",
     "contracts/edit-plan.schema.json": "dffd24b55d65a3e6ec9e149654bc3ccc69dce1824605d99546fc7a5c77cd4de2",
     "contracts/error-taxonomy.json": "ded2f1c2b3aed6c83e57a392bb4c5e1ce228dfbc46e51d52b28eae571c47a3d2",

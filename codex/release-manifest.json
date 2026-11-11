@@ -2,23 +2,23 @@
   "schema_version": 1,
   "plugin": {
     "name": "aixcut",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "host": "codex"
   },
   "server_contract": {
-    "min": "1.3.0",
-    "max": "1.3.0"
+    "min": "1.4.0",
+    "max": "1.4.0"
   },
   "core": {
     "name": "@aixcut/plugin-core",
-    "version": "1.1.2",
-    "manifest_sha256": "9c44ace05846c6f6338f9518d2e05edea837c5b7e08977a7e6279e233a7eeff0"
+    "version": "1.2.0",
+    "manifest_sha256": "74b17e208fb178fca6a8146f0bc24d4afb7836f6bb6c9e687c51ba6cdfc34489"
   },
-  "catalog_sha256": "7dbdb485fe84ce8d662af571218cb84b4aeb0cdc45d042210dd62994537541df",
+  "catalog_sha256": "7140392ec004b3a1c391752d7c1131dea51fdeab38563c681009fded9b42fb08",
   "files": [
     {
       "path": ".codex-plugin/plugin.json",
-      "sha256": "dc541bbe667be2489c4e8db9bcb55a9f0dabef97f33d343be6180dfa1a58c738"
+      "sha256": "01fc4d5e0ca2d39ee540a1bcc440493846b86974dbcdb8f515acd52655fc3724"
     },
     {
       "path": ".mcp.json",
@@ -30,11 +30,11 @@
     },
     {
       "path": "contracts/compatibility.json",
-      "sha256": "c1ee6b1c92a82c920171a81c9ccdcafd32a191fdc09e8efecbadeaf6259e5ff7"
+      "sha256": "4976a53b2e3cbe23d8b65e31d123fb574a00edf0b1b669370962a9c788e82f65"
     },
     {
       "path": "contracts/core/action-contract.json",
-      "sha256": "6157727e3182c15229c92999ca383b99d87731e172ee3abbac551da4c92eed19"
+      "sha256": "d93d5ed54c0243228aaac904327da2a542f659c4f9dca6937cf87ada96aeab9f"
     },
     {
       "path": "contracts/core/checkpoint.schema.json",
@@ -42,7 +42,7 @@
     },
     {
       "path": "contracts/core/core-manifest.json",
-      "sha256": "9c44ace05846c6f6338f9518d2e05edea837c5b7e08977a7e6279e233a7eeff0"
+      "sha256": "74b17e208fb178fca6a8146f0bc24d4afb7836f6bb6c9e687c51ba6cdfc34489"
     },
     {
       "path": "contracts/core/edit-plan.schema.json",
@@ -54,7 +54,7 @@
     },
     {
       "path": "contracts/core/mcp-tool-catalog.json",
-      "sha256": "7dbdb485fe84ce8d662af571218cb84b4aeb0cdc45d042210dd62994537541df"
+      "sha256": "7140392ec004b3a1c391752d7c1131dea51fdeab38563c681009fded9b42fb08"
     },
     {
       "path": "contracts/core/operation-receipt.schema.json",
@@ -74,19 +74,19 @@
     },
     {
       "path": "contracts/core-lock.json",
-      "sha256": "d57f0c9d6d1dec975aa84cddeccf69fcf315448c2c170fc9e13b49d6bf16d8bc"
+      "sha256": "e294005d0ea6db9ec5d4a618d85f78fc0f7a8dad262cef335357b4ac821f0f76"
     },
     {
       "path": "contracts/core-manifest.json",
-      "sha256": "9c44ace05846c6f6338f9518d2e05edea837c5b7e08977a7e6279e233a7eeff0"
+      "sha256": "74b17e208fb178fca6a8146f0bc24d4afb7836f6bb6c9e687c51ba6cdfc34489"
     },
     {
       "path": "contracts/mcp-tool-catalog.json",
-      "sha256": "7dbdb485fe84ce8d662af571218cb84b4aeb0cdc45d042210dd62994537541df"
+      "sha256": "7140392ec004b3a1c391752d7c1131dea51fdeab38563c681009fded9b42fb08"
     },
     {
       "path": "contracts/skill-tool-map.json",
-      "sha256": "bb5f175a4248840db6abba773c2fdaeb67e1a8dba68e9dbe2352782649f33282"
+      "sha256": "d04defaaa51ceed3499852fa31178404c30dcb750346dad0fd4ee7be4d02bed0"
     },
     {
       "path": "references/core/orchestration.md",
@@ -271,6 +271,14 @@
     {
       "path": "skills/aixcut-video-assembly/SKILL.md",
       "sha256": "e10944074b799b64964235707cbeda808ad739001b2c23fee933136e9171dffd"
+    },
+    {
+      "path": "skills/aixcut-visual-effects/references/actions.md",
+      "sha256": "f848465b040b5a1b64a67993b517deae536c2449ba1d1ec754d4e3e0f9a5f4c3"
+    },
+    {
+      "path": "skills/aixcut-visual-effects/SKILL.md",
+      "sha256": "ab10b5262d4605774121fa8e52e95242bd37840498bea0225f73d737fe1c83d7"
     },
     {
       "path": "skills/aixcut-voice/references/actions.md",
