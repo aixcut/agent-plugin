@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "aixcut",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "All-in-one AI video editing across talking-head cuts, livestream clips, e-commerce feed ads, TV commercials, and batch content production. Aixcut Studio supports project-file export to major post-production software.",
   "author": {
     "name": "CSEQ Labs",
