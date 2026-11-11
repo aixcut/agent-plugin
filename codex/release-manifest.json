@@ -86,7 +86,7 @@
     },
     {
       "path": "contracts/skill-tool-map.json",
-      "sha256": "d04defaaa51ceed3499852fa31178404c30dcb750346dad0fd4ee7be4d02bed0"
+      "sha256": "e1436993fa5084f08b79099eaf5c01b4b2b76e1c261f5bf3c66c82ae16f1ccfe"
     },
     {
       "path": "references/core/orchestration.md",
@@ -190,7 +190,7 @@
     },
     {
       "path": "skills/aixcut-captions/references/actions.md",
-      "sha256": "e3cc8525506826dbd043eae79ced69aacb4eda2909327f56426020bb9363c09e"
+      "sha256": "aad172a2ec01b4b9bd8d60581d630efa83da8f441cbc30704737e5ea7cca6be1"
     },
     {
       "path": "skills/aixcut-captions/SKILL.md",
@@ -242,11 +242,11 @@
     },
     {
       "path": "skills/aixcut-talking-head/SKILL.md",
-      "sha256": "717929a5a22c3027ce57cf0d7b435e53ac87578fb9296e7668963c07e5d09262"
+      "sha256": "d5ad26630cd6d9d16ff9fa1cb20de3041368ddcf97a234f0b56594f34d0774cf"
     },
     {
       "path": "skills/aixcut-timeline-editing/references/actions.md",
-      "sha256": "1272c91117246159c2abdfba16a20b640a3faf99dce6a162f3d83b42afcce192"
+      "sha256": "319fb814264ceca23677f05fb17dc40d76660bfb888c4324e8a9ab881cb56623"
     },
     {
       "path": "skills/aixcut-timeline-editing/references/frontend-actions.md",
@@ -278,7 +278,7 @@
     },
     {
       "path": "skills/aixcut-visual-effects/SKILL.md",
-      "sha256": "ab10b5262d4605774121fa8e52e95242bd37840498bea0225f73d737fe1c83d7"
+      "sha256": "3bf75373632c3903a0983e310dc94bd74154199b1a9129ce3d2edb7fa4189bcd"
     },
     {
       "path": "skills/aixcut-voice/references/actions.md",
