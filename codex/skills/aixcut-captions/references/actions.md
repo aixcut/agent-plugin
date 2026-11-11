@@ -40,12 +40,28 @@ This reference maps each published caption operation to its fields. Source selec
 
 These Chinese captions are deliberate user-facing content; the tool reference remains English:
 
-```json
+```json aixcut_caption
 {
+  "action": "set",
   "idempotency_key": "7d3f0b6e-3d2a-4c9f-9d5c-6a1b2c3d4e5f",
   "items": [
     { "text": "Some views are waiting for you along the way.", "start_ms": 0, "duration_ms": 3200 },
     { "text": "At dawn, the first light passes through the forest canopy.", "start_ms": 3200, "duration_ms": 3600 }
+  ]
+}
+```
+
+## Append example
+
+`add` appends caption items and takes no top-level `text`; a call that passes text outside `items` is rejected. Pass `start_ms` on the action to place the appended captions, or on each item to time them individually:
+
+```json aixcut_caption
+{
+  "action": "add",
+  "idempotency_key": "9c1a4e02-6f77-4a30-8f0e-2b7d51c4a9d3",
+  "start_ms": 0,
+  "items": [
+    { "text": "Caption appended to the existing track.", "duration_ms": 2000 }
   ]
 }
 ```

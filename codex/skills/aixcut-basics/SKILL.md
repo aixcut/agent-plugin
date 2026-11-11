@@ -7,7 +7,7 @@ description: "Shared Aixcut MCP rules for context, read-before-write, stable ref
 
 Load with the relevant specialist Skill. Follow [language](references/language.md), [conversation guidance](references/conversation-guidance.md), and [ownership](references/model.md).
 
-At the start of the first Aixcut workflow in each new Codex task, follow [plugin maintenance](references/plugin-maintenance.md) once. Check the configured GitHub or Gitee marketplace, ask before upgrading, preserve the existing MCP configuration and authorization, and start a fresh task after a successful upgrade.
+At the start of the first Aixcut workflow in each new Codex task, follow [plugin maintenance](references/plugin-maintenance.md) once.
 
 The release package supplies shared Core policy at [orchestration](../../references/core/orchestration.md) and [workflow boundaries](../../references/core/workflow-boundaries.md). Use these for phase budgets, Checkpoint recovery, state ownership and host fallbacks; live schemas and current user authorization remain authoritative.
 

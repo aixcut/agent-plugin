@@ -20,6 +20,7 @@ Voice, captions, and export have dedicated Skills: `aixcut-voice`, `aixcut-capti
 3. Call the narrowest Tool and action matching the intent.
 4. Read affected views after a successful write; use `aixcut_review(view="timeline")` or `aixcut_review(view="renderability")` when structure or visual placement needs confirmation.
 5. Report the actual result fields when present: `status`, `mutation_id`, `operation_id`, `revision_after`, `created`, `removed`, `ref_map`, and `warnings`.
+6. After the requested edit passes final verification, invoke `aixcut-export` when the user requests a deliverable. Do not duplicate an export already owned by `aixcut-video-assembly`.
 
 ### Batching writes
 
@@ -46,7 +47,11 @@ Voice, captions, and export have dedicated Skills: `aixcut-voice`, `aixcut-capti
 | Video, image, or Motion Graph clips | `aixcut_clip(action="add")`, `aixcut_clip(action="update")` |
 | Regular on-screen text | `aixcut_text(action="add")`, `aixcut_text(action="update")` |
 | Music, effects, or placed voice audio | `aixcut_audio(action="add")`, `aixcut_audio(action="update")` |
+| Canvas placement of picture clips | `aixcut_layout(action="update")`, `aixcut_layout(action="set")` |
+| Text and caption styling | `aixcut_style(action="update")`, `aixcut_style(action="set")` |
+| Batch delete, copy, move, gaps and playhead trims | `aixcut_arrange(action="delete")`, `aixcut_arrange(action="move")` |
 | Tracks | `aixcut_track(action="ensure")`, `aixcut_track(action="update")` |
+| Versions and timelines | `aixcut_timeline(action="list")`, `aixcut_timeline(action="duplicate")` |
 | Canvas or full cleanup | `aixcut_project(action="canvas")`, `aixcut_project(action="clear")` |
 | Remote browser actions | `aixcut_frontend(action="page_status")`, `aixcut_frontend(action="capture_timeline_frames")` |
 
@@ -80,7 +85,7 @@ Treat every requested visual annotation as a typed timeline element before writi
 
 - A new Project may start at `0×0`. The first visual write chooses the source dimensions; if none are available, the server falls back to `1920×1080` and returns `MCP_CANVAS_DEFAULTED`. Use `aixcut_project(action="canvas")` for an explicit portrait or other ratio.
 - Add music, effects, or rendered voice through `aixcut_audio(action="add")`. Use `fade_in_ms` and `fade_out_ms` for music. Volume is not an add field: after adding, read the created clip ref and call `aixcut_audio(action="update", target="clip:...", volume=0.2–0.4)` when narration must remain clear.
-- When the user wants a video's original sound separately, call `aixcut_frontend(action="media.extract_audio", media_id=..., expected_file_revision=...)`, follow `operation.get` until it succeeds, then add the resulting published audio media. Never send a video media ref directly to `aixcut_audio(action="add")`.
+- When the user wants a video's original sound separately, call `aixcut_frontend(action="media.extract_audio", params={media_id: ..., expected_file_revision: ...})`, then poll `aixcut_frontend(action="operation.get", params={operation_id: ...})` until it succeeds, and add the resulting published audio media. Never send a video media ref directly to `aixcut_audio(action="add")`.
 - Before adding audio, ensure an audio track exists with `aixcut_track(action="ensure")`. If read-back reports `MCP_TRACK_ENSURE_NOT_APPLIED`, retry once with a new UUID.
 - Change track mute or enabled state only after reading the current track state.
 
@@ -100,8 +105,8 @@ There are two supported import paths. Both are asynchronous and an accepted resp
 
 Call:
 
-```json
-{}
+```json aixcut_frontend
+{"action":"prompt_add_material"}
 ```
 
 A completed response means the upload area is open. Tell the user to select or drag files. After the user confirms upload, read `aixcut_read(view="sources")` and match by `file_name`; do not call `prompt_add_material` again.
