@@ -87,7 +87,8 @@
         "required": [
           "aixcut_read",
           "aixcut_review",
-          "aixcut_frontend"
+          "aixcut_frontend",
+          "aixcut_export"
         ],
         "optional": [
           "aixcut_open"
@@ -98,6 +99,11 @@
         "aixcut_frontend": [
           "export_timeline",
           "export_timeline_status"
+      ],
+      "aixcut_export": [
+        "submit",
+        "get",
+        "cancel"
         ]
       },
       "helper": null,
@@ -279,7 +285,8 @@
           "aixcut_frontend"
         ],
         "optional": [
-          "aixcut_review"
+          "aixcut_review",
+          "aixcut_media"
         ],
         "forbidden": [
           "aixcut_login"
@@ -322,6 +329,11 @@
           "operation.get",
           "operation.cancel",
           "operation.retry"
+        ],
+        "aixcut_media": [
+          "prepare_upload",
+          "complete_upload",
+          "upload_status"
         ]
       },
       "helper": "plugin-core/helpers/download-capture-artifacts.mjs",
