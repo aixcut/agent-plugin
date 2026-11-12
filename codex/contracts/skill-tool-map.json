@@ -20,6 +20,7 @@
         "references/model.md",
         "references/language.md",
         "references/conversation-guidance.md",
+        "references/intent-routing.md",
         "references/workflow-host.md",
         "references/plugin-maintenance.md"
       ]
