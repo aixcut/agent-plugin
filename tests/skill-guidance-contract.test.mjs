@@ -50,6 +50,19 @@ for (const host of hosts) {
     }
   });
 
+  test(`${host}: generation reference keeps prompt top-level and image fields model-specific`, () => {
+    const source = readFileSync(
+      join(skillsRoot, "aixcut-generation/references/providers.md"),
+      "utf8",
+    );
+    assert.match(source, /`prompt` is always a top-level field/);
+    assert.doesNotMatch(source, /Unknown keys may be ignored/);
+    assert.match(source, /Seedream 5\.0 Pro[\s\S]*does not accept `aspect_ratio`/);
+    assert.match(source, /`optimize_prompt_options`/);
+    assert.match(source, /`layer_decomposition`/);
+    assert.match(source, /`references`[\s\S]*media_id/);
+  });
+
   test(`${host}: music volume and extracted video audio are explicit`, () => {
     const timeline = readFileSync(join(skillsRoot, "aixcut-timeline-editing/SKILL.md"), "utf8");
     assert.match(timeline, /aixcut_audio\(action="update",[^)]*target[^)]*volume/i);
