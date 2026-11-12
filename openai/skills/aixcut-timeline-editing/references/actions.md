@@ -9,7 +9,31 @@ This reference lists fields for each action. Follow the main Skill for workflow,
 - `target` / `targets`: Stable refs or IDs returned by a read operation such as `aixcut_read(view="clips")`; never guess UUIDs.
 - `items`: Array whose item fields are checked by the live Tool Schema.
 - `timeline_id`: Target timeline UUID. Include it in every read, edit, capture, and review for multi-version work; omit only for a single version using the default timeline.
+- `plan_context`: Required on the protected actions marked in the Required column. Pass it at the Tool's top level, not inside `params`. Build it from the latest read with `project_id`, `timeline_id`, `base_revision`, `mode`, `preserve`, `delete_refs`, and the exact `authorized_actions`; the `aixcut-basics` Skill documents the workflow host contract.
 - Every Tool accepts a strict object. Send only fields listed here; extra fields are rejected.
+
+## Frontend request shapes
+
+`aixcut_frontend` has two input shapes; follow the live action schema rather than moving fields between them:
+
+- Shared file actions (`media.*` and `timeline.*`, including `timeline.export_range`) keep `action` at the top level and put action-specific fields inside `params`. For example, `media.list` takes an empty `params` object.
+- Fixed page actions use top-level fields as declared by their action schema. This includes `page_status`, `playback_check`, frame capture, local-media import/status, Project document actions, and `export_timeline` / `export_timeline_status`; do not wrap these fields in `params`.
+
+```json aixcut_frontend
+{"action":"media.list","params":{}}
+```
+
+```json aixcut_frontend
+{
+  "action":"playback_check",
+  "timeline_id":"00000000-0000-4000-8000-000000000001",
+  "expected_revision":12,
+  "start_ms":0,
+  "target_ms":2000
+}
+```
+
+Replace the playback example's timeline ID and revision with values from the current Project. `playback_check` uses `target_ms`, not `end_ms`.
 
 ## Field groups
 
@@ -98,12 +122,24 @@ A clip crossing the playhead is trimmed, not deleted. Duplicating or moving to a
 
 Pass only the field needed; omitted means 0. Audio clips map to `audioFadeInMs`/`audioFadeOutMs`, and video clips map to `videoFadeInMs`/`videoFadeOutMs`; callers do not provide storage keys. Text and caption clips reject fades. Their `purpose` is assigned from the target track (`caption` or `art-text`). For music covering the full video, set both fades.
 
-```json
+```json aixcut_clip
 {
+  "action": "fade",
   "idempotency_key": "b7f0c2a4-9d31-4e6b-8c2f-1a5d3e7b9c01",
   "target": "clip:12",
   "fade_in_ms": 300,
   "fade_out_ms": 500
+}
+```
+
+## Batched item fields
+
+For `aixcut_text(action="add")`, per-item `start_ms` and `duration_ms` belong in each `items[]` entry. The optional top-level `start_ms` is an action-level initial offset; use item fields when entries need their own start or duration. The live schema remains authoritative.
+
+```json aixcut_text
+{
+  "action":"add",
+  "items":[{"text":"标题","start_ms":0,"duration_ms":1500}]
 }
 ```
 
@@ -207,15 +243,18 @@ Page export uses `aixcut_frontend(action="export_timeline")` and `aixcut_fronten
 
 ## Complete request examples
 
-```json
+```json aixcut_clip
 {
+  "action": "trim",
   "idempotency_key": "8c1f0b6e-3d2a-4c9f-9d5c-6a1b2c3d4e5f",
   "target": "clip:3",
   "source_start_ms": 1200,
   "duration_ms": 2400
 }
 ```
-
-```json
-{}
+c9f-9d5c-6a1b2c3d4e5f",
+  "target": "clip:3",
+  "source_start_ms": 1200,
+  "duration_ms": 2400
+}
 ```

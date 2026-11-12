@@ -54,9 +54,8 @@ For multiple versions, call `aixcut_timeline(action="list")`, then duplicate the
 
 1. Read the Project summary, source list, current timeline, audio tracks, existing voice state, existing music state, and source transcript states before deciding whether any audio should be generated:
 
-```json
-{
-}
+```json aixcut_read
+{"view":"sources"}
 ```
 
 2. Do not use an old server-side analysis status to decide whether a local video is available. For `import_local_media`, use `import_status` only until the import is settled, then use the returned `media_id` to match the source in `aixcut_read(view="sources")` and check `transcript_status` plus `transcription_tasks` when speech matters. Active transcription states are `pending`, `queued`, `running`, `processing`, `submitted`, or `retrying`; wait briefly and reread `sources`. Do not keep polling a settled import. For `prompt_add_material`, wait for the user's confirmation and match the uploaded file by `file_name` in `sources`.
