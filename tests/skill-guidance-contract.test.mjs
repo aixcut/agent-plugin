@@ -64,6 +64,16 @@ for (const host of hosts) {
     assert.match(assembly, /aixcut_audio\(action="update",[^)]*target[^)]*volume/i);
   });
 
+  test(`${host}: the generation Skill reports what a model ignored`, () => {
+    // The receipt carries warnings when a model ignores a requested length or frame
+    // (generation_duration_ignored, generation_frame_resized). Without this rule the
+    // caller reports "done" and the user never learns the request was not honoured.
+    const skill = readFileSync(join(skillsRoot, "aixcut-generation/SKILL.md"), "utf8");
+    assert.match(skill, /warnings/i);
+    assert.match(skill, /generation_duration_ignored/);
+    assert.match(skill, /generation_frame_resized/);
+  });
+
   test(`${host}: does not reference retired MCP tool names outside retirement notes`, () => {
     const retirementNote = /旧\s*`aixcut_[a-z_]+`\s*Tool 已退役/;
     const offenders = [];
