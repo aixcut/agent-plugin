@@ -85,6 +85,7 @@ for (const host of hosts) {
     assert.match(skill, /warnings/i);
     assert.match(skill, /generation_duration_ignored/);
     assert.match(skill, /generation_frame_resized/);
+    assert.match(skill, /generation_layer_decomposition_incomplete/);
   });
 
   test(`${host}: the generation Skill names the audio kind`, () => {
