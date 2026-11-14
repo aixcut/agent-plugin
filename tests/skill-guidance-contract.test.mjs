@@ -72,6 +72,14 @@ for (const host of hosts) {
     assert.match(skill, /warnings/i);
     assert.match(skill, /generation_duration_ignored/);
     assert.match(skill, /generation_frame_resized/);
+    assert.match(skill, /generation_layer_decomposition_incomplete/);
+  });
+
+  test(`${host}: the generation Skill names the audio kind`, () => {
+    // 音频创作（Seed Audio）是 MCP 的 kind=audio；技能不提，调用方就只会用音乐。
+    const skill = readFileSync(join(skillsRoot, "aixcut-generation/SKILL.md"), "utf8");
+    assert.match(skill, /Seed Audio/);
+    assert.doesNotMatch(skill, /Seed Audio[^.]*bitrate/);
   });
 
   test(`${host}: does not reference retired MCP tool names outside retirement notes`, () => {
