@@ -1,13 +1,13 @@
 ---
 name: aixcut-basics
-description: "Shared Aixcut MCP rules for context, read-before-write, stable refs, idempotency, async jobs, envelopes, and host boundaries. Load as fallback when no specialist Skill applies; do not use instead of a specialist workflow. Chinese triggers: 项目、时间轴、字幕、配音、生成、导出、报错."
+description: "Mandatory entry for every Aixcut task: context, intent routing, read-before-write, refs, idempotency, async jobs and host boundaries. Load before any MCP call. Do not use alone: pair with one specialist workflow. Chinese triggers: 项目、时间轴、字幕、配音、生成、导出、报错."
 ---
 
 # Aixcut MCP Basics
 
-Load with the relevant specialist Skill. Follow [language](references/language.md), [conversation guidance](references/conversation-guidance.md), and [ownership](references/model.md).
+Follow [language](references/language.md), [conversation guidance](references/conversation-guidance.md), and [ownership](references/model.md). Select exactly one main workflow with [intent routing](references/intent-routing.md), then load specialist Skills only at the stages they own.
 
-At the start of the first Aixcut workflow in each new Codex task, follow [plugin maintenance](references/plugin-maintenance.md) once. Check the configured GitHub or Gitee marketplace, ask before upgrading, preserve the existing MCP configuration and authorization, and start a fresh task after a successful upgrade.
+At the start of the first Aixcut workflow in each new Codex task, follow [plugin maintenance](references/plugin-maintenance.md) once.
 
 The release package supplies shared Core policy at [orchestration](../../references/core/orchestration.md) and [workflow boundaries](../../references/core/workflow-boundaries.md). Use these for phase budgets, Checkpoint recovery, state ownership and host fallbacks; live schemas and current user authorization remain authoritative.
 
