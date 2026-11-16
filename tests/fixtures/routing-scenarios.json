@@ -1,0 +1,102 @@
+[
+  {
+    "id": "mechanical-trim",
+    "prompt": "把第二段剪短两秒，不加音乐也不导出",
+    "route": "mechanical",
+    "mainSkill": "aixcut-timeline-editing",
+    "requiredSkills": ["aixcut-basics", "aixcut-timeline-editing"],
+    "forbiddenTools": ["aixcut_generate", "aixcut_export"],
+    "requiredTools": ["aixcut_read", "aixcut_clip"],
+    "sequence": ["inspect", "trim", "read_back"]
+  },
+  {
+    "id": "talking-head-cleanup",
+    "prompt": "把这段口播的口误、重复和长停顿剪掉，保留原意",
+    "route": "talking_head",
+    "mainSkill": "aixcut-talking-head",
+    "requiredSkills": ["aixcut-basics", "aixcut-talking-head"],
+    "forbiddenTools": ["aixcut_generate", "aixcut_export"],
+    "requiredTools": ["aixcut_read", "aixcut_speech"],
+    "sequence": ["read_source_lines", "speech_edit", "read_speech"]
+  },
+  {
+    "id": "caption-from-speech",
+    "prompt": "按最终口播给视频加中文字幕，断句自然",
+    "route": "focused_task",
+    "mainSkill": "aixcut-captions",
+    "requiredSkills": ["aixcut-basics", "aixcut-captions"],
+    "forbiddenTools": ["aixcut_text"],
+    "requiredTools": ["aixcut_read", "aixcut_caption"],
+    "sequence": ["read_speech", "check_transcript", "caption_regenerate", "read_captions"]
+  },
+  {
+    "id": "assembly-promo",
+    "prompt": "用这些素材做一条 30 秒横屏宣传片，先定结构，再加字幕",
+    "route": "full_assembly",
+    "mainSkill": "aixcut-video-assembly",
+    "requiredSkills": ["aixcut-basics", "aixcut-video-assembly", "aixcut-captions"],
+    "forbiddenTools": ["aixcut_export"],
+    "requiredTools": ["aixcut_read", "aixcut_primary", "aixcut_caption"],
+    "sequence": ["inspect", "visual_structure", "transcript", "captions", "review"]
+  },
+  {
+    "id": "voice-with-quote",
+    "prompt": "写一段旁白并生成 AI 配音，先告诉我费用",
+    "route": "focused_task",
+    "mainSkill": "aixcut-voice",
+    "requiredSkills": ["aixcut-basics", "aixcut-voice"],
+    "forbiddenTools": [],
+    "requiredTools": ["aixcut_generate"],
+    "sequence": ["speech_read", "speech_edit", "speech_quote", "user_accepted", "speech_submit"]
+  },
+  {
+    "id": "export-requested",
+    "prompt": "检查没问题后导出 1080p MP4",
+    "route": "focused_task",
+    "mainSkill": "aixcut-export",
+    "requiredSkills": ["aixcut-basics", "aixcut-export", "aixcut-verification"],
+    "forbiddenTools": [],
+    "requiredTools": ["aixcut_read", "aixcut_review", "aixcut_export"],
+    "sequence": ["read", "review", "export_submit", "export_get"]
+  },
+  {
+    "id": "layout-vertical",
+    "prompt": "把主体放到 9:16 画面中间，不要裁掉人物",
+    "route": "local_edit",
+    "mainSkill": "aixcut-timeline-editing",
+    "requiredSkills": ["aixcut-basics", "aixcut-timeline-editing"],
+    "forbiddenTools": ["aixcut_text", "aixcut_caption", "aixcut_export"],
+    "requiredTools": ["aixcut_read", "aixcut_layout", "aixcut_frontend"],
+    "sequence": ["read_layout", "layout_set", "capture_timeline_frames"]
+  },
+  {
+    "id": "visual-transition",
+    "prompt": "给这两个相邻镜头加一个柔和的交叉溶解",
+    "route": "local_edit",
+    "mainSkill": "aixcut-visual-effects",
+    "requiredSkills": ["aixcut-basics", "aixcut-visual-effects"],
+    "forbiddenTools": ["aixcut_text", "aixcut_export"],
+    "requiredTools": ["aixcut_read", "aixcut_transition", "aixcut_frontend"],
+    "sequence": ["read_transition_catalog", "transition_add", "capture_timeline_frames"]
+  },
+  {
+    "id": "inspect-only",
+    "prompt": "检查这个项目能不能导出，列出阻塞项",
+    "route": "inspect_only",
+    "mainSkill": "aixcut-verification",
+    "requiredSkills": ["aixcut-basics", "aixcut-verification"],
+    "forbiddenTools": ["aixcut_clip", "aixcut_audio", "aixcut_caption"],
+    "requiredTools": ["aixcut_read", "aixcut_review"],
+    "sequence": ["read", "review"]
+  },
+  {
+    "id": "multi-version",
+    "prompt": "从这个母版复制一个竖版，只修改竖版",
+    "route": "full_assembly",
+    "mainSkill": "aixcut-video-assembly",
+    "requiredSkills": ["aixcut-basics", "aixcut-video-assembly"],
+    "forbiddenTools": [],
+    "requiredTools": ["aixcut_timeline", "aixcut_project"],
+    "sequence": ["timeline_list", "timeline_duplicate", "read_target", "edit_target", "review_target"]
+  }
+]
