@@ -34,6 +34,7 @@ Voice, captions, and export have dedicated Skills: `aixcut-voice`, `aixcut-capti
 
 - For versions, A/B variants, aspect-ratio adaptations, or “keep the original and make another”, call `aixcut_timeline(action="list")` first.
 - Create a new version with `aixcut_timeline(action="duplicate", source_timeline_id=...)`; use `create` only when the user explicitly wants a blank timeline.
+- Creating or duplicating a timeline does not by itself switch the visible Project page. After the write, require `data.active_timeline_id` to equal the new `timeline_id`; if it is absent, or the result warns `TIMELINE_ACTIVATION_DEFERRED`, call `aixcut_frontend(action="activate_timeline", timeline_id=...)` and verify the returned `status` is `ready` before saying the user is working in the new version.
 - After selecting a `timeline_id`, include it in every later read, edit, capture, and review for that version. Do not mix refs across timelines.
 - Do not create an extra timeline for a single-version request.
 
@@ -85,6 +86,9 @@ Treat every requested visual annotation as a typed timeline element before writi
 ## Canvas, audio, and tracks
 
 - A new Project may start at `0×0`. The first visual write chooses the source dimensions; if none are available, the server falls back to `1920×1080` and returns `MCP_CANVAS_DEFAULTED`. Use `aixcut_project(action="canvas")` for an explicit portrait or other ratio.
+- Canvas presets are `landscape|fhd|fullhd|1080p` = 1920×1080, `portrait|vertical` = 1080×1920, `square` = 1080×1080, `hd|720p` = 1280×720, and `uhd|4k` = 3840×2160. An unknown preset returns `MCP_CANVAS_PRESET_INVALID`; it is never silently ignored. `aixcut_timeline(action="create")` does not accept canvas fields; create first, then call `aixcut_timeline(action="update", ...)`.
+- `aixcut_read` clip-list views (`clips`, `captions`, `text`, `audio`) accept top-level `track` and `kind` filters, and also the legacy nested `filters.track_id` and `filters.kind` forms. The top-level form is preferred.
+- A caption `update` that only changes clip columns such as `start_ms` or `duration_ms` does not require text component values. Add `text`, `style`, `x`, or `y` only when the component itself must change.
 - Add music, effects, or rendered voice through `aixcut_audio(action="add")`. Use `fade_in_ms` and `fade_out_ms` for music. Volume is not an add field: after adding, read the created clip ref and call `aixcut_audio(action="update", target="clip:...", volume=0.2–0.4)` when narration must remain clear.
 - When the user wants a video's original sound separately, call `aixcut_frontend(action="media.extract_audio", params={media_id: ..., expected_file_revision: ...})`, then poll `aixcut_frontend(action="operation.get", params={operation_id: ...})` until it succeeds, and add the resulting published audio media. Never send a video media ref directly to `aixcut_audio(action="add")`.
 - Before adding audio, ensure an audio track exists with `aixcut_track(action="ensure")`. If read-back reports `MCP_TRACK_ENSURE_NOT_APPLIED`, retry once with a new UUID.
@@ -114,16 +118,16 @@ A completed response means the upload area is open. Tell the user to select or d
 
 ### Import an explicit local path
 
-When the user gives local paths, start or reuse the bridge yourself before importing; do not ask the user to start it. Locate the plugin helper and use the Site origin from the connected MCP Server instructions. If either is unavailable, report that specific setup blocker instead of running an incomplete command.
+When the user gives local paths, start or reuse the bridge yourself before importing; do not ask the user to start it. Use the target Project page/editor origin, not the marketing website origin. Prefer the `Bridge allowed origin` from the connected MCP Server instructions and require it to match the current Project page origin when available. If either is unavailable, report that specific setup blocker instead of running an incomplete command.
 
 ```bash
 BRIDGE=$(find ~/.codex/plugins -maxdepth 6 -name local-media-bridge.mjs 2>/dev/null | head -1)
-node "$BRIDGE" /absolute/path/a.mp4 /absolute/path/b.mp4 --allowed-origin "<MCP Server Site origin>"
+node "$BRIDGE" /absolute/path/a.mp4 /absolute/path/b.mp4 --allowed-origin "<Project editor origin>"
 ```
 
 The helper checks an existing bridge's health or starts a new one, waits until it is ready, and only then returns URLs. Do not call `aixcut_frontend(action="import_local_media")` until this command succeeds. Never invent the origin, URL, or port. The helper manages its own background process and port, reuses a running bridge when possible, and expires after its TTL; do not wrap it in `screen`, `nohup`, or `&`.
 
-If the helper command fails, inspect its exact error and the reported log file before deciding what to do. Do not ask the user to start the bridge or switch to manual upload after the first failure. Retry the same helper command once for a transient startup or health failure; it will recheck/restart the bridge. Do not retry missing files, unreadable paths, a missing Site origin, or a missing helper—report the specific blocker. Offer manual upload only after the bounded retry fails or a required local capability is unavailable, and explain why.
+If the helper command fails, inspect its exact error and the reported log file before deciding what to do. If import reports the bridge unreachable, first verify that the bridge's allowed origin matches the target Project page/editor origin. When it does not match, rerun the helper with `--no-reuse --allowed-origin <project-editor-origin>` and retry the failed import once with the new URLs. Do not ask the user to start the bridge or switch to manual upload after the first failure. Retry the same helper command once for a transient startup or health failure; it will recheck/restart the bridge. Do not retry missing files, unreadable paths, a missing editor origin, or a missing helper—report the specific blocker. Offer manual upload only after the bounded retry fails or a required local capability is unavailable, and explain why.
 
 After the helper succeeds, use the printed `files[].url` values in one `aixcut_frontend(action="import_local_media")` call, with `url` for one file or `urls` for up to eight. A ready bridge does not prove the Project page can fetch it. If import reports bridge-unreachable or URL failures, rerun the helper for only the failed files and retry those once with the new URLs. Report only files that still fail; offer manual upload only after that recovery fails.
 

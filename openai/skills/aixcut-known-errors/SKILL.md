@@ -32,6 +32,8 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 - `MCP_IDEMPOTENCY_KEY_INVALID`: Generate a new UUID v4 for `idempotency_key`.
 - `MCP_ACTION_UNSUPPORTED`: Choose a Tool that supports the requested action.
 - `MCP_LAYOUT_CLIP_UNSUPPORTED`: The target has no visual content. Layout applies only to video and image clips, not audio or text.
+- `MCP_MOTION_CLIP_UNSUPPORTED`: Object motion applies only to a real video clip without composition content. Do not retry it on text, image composition, or authored Composition clips; use that clip's own animation model instead.
+- `MCP_CANVAS_PRESET_INVALID`: Use one of the returned `supported_presets` or explicit `width` and `height`. Do not guess aliases that are not in the live list.
 
 ## Authorization and project context
 
@@ -45,6 +47,7 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 - `MCP_MUTATION_SERVER_REJECTED`: Read the latest snapshot and regenerate the operation. Do not replay the old payload unchanged.
 - `NLE_IDEMPOTENCY_CONFLICT`: The key is already bound to a different project, timeline, or action. Read the timeline and confirm whether the earlier write already achieved the intent before redoing. A same-key retry against the same target is reported as a replay instead, not as this error.
 - `MCP_TRACK_ENSURE_NOT_APPLIED`: Read-back found no track. Confirm the original receipt and current timeline before correcting anything; an absent projection alone does not authorize a new-key write.
+- `TIMELINE_ACTIVATION_DEFERRED`: The timeline mutation succeeded, but the visible Project page was not switched to the new timeline. Bring the target Project page online if needed, call `aixcut_frontend(action="activate_timeline", timeline_id=...)`, and verify the returned `status` is `ready` before reporting that the new timeline is visible.
 - `MCP_CANVAS_DEFAULTED`: This is a warning, not a failure. A `0×0` canvas was set to `1920×1080`. If portrait or another ratio is required, use `aixcut_project(action="canvas")` to override it.
 - `MCP_MUTATION_LOCAL_REJECTED`: Local validation failed, usually because a ref is stale or a range is out of bounds. Read fresh data and correct the input.
 - `MCP_PROJECTION_BARRIER_TIMEOUT`, `MCP_ZERO_QUERY_UNAVAILABLE`: The read did not finish before timeout. Retry the same read parameters.
@@ -65,7 +68,7 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 - `MCP_EXPORT_FAILED`: Page rendering failed. Report `error_message`; do not replay unchanged input. If one corrected retry fails, stop and report it.
 - `MCP_EXPORT_CANCELLED`: The user cancelled the page export. Report cancellation; do not retry it as a failure.
 - `CAPTURE_PERMISSION_REQUIRED`: Browser permission for local media expired after a refresh or browser change. Ask the user to click anywhere in the Project page (or use its “Fix now” control), then retry the original request. Do not re-import the media or bypass the page.
-- `MCP_LOCAL_MEDIA_BRIDGE_UNREACHABLE`: The local media bridge URL is no longer serving the file. Do not retry the same URL. Either rerun the helper described by `aixcut-timeline-editing` to obtain its newly printed URL, or ask the user to upload through `prompt_add_material`. Never invent a URL.
+- `MCP_LOCAL_MEDIA_BRIDGE_UNREACHABLE`: The bridge URL cannot serve the file because the bridge stopped, expired, moved, or its allowed origin does not match the Project editor origin. Inspect the bridge state and compare `allowed_origin` with the target Project page/editor origin. If they differ, rerun the helper with `--no-reuse --allowed-origin <project-editor-origin>`, then retry the failed import once with the new URL. Ask for manual upload only after that bounded recovery fails. Never invent a URL.
 
 Page-export failures appear as `error_code` in `export_timeline_status`, not as a rejected Tool call. Follow `aixcut-export` for those results.
 
