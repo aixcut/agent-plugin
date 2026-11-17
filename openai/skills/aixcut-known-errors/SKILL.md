@@ -68,7 +68,7 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 - `MCP_EXPORT_FAILED`: Page rendering failed. Report `error_message`; do not replay unchanged input. If one corrected retry fails, stop and report it.
 - `MCP_EXPORT_CANCELLED`: The user cancelled the page export. Report cancellation; do not retry it as a failure.
 - `CAPTURE_PERMISSION_REQUIRED`: Browser permission for local media expired after a refresh or browser change. Ask the user to click anywhere in the Project page (or use its “Fix now” control), then retry the original request. Do not re-import the media or bypass the page.
-- `MCP_LOCAL_MEDIA_BRIDGE_UNREACHABLE`: The local media bridge URL is no longer serving the file. Do not retry the same URL. Either rerun the helper described by `aixcut-timeline-editing` to obtain its newly printed URL, or ask the user to upload through `prompt_add_material`. Never invent a URL.
+- `MCP_LOCAL_MEDIA_BRIDGE_UNREACHABLE`: The bridge URL cannot serve the file because the bridge stopped, expired, moved, or its allowed origin does not match the Project editor origin. Inspect the bridge state and compare `allowed_origin` with the target Project page/editor origin. If they differ, rerun the helper with `--no-reuse --allowed-origin <project-editor-origin>`, then retry the failed import once with the new URL. Ask for manual upload only after that bounded recovery fails. Never invent a URL.
 
 Page-export failures appear as `error_code` in `export_timeline_status`, not as a rejected Tool call. Follow `aixcut-export` for those results.
 

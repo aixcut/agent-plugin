@@ -118,16 +118,16 @@ A completed response means the upload area is open. Tell the user to select or d
 
 ### Import an explicit local path
 
-When the user gives local paths, start or reuse the bridge yourself before importing; do not ask the user to start it. Locate the plugin helper and use the Site origin from the connected MCP Server instructions. If either is unavailable, report that specific setup blocker instead of running an incomplete command.
+When the user gives local paths, start or reuse the bridge yourself before importing; do not ask the user to start it. Use the target Project page/editor origin, not the marketing website origin. Prefer the `Bridge allowed origin` from the connected MCP Server instructions and require it to match the current Project page origin when available. If either is unavailable, report that specific setup blocker instead of running an incomplete command.
 
 ```bash
 BRIDGE=$(find ~/.codex/plugins -maxdepth 6 -name local-media-bridge.mjs 2>/dev/null | head -1)
-node "$BRIDGE" /absolute/path/a.mp4 /absolute/path/b.mp4 --allowed-origin "<MCP Server Site origin>"
+node "$BRIDGE" /absolute/path/a.mp4 /absolute/path/b.mp4 --allowed-origin "<Project editor origin>"
 ```
 
 The helper checks an existing bridge's health or starts a new one, waits until it is ready, and only then returns URLs. Do not call `aixcut_frontend(action="import_local_media")` until this command succeeds. Never invent the origin, URL, or port. The helper manages its own background process and port, reuses a running bridge when possible, and expires after its TTL; do not wrap it in `screen`, `nohup`, or `&`.
 
-If the helper command fails, inspect its exact error and the reported log file before deciding what to do. Do not ask the user to start the bridge or switch to manual upload after the first failure. Retry the same helper command once for a transient startup or health failure; it will recheck/restart the bridge. Do not retry missing files, unreadable paths, a missing Site origin, or a missing helper—report the specific blocker. Offer manual upload only after the bounded retry fails or a required local capability is unavailable, and explain why.
+If the helper command fails, inspect its exact error and the reported log file before deciding what to do. If import reports the bridge unreachable, first verify that the bridge's allowed origin matches the target Project page/editor origin. When it does not match, rerun the helper with `--no-reuse --allowed-origin <project-editor-origin>` and retry the failed import once with the new URLs. Do not ask the user to start the bridge or switch to manual upload after the first failure. Retry the same helper command once for a transient startup or health failure; it will recheck/restart the bridge. Do not retry missing files, unreadable paths, a missing editor origin, or a missing helper—report the specific blocker. Offer manual upload only after the bounded retry fails or a required local capability is unavailable, and explain why.
 
 After the helper succeeds, use the printed `files[].url` values in one `aixcut_frontend(action="import_local_media")` call, with `url` for one file or `urls` for up to eight. A ready bridge does not prove the Project page can fetch it. If import reports bridge-unreachable or URL failures, rerun the helper for only the failed files and retry those once with the new URLs. Report only files that still fail; offer manual upload only after that recovery fails.
 
