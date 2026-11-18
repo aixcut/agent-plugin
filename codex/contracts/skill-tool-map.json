@@ -10,7 +10,9 @@
         "required": [
           "aixcut_read"
         ],
-        "optional": [],
+        "optional": [
+          "aixcut_agent_bootstrap"
+        ],
         "forbidden": [
           "aixcut_login"
         ]
@@ -92,7 +94,8 @@
           "aixcut_export"
         ],
         "optional": [
-          "aixcut_open"
+          "aixcut_open",
+          "aixcut_upload_link"
         ],
         "forbidden": []
       },
@@ -105,6 +108,10 @@
         "submit",
         "get",
         "cancel"
+        ],
+        "aixcut_upload_link": [
+          "create",
+          "status"
         ]
       },
       "helper": null,
@@ -287,7 +294,8 @@
         ],
         "optional": [
           "aixcut_review",
-          "aixcut_media"
+          "aixcut_media",
+          "aixcut_upload_link"
         ],
         "forbidden": [
           "aixcut_login"
@@ -335,6 +343,12 @@
           "prepare_upload",
           "complete_upload",
           "upload_status"
+        ],
+        "aixcut_upload_link": [
+          "create",
+          "status",
+          "renew",
+          "revoke"
         ]
       },
       "helper": "plugin-core/helpers/download-capture-artifacts.mjs",
