@@ -39,10 +39,23 @@
           "aixcut_caption"
         ],
         "optional": [
-          "aixcut_review"
+          "aixcut_review",
+          "aixcut_media",
+          "aixcut_upload_link"
         ],
         "forbidden": [
           "aixcut_text"
+        ],
+        "aixcut_media": [
+          "prepare_upload",
+          "complete_upload",
+          "upload_status"
+        ],
+        "aixcut_upload_link": [
+          "create",
+          "status",
+          "renew",
+          "revoke"
         ]
       },
       "helper": null,
@@ -91,7 +104,8 @@
           "aixcut_frontend"
         ],
         "optional": [
-          "aixcut_open"
+          "aixcut_open",
+          "aixcut_upload_link"
         ],
         "forbidden": []
       },
@@ -99,6 +113,10 @@
         "aixcut_frontend": [
           "export_timeline",
           "export_timeline_status"
+        ],
+        "aixcut_upload_link": [
+          "create",
+          "status"
         ]
       },
       "helper": null,

@@ -236,6 +236,10 @@ For `aixcut_text(action="add")`, per-item `start_ms` and `duration_ms` belong in
 | aixcut_frontend(action="import_local_media") | — | `url` or `urls` | `timeout_ms`, `workspace_id` | Import 1–8 local assets; returns `import_ids` |
 | aixcut_frontend(action="import_status") | — | `import_ids` | `timeout_ms`, `workspace_id` | Check imports until settled and `private_copy` is not `copying` |
 | aixcut_frontend(action="prompt_add_material") | — | — | `timeout_ms`, `workspace_id` | Show the user upload area |
+| aixcut_upload_link(action="create") | — | — | — | Create a temporary upload link after headed-browser or bridge startup fails |
+| aixcut_upload_link(action="status") | — | `upload_id` | — | Read files accepted by the same upload link |
+| aixcut_upload_link(action="renew") | — | `upload_id` | — | Extend the same upload link |
+| aixcut_upload_link(action="revoke") | — | `upload_id` | — | Close the same upload link |
 
 `import_local_media` and `prompt_add_material` both return acceptance, not completed library ingestion. The first returns `import_ids` for `import_status`; the second has no import ID and must be confirmed by rereading `aixcut_read(view="sources")`. A batch uses `url` for one file or `urls` for up to eight; per-file failures appear in `failures`.
 
