@@ -67,13 +67,13 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 - `MCP_FRONTEND_TIMELINE_STALE`: The timeline changed. Read it again before capturing frames.
 - `playback_state=blocked_by_user_playback`: The user is controlling playback. Do not retry it as a tool failure and do not take over playback; keep the audio interval unjudgeable unless separate playback/listening evidence exists.
 - `MCP_FRONTEND_EXPORT_INVALID`, `MCP_EXPORT_INVALID_INPUT`: Page export parameters are invalid (format, dimensions, or frame rate). Correct the parameters and retry once; do not replay unchanged input.
-- `MCP_EXPORT_ALREADY_RUNNING`: Do not start another export. Check the existing run with `aixcut_frontend(action="export_timeline_status")`.
+- `MCP_EXPORT_ALREADY_RUNNING`: Do not start another export and do not poll automatically. Tell the user an export is already active so they can finish or cancel it in the page.
 - `MCP_EXPORT_FAILED`: Page rendering failed. Report `error_message`; do not replay unchanged input. If one corrected retry fails, stop and report it.
 - `MCP_EXPORT_CANCELLED`: The user cancelled the page export. Report cancellation; do not retry it as a failure.
 - `CAPTURE_PERMISSION_REQUIRED`: Browser permission for local media expired after a refresh or browser change. Ask the user to click anywhere in the Project page (or use its “Fix now” control), then retry the original request. Do not re-import the media or bypass the page.
 - `MCP_LOCAL_MEDIA_BRIDGE_UNREACHABLE`: The bridge URL cannot serve the file because the bridge stopped, expired, moved, or its allowed origin does not match the Project editor origin. Inspect the bridge state and compare `allowed_origin` with the target Project page/editor origin. If they differ, rerun the helper with `--no-reuse --allowed-origin <project-editor-origin>`, then retry the failed import once with the new URL. Ask for manual upload only after that bounded recovery fails. Never invent a URL.
 
-Page-export failures appear as `error_code` in `export_timeline_status`, not as a rejected Tool call. Follow `aixcut-export` for those results.
+Read `export_timeline_status` only if the user explicitly asks to inspect an export they already started. The default export flow ends when the user-facing prompt opens.
 
 ## Server and rate-limit errors
 
