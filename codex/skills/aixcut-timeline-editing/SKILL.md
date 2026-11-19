@@ -30,12 +30,14 @@ Voice, captions, and export have dedicated Skills: `aixcut-voice`, `aixcut-capti
 - Never merge different actions, different tracks, or different domains into one call; only the live Tool Schema decides what may be combined.
 - Do not run structural writes on the same timeline concurrently.
 - After each write, treat the returned `revision_after` as the next revision. Derived caption writes may advance it even when the root write succeeded.
+- `aixcut_arrange(action="close_gaps")` moves linked tracks. Use it only after the primary structure is frozen, then reread speech and captions because their positions may have changed.
 - Reuse the last read while the timeline is unchanged; reread before a position-dependent command and after each atomic batch.
 
 ## Multiple timelines and versions
 
 - For versions, A/B variants, aspect-ratio adaptations, or “keep the original and make another”, call `aixcut_timeline(action="list")` first.
 - Create a new version with `aixcut_timeline(action="duplicate", source_timeline_id=...)`; use `create` only when the user explicitly wants a blank timeline.
+- When creating a timeline, pass the requested or source-derived aspect ratio/frame rate in the create call. Do not create a default-shaped timeline and correct it after content is placed.
 - Creating or duplicating a timeline does not by itself switch the visible Project page. After the write, require `data.active_timeline_id` to equal the new `timeline_id`; if it is absent, or the result warns `TIMELINE_ACTIVATION_DEFERRED`, call `aixcut_frontend(action="activate_timeline", timeline_id=...)` and verify the returned `status` is `ready` before saying the user is working in the new version.
 - After selecting a `timeline_id`, include it in every later read, edit, capture, and review for that version. Do not mix refs across timelines.
 - Do not create an extra timeline for a single-version request.
