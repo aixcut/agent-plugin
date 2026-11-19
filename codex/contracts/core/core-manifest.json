@@ -27,7 +27,7 @@
     "helpers/workflow-trace-adapter.mjs": "f0e0f60bb1eb2e8bbd4b2aa906a0203c01a134a2fb6612214046f9d1317b62aa",
     "references/orchestration.md": "357c46f28d85d955949e372ff7beeb34a471e3b395d5ede9e74d1e7b1b2c80a2",
     "references/performance-budget.md": "3c8dbee92240c08e0a60cf7b2bf0ae84828caa7909793251af301b0535f87e0a",
-    "references/quality-gates.md": "6f67543dfcbb83f7703fa057161bc03c43080db0f3255b363356d2a18c896452",
+    "references/quality-gates.md": "d5ce66859d0e4651decd35f3e52915d437600600eff8f723f58ecdd20f03be7f",
     "references/speech-workflow.md": "e4a7d7a12d1bb20e9fa539434f793478aae75c42b70512e9104f0db232834951",
     "references/workflow-boundaries.md": "262fdd348f3e1bd4452705dffe3e114b05e930be3d8326bebf4ad4c6e732af13"
   }

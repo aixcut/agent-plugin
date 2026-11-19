@@ -64,6 +64,28 @@ for (const host of hosts) {
     assert.match(assembly, /aixcut_audio\(action="update",[^)]*target[^)]*volume/i);
   });
 
+  test(`${host}: assembly guidance keeps audio optional and ordered after visual structure`, () => {
+    const assembly = [
+      "aixcut-video-assembly/SKILL.md",
+      "aixcut-video-assembly/references/pipeline.md",
+    ]
+      .map((file) => readFileSync(join(skillsRoot, file), "utf8"))
+      .join("\n");
+    assert.match(assembly, /existing correct (?:voice|narration)[\s\S]{0,160}(?:preserve|reuse)/i);
+    assert.match(assembly, /optional[- ]?music[\s\S]{0,160}(?:no music|keep music off|不添加音乐)/i);
+    assert.match(assembly, /visual structure[\s\S]{0,240}(?:voice|配音)[\s\S]{0,240}(?:captions|字幕)[\s\S]{0,240}(?:music|音乐)/i);
+  });
+
+  test(`${host}: review guidance requires independent visual and audio evidence`, () => {
+    const quality = readFileSync(join(root, host, "references/core/quality-gates.md"), "utf8");
+    const verification = readFileSync(join(skillsRoot, "aixcut-verification/SKILL.md"), "utf8");
+    const text = `${quality}\n${verification}`;
+    assert.match(text, /composed frame|合成帧/i);
+    assert.match(text, /listened|试听/i);
+    assert.match(text, /structure[\s\S]{0,160}semantic[\s\S]{0,160}visual[\s\S]{0,160}audio/i);
+    assert.match(text, /(?:字幕|caption track)[\s\S]{0,180}(?:视觉|visual packaging|Motion Graph)[\s\S]{0,180}(?:独立|dedicated visual tracks|分轨)/i);
+  });
+
   test(`${host}: the generation Skill reports what a model ignored`, () => {
     // The receipt carries warnings when a model ignores a requested length or frame
     // (generation_duration_ignored, generation_frame_resized). Without this rule the
