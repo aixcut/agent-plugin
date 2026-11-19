@@ -45,6 +45,8 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 ## Mutation conflicts and uncertain state
 
 - `MCP_MUTATION_SERVER_REJECTED`: Read the latest snapshot and regenerate the operation. Do not replay the old payload unchanged.
+- `MCP_PLAN_REVISION_STALE`: Re-read once, then retry the same intended change with the current revision. If the prior response included `MCP_CAPTION_AUTO_REGENERATED`, its final `revision_after` is authoritative; never replay the root write.
+- `MCP_CAPTION_AUTO_REGENERATED`: This is a derived-write warning, not a failed edit. Continue from the same response's `revision_after`; do not reuse the plan's pre-write revision.
 - `NLE_IDEMPOTENCY_CONFLICT`: The key is already bound to a different project, timeline, or action. Read the timeline and confirm whether the earlier write already achieved the intent before redoing. A same-key retry against the same target is reported as a replay instead, not as this error.
 - `MCP_TRACK_ENSURE_NOT_APPLIED`: Read-back found no track. Confirm the original receipt and current timeline before correcting anything; an absent projection alone does not authorize a new-key write.
 - `TIMELINE_ACTIVATION_DEFERRED`: The timeline mutation succeeded, but the visible Project page was not switched to the new timeline. Bring the target Project page online if needed, call `aixcut_frontend(action="activate_timeline", timeline_id=...)`, and verify the returned `status` is `ready` before reporting that the new timeline is visible.
@@ -63,6 +65,7 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 - If the browser failure is unclear, call the read-only probe `aixcut_frontend(action="page_status")`. It returns `bound_frontend_client_id`, `binding_error`, `presence_connections`, `online_project_pages`, `online_studio_pages`, and `pages` without throwing an offline error. Use the result to decide whether the user must open a page, switch Projects, or wait.
 - Do not repeatedly resubmit the same request for any of the four browser states above. Do not loop through project opens while offline or use another Tool to pretend a page-only action succeeded.
 - `MCP_FRONTEND_TIMELINE_STALE`: The timeline changed. Read it again before capturing frames.
+- `playback_state=blocked_by_user_playback`: The user is controlling playback. Do not retry it as a tool failure and do not take over playback; keep the audio interval unjudgeable unless separate playback/listening evidence exists.
 - `MCP_FRONTEND_EXPORT_INVALID`, `MCP_EXPORT_INVALID_INPUT`: Page export parameters are invalid (format, dimensions, or frame rate). Correct the parameters and retry once; do not replay unchanged input.
 - `MCP_EXPORT_ALREADY_RUNNING`: Do not start another export. Check the existing run with `aixcut_frontend(action="export_timeline_status")`.
 - `MCP_EXPORT_FAILED`: Page rendering failed. Report `error_message`; do not replay unchanged input. If one corrected retry fails, stop and report it.
