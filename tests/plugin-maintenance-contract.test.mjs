@@ -74,7 +74,7 @@ for (const pkg of packages) {
     const plugin = await json(pkg.plugin);
     const compatibility = await json(pkg.compatibility);
     // 发布版本在这里显式钉住：改版本号必须同时改这一行，避免悄悄发布。
-    assert.equal(plugin.version, '0.4.0');
+    assert.equal(plugin.version, '0.8.0');
     assert.equal(compatibility.plugin_version, plugin.version);
     if (pkg.release) {
       const release = await json(pkg.release);
