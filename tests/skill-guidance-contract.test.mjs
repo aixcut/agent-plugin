@@ -57,6 +57,11 @@ for (const host of hosts) {
     const rule = actions.split("\n").find((line) => line.startsWith("- `timeline_id`:")) ?? "";
     assert.match(rule, /timeline-scoped|时间轴/);
     for (const view of ["sources", "source_lines", "mutation_receipt"]) assert.match(rule, new RegExp(view));
+    // 动作面很大，规则必须给出「项目级动作不带」的类别和运行时的恢复话术，而不是让模型逐个试。
+    assert.match(rule, /project- and asset-scoped/i);
+    assert.match(rule, /this action is project-scoped and takes no timeline_id/);
+    for (const scope of ["aixcut_media", "aixcut_upload_link"]) assert.match(rule, new RegExp(scope));
+    assert.match(rule, /speech\/transcript and generation action/i);
   });
 
   test(`${host}: headless export binds the timeline it renders`, () => {
