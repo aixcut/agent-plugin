@@ -50,6 +50,15 @@ for (const host of hosts) {
     }
   });
 
+  test(`${host}: the timeline_id rule names the views that reject it`, () => {
+    // Skill 说「每次 read 都带 timeline_id」，但媒体级/突变级 view 的 schema 会拒绝它。
+    // 规则必须写出例外，否则 agent 每次都要浪费一次纠正调用。
+    const actions = readFileSync(join(skillsRoot, "aixcut-timeline-editing/references/actions.md"), "utf8");
+    const rule = actions.split("\n").find((line) => line.startsWith("- `timeline_id`:")) ?? "";
+    assert.match(rule, /timeline-scoped|时间轴/);
+    for (const view of ["sources", "source_lines", "mutation_receipt"]) assert.match(rule, new RegExp(view));
+  });
+
   test(`${host}: headless export binds the timeline it renders`, () => {
     // 不带 timeline_id 会渲染项目默认时间轴：导出必须显式绑定正在编辑的那条轴，
     // 并把两个渲染前校验错误当作绑定错误处理。
