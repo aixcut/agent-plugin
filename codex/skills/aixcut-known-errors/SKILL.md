@@ -73,6 +73,8 @@ Use `error.code`, `error.type`, `error.retryable`, and `error.next_action` to ch
 - `MCP_EXPORT_ALREADY_RUNNING`: Do not start another export and do not poll automatically. Tell the user an export is already active so they can finish or cancel it in the page.
 - `MCP_EXPORT_FAILED`: Page rendering failed. Report `error_message`; do not replay unchanged input. If one corrected retry fails, stop and report it.
 - `MCP_EXPORT_CANCELLED`: The user cancelled the page export. Report cancellation; do not retry it as a failure.
+- `RENDER_SEQUENCE_NOT_FOUND`: The headless render job bound a `timeline_id` that does not exist in this Project. Re-read the Project, bind `timeline_id` to the timeline you actually inspected, and submit once; never replay the same id.
+- `RENDER_CANVAS_SIZE_INVALID`: The bound timeline has no canvas size, so the render would produce a black frame. Report the timeline and ask the user to set its canvas size in the editor; do not submit the same export again.
 - `CAPTURE_PERMISSION_REQUIRED`: Browser permission for local media expired after a refresh or browser change. Ask the user to click anywhere in the Project page (or use its “Fix now” control), then retry the original request. Do not re-import the media or bypass the page.
 - `MCP_LOCAL_MEDIA_BRIDGE_UNREACHABLE`: The bridge URL cannot serve the file because the bridge stopped, expired, moved, or its allowed origin does not match the Project editor origin. Inspect the bridge state and compare `allowed_origin` with the target Project page/editor origin. If they differ, rerun the helper with `--no-reuse --allowed-origin <project-editor-origin>`, then retry the failed import once with the new URL. Ask for manual upload only after that bounded recovery fails. Never invent a URL.
 

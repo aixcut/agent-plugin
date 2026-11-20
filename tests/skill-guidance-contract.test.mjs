@@ -50,6 +50,20 @@ for (const host of hosts) {
     }
   });
 
+  test(`${host}: headless export binds the timeline it renders`, () => {
+    // 不带 timeline_id 会渲染项目默认时间轴：导出必须显式绑定正在编辑的那条轴，
+    // 并把两个渲染前校验错误当作绑定错误处理。
+    const exportSkill = readFileSync(join(skillsRoot, "aixcut-export/SKILL.md"), "utf8");
+    assert.match(exportSkill, /aixcut_export\(\s*action="submit"[^)]*timeline_id/i);
+    assert.match(exportSkill, /omit[^.]{0,200}default timeline/i);
+    assert.match(exportSkill, /RENDER_SEQUENCE_NOT_FOUND/);
+    assert.match(exportSkill, /RENDER_CANVAS_SIZE_INVALID/);
+
+    const knownErrors = readFileSync(join(skillsRoot, "aixcut-known-errors/SKILL.md"), "utf8");
+    assert.match(knownErrors, /RENDER_SEQUENCE_NOT_FOUND/);
+    assert.match(knownErrors, /RENDER_CANVAS_SIZE_INVALID/);
+  });
+
   test(`${host}: music volume and extracted video audio are explicit`, () => {
     const timeline = readFileSync(join(skillsRoot, "aixcut-timeline-editing/SKILL.md"), "utf8");
     assert.match(timeline, /aixcut_audio\(action="update",[^)]*target[^)]*volume/i);
