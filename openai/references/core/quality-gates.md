@@ -9,6 +9,8 @@
 | visual | 目标 Timeline/revision 的真实 composed frame，记录 artifact ref、timestamp；素材缩略图不能替代合成帧 |
 | audio | 实际试听，记录 `listened=true` 和检查片段；没有试听不能标记 pass，没有测量不能编造 LUFS |
 
+四层证据的判断顺序是 `structure → semantic → visual → audio`，但四层结论互不替代：结构通过不代表语义正确，语义正确不代表合成画面可读，画面可读也不代表声音自然。字幕只承载口语，视觉文字、花字和 Motion Graph 必须在独立视觉轨道上分别验收。
+
 硬失败包括缺素材、错误片段、语义反转、黑帧/遮挡、对白不可懂、字幕失配和错误目标版本。`hard_failures` 不为空时禁止 deliver，无论其他层评分多高。
 
 ## 按任务检查

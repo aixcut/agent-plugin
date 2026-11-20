@@ -50,6 +50,34 @@ for (const host of hosts) {
     }
   });
 
+  test(`${host}: the timeline_id rule names the views that reject it`, () => {
+    // Skill 说「每次 read 都带 timeline_id」，但媒体级/突变级 view 的 schema 会拒绝它。
+    // 规则必须写出例外，否则 agent 每次都要浪费一次纠正调用。
+    const actions = readFileSync(join(skillsRoot, "aixcut-timeline-editing/references/actions.md"), "utf8");
+    const rule = actions.split("\n").find((line) => line.startsWith("- `timeline_id`:")) ?? "";
+    assert.match(rule, /timeline-scoped|时间轴/);
+    for (const view of ["sources", "source_lines", "mutation_receipt"]) assert.match(rule, new RegExp(view));
+    // 动作面很大，规则必须给出「项目级动作不带」的类别和运行时的恢复话术，而不是让模型逐个试。
+    assert.match(rule, /project- and asset-scoped/i);
+    assert.match(rule, /this action is project-scoped and takes no timeline_id/);
+    for (const scope of ["aixcut_media", "aixcut_upload_link"]) assert.match(rule, new RegExp(scope));
+    assert.match(rule, /speech\/transcript and generation action/i);
+  });
+
+  test(`${host}: headless export binds the timeline it renders`, () => {
+    // 不带 timeline_id 会渲染项目默认时间轴：导出必须显式绑定正在编辑的那条轴，
+    // 并把两个渲染前校验错误当作绑定错误处理。
+    const exportSkill = readFileSync(join(skillsRoot, "aixcut-export/SKILL.md"), "utf8");
+    assert.match(exportSkill, /aixcut_export\(\s*action="submit"[^)]*timeline_id/i);
+    assert.match(exportSkill, /omit[^.]{0,200}default timeline/i);
+    assert.match(exportSkill, /RENDER_SEQUENCE_NOT_FOUND/);
+    assert.match(exportSkill, /RENDER_CANVAS_SIZE_INVALID/);
+
+    const knownErrors = readFileSync(join(skillsRoot, "aixcut-known-errors/SKILL.md"), "utf8");
+    assert.match(knownErrors, /RENDER_SEQUENCE_NOT_FOUND/);
+    assert.match(knownErrors, /RENDER_CANVAS_SIZE_INVALID/);
+  });
+
   test(`${host}: music volume and extracted video audio are explicit`, () => {
     const timeline = readFileSync(join(skillsRoot, "aixcut-timeline-editing/SKILL.md"), "utf8");
     assert.match(timeline, /aixcut_audio\(action="update",[^)]*target[^)]*volume/i);
@@ -62,6 +90,28 @@ for (const host of hosts) {
       .map((file) => readFileSync(join(skillsRoot, file), "utf8"))
       .join("\n");
     assert.match(assembly, /aixcut_audio\(action="update",[^)]*target[^)]*volume/i);
+  });
+
+  test(`${host}: assembly guidance keeps audio optional and ordered after visual structure`, () => {
+    const assembly = [
+      "aixcut-video-assembly/SKILL.md",
+      "aixcut-video-assembly/references/pipeline.md",
+    ]
+      .map((file) => readFileSync(join(skillsRoot, file), "utf8"))
+      .join("\n");
+    assert.match(assembly, /existing correct (?:voice|narration)[\s\S]{0,160}(?:preserve|reuse)/i);
+    assert.match(assembly, /optional[- ]?music[\s\S]{0,160}(?:no music|keep music off|不添加音乐)/i);
+    assert.match(assembly, /visual structure[\s\S]{0,240}(?:voice|配音)[\s\S]{0,240}(?:captions|字幕)[\s\S]{0,240}(?:music|音乐)/i);
+  });
+
+  test(`${host}: review guidance requires independent visual and audio evidence`, () => {
+    const quality = readFileSync(join(root, host, "references/core/quality-gates.md"), "utf8");
+    const verification = readFileSync(join(skillsRoot, "aixcut-verification/SKILL.md"), "utf8");
+    const text = `${quality}\n${verification}`;
+    assert.match(text, /composed frame|合成帧/i);
+    assert.match(text, /listened|试听/i);
+    assert.match(text, /structure[\s\S]{0,160}semantic[\s\S]{0,160}visual[\s\S]{0,160}audio/i);
+    assert.match(text, /(?:字幕|caption track)[\s\S]{0,180}(?:视觉|visual packaging|Motion Graph)[\s\S]{0,180}(?:独立|dedicated visual tracks|分轨)/i);
   });
 
   test(`${host}: the generation Skill reports what a model ignored`, () => {

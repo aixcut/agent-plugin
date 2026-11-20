@@ -8,9 +8,13 @@ This reference lists fields for each action. Follow the main Skill for workflow,
 - `idempotency_key`: Optional; the server generates one when omitted. Reuse it only for an identical retry. A new write intent needs a new key.
 - `target` / `targets`: Stable refs or IDs returned by a read operation such as `aixcut_read(view="clips")`; never guess UUIDs.
 - `items`: Array whose item fields are checked by the live Tool Schema.
-- `timeline_id`: Target timeline UUID. Include it in every read, edit, capture, and review for multi-version work; omit only for a single version using the default timeline.
+- `timeline_id`: Target timeline UUID. Include it in every timeline-scoped read, edit, capture, and review for multi-version work; omit only for a single version using the default timeline. Project- and asset-scoped actions take no `timeline_id` at all — for example `aixcut_timeline` create/list/history/receipt/undo/redo/duplicate/reorder, the `aixcut_read` sources/source/source_lines/mutation_receipt views, `aixcut_media.*`, `aixcut_upload_link.*`, every speech/transcript and generation action, the render-lookup actions, and the `aixcut_frontend` media, operation and page actions. When a Tool rejects it, the error says `this action is project-scoped and takes no timeline_id`: drop the field and retry once instead of guessing.
 - `plan_context`: Required on the protected actions marked in the Required column. Pass it at the Tool's top level, not inside `params`. Build it from the latest read with `project_id`, `timeline_id`, `base_revision`, `mode`, `preserve`, `delete_refs`, and the exact `authorized_actions`; the `aixcut-basics` Skill documents the workflow host contract.
 - Every Tool accepts a strict object. Send only fields listed here; extra fields are rejected.
+
+`kind` is limited to editor-supported values: `video`, `audio`, `text`, `motion-graph`, and `effect`. Images use `kind="video"`. `graphic` and `composition` are not valid public MCP inputs.
+
+`created` contains typed entries `{ id, ref, type }`. Caption and text writes can create both clip and component rows; count `clip:` entries when reporting actual clips.
 
 ## Frontend request shapes
 
@@ -230,6 +234,34 @@ For `aixcut_text(action="add")`, per-item `start_ms` and `duration_ms` belong in
 | aixcut_timeline(action="delete") | — | `timeline_id` | — | Delete a timeline; retain at least one |
 | aixcut_timeline(action="reorder") | — | `timeline_ids` | — | Reorder timelines using the complete list |
 | aixcut_timeline(action="update") | — | `timeline_id` | `name`, `preset`, `width`, `height`, `fps` | Update one version's name, canvas or frame rate |
+
+Batch style example:
+
+```json aixcut_style
+{
+  "action": "set",
+  "items": [
+    { "target": "clip:title-one", "style": { "y": 0.925 } },
+    { "target": "clip:title-two", "style": { "y": 0.925 } }
+  ]
+}
+```
+
+`aixcut_style(action="update")` is single-target. Never send `items` or `targets` to `update`; use `set` for several clips.
+
+Text timing and content use top-level update fields:
+
+```json aixcut_text
+{
+  "action": "update",
+  "target": "clip:title-one",
+  "start_ms": 1950,
+  "duration_ms": 2200,
+  "label": "1. Blue Baseball Cap"
+}
+```
+
+The text tool has no `time` action, and these fields do not use a `values` wrapper.
 | aixcut_timeline(action="clear") | — | `timeline_id` | — | Remove every clip from one version, keeping its tracks |
 | aixcut_frontend(action="capture_source_frames") | — | `media_id`, `selections` | `timeout_ms`, `workspace_id` | Capture 1–8 JPEG frames from a source |
 | aixcut_frontend(action="capture_timeline_frames") | — | `selections` | `timeline_id`, `expected_revision`, `timeout_ms`, `workspace_id` | Capture 1–8 JPEG frames from a timeline |

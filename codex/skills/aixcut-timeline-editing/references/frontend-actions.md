@@ -18,7 +18,7 @@ Every call may include `project_id`, `workspace_id`, and `timeout_ms` when suppo
 | `capture_source_frames` | `media_id`, `selections` | `timeout_ms`, `workspace_id`; 1–8 selections, each using `times_ms` or `{start_ms,end_ms,count}`. |
 | `capture_timeline_frames` | `selections` | `timeline_id`, `expected_revision`, `timeout_ms`, `workspace_id`; 1–8 selections. |
 | `activate_timeline` | `timeline_id` | Switches the active timeline in the bound Project page. |
-| `playback_check` | `timeline_id`, `expected_revision`, `start_ms`, `target_ms` | Plays at most 10 seconds and restores the playhead. Times are absolute timeline milliseconds; `target_ms` must be 1–10000 ms after `start_ms`, and there is no `end_ms` field. |
+| `playback_check` | `timeline_id`, `expected_revision`, `start_ms`, `target_ms` | Plays at most 10 seconds and restores the playhead. Times are absolute timeline milliseconds; `target_ms` must be 1–10000 ms after `start_ms`, and there is no `end_ms` field. A stale `expected_revision` is rejected before the page runs: `MCP_FRONTEND_TIMELINE_STALE` with `expected_revision` and `current_revision` in details — reread and retry with the current one. `timeline_not_active` and `timeline_revision_changed` are `playback_state` values for what the page found while checking. |
 | `prompt_add_material` | — | Opens the Project media upload area. The user selects files; verify the result with `aixcut_read(view="sources")`. |
 | `import_local_media` | Exactly one of `url` or `urls` | `timeout_ms`, `workspace_id`; only use loopback bridge URLs for paths the user explicitly named. Returns `import_ids`, not completion. |
 | `import_status` | `import_ids` | `timeout_ms`, `workspace_id`; poll these same IDs until settled; never resend the import. |
