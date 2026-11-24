@@ -258,7 +258,7 @@
     },
     {
       "path": "skills/aixcut-timeline-editing/SKILL.md",
-      "sha256": "50ec72805ed96368511ab14c37da6a6c8e0174a7c464fcb794e0f2b0503f2539"
+      "sha256": "2e03a61447a70b4b21c1bd563aaddc7b73fff60abe9d772571cbd50a52e698a3"
     },
     {
       "path": "skills/aixcut-verification/references/actions.md",
@@ -278,11 +278,11 @@
     },
     {
       "path": "skills/aixcut-visual-effects/references/actions.md",
-      "sha256": "f848465b040b5a1b64a67993b517deae536c2449ba1d1ec754d4e3e0f9a5f4c3"
+      "sha256": "5be6db205a106c7910edafece02dc5d0eb9a3679e551546351cc9e87f81f7ea3"
     },
     {
       "path": "skills/aixcut-visual-effects/SKILL.md",
-      "sha256": "a87d4dfabb9a1feec274fd0e6ee0f12a87beecf4a3a5a36cd91bff89aebe3ec0"
+      "sha256": "4acc269eb10a9a1f83ba7e6bd9102ab244ab23ca2aff11f64890c1c3370e7163"
     },
     {
       "path": "skills/aixcut-voice/references/actions.md",
