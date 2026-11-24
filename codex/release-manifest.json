@@ -198,7 +198,7 @@
     },
     {
       "path": "skills/aixcut-captions/SKILL.md",
-      "sha256": "836f484a5496382afbb8b5d7092ddb1f7a0310753cb3443667286f6493accaa3"
+      "sha256": "e0d507b6417ebdbdd6a5007e776dfb7133e9ff202a779f9b7088848b9935c10a"
     },
     {
       "path": "skills/aixcut-documents/SKILL.md",
@@ -258,7 +258,7 @@
     },
     {
       "path": "skills/aixcut-timeline-editing/SKILL.md",
-      "sha256": "f5e6207c659947ed1cd019c44ca3b37818427b2ab6583f6e16c8dbcae6ac3491"
+      "sha256": "50ec72805ed96368511ab14c37da6a6c8e0174a7c464fcb794e0f2b0503f2539"
     },
     {
       "path": "skills/aixcut-verification/references/actions.md",
