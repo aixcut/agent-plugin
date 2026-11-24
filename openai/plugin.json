@@ -5,10 +5,10 @@
   "description": "All-in-one AI video editing across talking-head cuts, livestream clips, e-commerce feed ads, TV commercials, and batch content production. Aixcut Studio supports project-file export to major post-production software.",
   "author": {
     "name": "CSEQ Labs",
-    "url": "https://aixcut.cn"
+    "url": "https://aixcut.com"
   },
-  "homepage": "https://aixcut.cn",
-  "repository": "https://gitee.com/aixcut/agent-plugin",
+  "homepage": "https://aixcut.com",
+  "repository": "https://github.com/aixcut/agent-plugin",
   "license": "MIT",
   "keywords": [
     "aixcut",
@@ -88,10 +88,10 @@
           "Read",
           "Write"
         ],
-        "websiteURL": "https://aixcut.cn",
-        "supportURL": "https://gitee.com/aixcut/agent-plugin/issues",
-        "privacyPolicyURL": "https://aixcut.cn/privacy/",
-        "termsOfServiceURL": "https://aixcut.cn/terms/",
+        "websiteURL": "https://aixcut.com",
+        "supportURL": "https://github.com/aixcut/agent-plugin/issues",
+        "privacyPolicyURL": "https://aixcut.com/privacy/",
+        "termsOfServiceURL": "https://aixcut.com/terms/",
         "brandColor": "#0B5CFF",
         "composerIcon": "./assets/logo.svg",
         "logo": "./assets/logo.svg",
