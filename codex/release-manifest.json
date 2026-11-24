@@ -2,7 +2,7 @@
   "schema_version": 1,
   "plugin": {
     "name": "aixcut",
-    "version": "0.8.0",
+    "version": "1.0.0",
     "host": "codex"
   },
   "server_contract": {
@@ -18,7 +18,7 @@
   "files": [
     {
       "path": ".codex-plugin/plugin.json",
-      "sha256": "48cdfcc91d63b2d3d36b8a18e6ca9ab9c5e65aa3249b64b4b2089baec9d0e862"
+      "sha256": "b9f0fa74c6426934e7b395cffbd57571c69e629f885a4cee1fac7e577111ee55"
     },
     {
       "path": ".mcp.json",
@@ -30,7 +30,7 @@
     },
     {
       "path": "contracts/compatibility.json",
-      "sha256": "f1eee00791205da29873bca6c5537c86ad33e321df33a847fb1a9a731dc73695"
+      "sha256": "fc6672680e909fb7573181a994991e3fe6223b714a596cddd96c31e43f3cfc40"
     },
     {
       "path": "contracts/core/action-contract.json",
