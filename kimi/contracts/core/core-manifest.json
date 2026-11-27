@@ -1,0 +1,33 @@
+{
+  "name": "@aixcut/plugin-core",
+  "version": "1.3.0",
+  "server_contract_version": "1.4.0",
+  "helper_schema_version": "1.0.0",
+  "files": {
+    "contracts/action-contract.json": "7b6820c93888b00df41aa26400131af9350f70a29e2126a594d79e43b32c2a60",
+    "contracts/checkpoint.schema.json": "d33d6167e05d1cf61af0e41498c9a81479a44104292b75d387afad0bc2d2a799",
+    "contracts/edit-plan.schema.json": "cd85711bef68dc22e122ee9ff3e77f259604eae9bf1728f5a21e7edcb815afaa",
+    "contracts/error-taxonomy.json": "ded2f1c2b3aed6c83e57a392bb4c5e1ce228dfbc46e51d52b28eae571c47a3d2",
+    "contracts/mcp-tool-catalog.json": "feda56c058eaf0e11468693da178024fc7a051a10028436c714bd0a4cd1cafcf",
+    "contracts/operation-receipt.schema.json": "f29ded34eec4078cf39693344804250c6b988058a338d79f12b6bd54845b93f6",
+    "contracts/plan-context.schema.json": "14a35aebab3a63d203248a70ef18f2672a57efe7cbee149683d9282e11245991",
+    "contracts/review-evidence.schema.json": "7b0910c8d54c1ca5fef852f7f0f28bc8b2746867ee8938dd7fbcd0f5c98c9df8",
+    "contracts/trace-event.schema.json": "87364b2ffda3839aaf59cb06f8541a479b66e698ee29abcda890d30e1e9c6385",
+    "helpers/contract-semantics.mjs": "a00ecf2574d1eabf653a7ccd84f5a46b78745a2c817bdc0bcfbbf77e3bc4f72c",
+    "helpers/download-capture-artifacts.mjs": "03db33dcc00b8c28b950f35de237c9e85805a7bbcfb85a132fa8d7ed714ec10a",
+    "helpers/review-evidence.mjs": "5f000dbe857c0ba7d3cacd35a19e3cdbeeaa9355270f774d55eee781007b693f",
+    "helpers/schema-validators.mjs": "ab41141851d059e7dbb794a3297f43fc9ad5a30f40507a77831ed2e29e0ef867",
+    "helpers/skill-contract-closure.mjs": "035fc6010f3ffcada6b8928f9335e254fdd17cbc598f012bb61eb8bb2479b947",
+    "helpers/trace-events.mjs": "b8a7440575b545efd7ea14bf5f31dd23cc340534e8bbf6c9930010b9c0d69cac",
+    "helpers/validate-contract.mjs": "be29525286f3aef7e3675b63f7f3234c472dd9e0223969eb2c75f1132209c352",
+    "helpers/workflow-evaluation.mjs": "861aa30a6e6082991d7efdac6d9843b9b97f58177e5bfbbef766521bc8848b1e",
+    "helpers/workflow-host.mjs": "0970c1e3e2aeae2c498cd1a1243199e15a00019021606ba86cdbdbb86e4f4875",
+    "helpers/workflow-state.mjs": "136b217b681d0caaa83f590df29b59659bb362688593ea1a4e1af82a696ab32d",
+    "helpers/workflow-trace-adapter.mjs": "f0e0f60bb1eb2e8bbd4b2aa906a0203c01a134a2fb6612214046f9d1317b62aa",
+    "references/orchestration.md": "357c46f28d85d955949e372ff7beeb34a471e3b395d5ede9e74d1e7b1b2c80a2",
+    "references/performance-budget.md": "3c8dbee92240c08e0a60cf7b2bf0ae84828caa7909793251af301b0535f87e0a",
+    "references/quality-gates.md": "6f67543dfcbb83f7703fa057161bc03c43080db0f3255b363356d2a18c896452",
+    "references/speech-workflow.md": "e4a7d7a12d1bb20e9fa539434f793478aae75c42b70512e9104f0db232834951",
+    "references/workflow-boundaries.md": "262fdd348f3e1bd4452705dffe3e114b05e930be3d8326bebf4ad4c6e732af13"
+  }
+}

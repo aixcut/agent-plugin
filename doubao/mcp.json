@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "aixcut": {
+      "type": "streamable-http",
+      "url": "https://web.aixcut.cn/mcp"
+    }
+  }
+}

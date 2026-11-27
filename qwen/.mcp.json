@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "aixcut": {
+      "type": "guided-setup",
+      "_setup": {
+        "url": "https://aixcut.cn/qwen",
+        "description": "1. Open QwenWorkCN Connector settings or add a custom MCP server named `aixcut`\n2. Set the Streamable HTTP URL to `https://web.aixcut.cn/mcp`\n3. Complete Aixcut OAuth sign-in when prompted\n4. Start a new conversation to edit videos in Aixcut Studio",
+        "descriptionZh": "1. 在千问办公版连接器（Connector）中添加自定义 MCP 服务 `aixcut`\n2. 将远程 MCP 地址设为 `https://web.aixcut.cn/mcp`\n3. 按提示完成 Aixcut 账号 OAuth 授权\n4. 开启新对话即可直接用千问剪辑 Aixcut 视频项目"
+      }
+    }
+  }
+}

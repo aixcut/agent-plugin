@@ -1,0 +1,42 @@
+{
+  "name": "aixcut",
+  "displayName": "Aixcut Video Editor",
+  "displayNameEn": "Aixcut Video Editor",
+  "displayNameCn": "Aixcut 全能视频剪辑",
+  "version": "1.0.0",
+  "description": "All-in-one AI video editing plugin for talking-head cuts, livestream clips, e-commerce ads, TV commercials, and batch production in Aixcut Studio.",
+  "descriptionEn": "All-in-one AI video editing plugin for talking-head cuts, livestream clips, e-commerce ads, TV commercials, and batch production in Aixcut Studio.",
+  "descriptionZh": "全能剪辑专家。覆盖口播精剪、直播切片、电商信息流、TVC 广告、矩阵批量生产五大场景，帮助用户快速出片；Aixcut Studio 支持将工程文件导出至主流后期软件。",
+  "author": {
+    "name": "Aixcut",
+    "url": "https://aixcut.cn"
+  },
+  "category": "creative",
+  "tags": [
+    "aixcut",
+    "video",
+    "video-editing",
+    "captions",
+    "voiceover",
+    "mcp"
+  ],
+  "skills": [
+    "skills/aixcut-host",
+    "skills/aixcut-basics",
+    "skills/aixcut-captions",
+    "skills/aixcut-documents",
+    "skills/aixcut-export",
+    "skills/aixcut-generation",
+    "skills/aixcut-known-errors",
+    "skills/aixcut-login",
+    "skills/aixcut-mcp-logout",
+    "skills/aixcut-projects",
+    "skills/aixcut-scenarios",
+    "skills/aixcut-talking-head",
+    "skills/aixcut-timeline-editing",
+    "skills/aixcut-verification",
+    "skills/aixcut-video-assembly",
+    "skills/aixcut-visual-effects",
+    "skills/aixcut-voice"
+  ]
+}

@@ -1,0 +1,12 @@
+interface:
+  display_name: "AIXCut 视频剪辑师"
+  short_description: "口播精剪、直播切片、电商广告、TVC 与矩阵批量视频创作。"
+  default_prompt: "素材成片：用我提供的素材和脚本做一条完整视频，先确认画幅、时长和风格；按脚本完成剪辑、字幕、配音和背景音乐，最后核验并导出成片。"
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "aixcut"
+      description: "AIXCut 远程 MCP 服务，通过豆包 Connector 使用 OAuth 连接"
+      transport: "streamable_http"
+policy:
+  allow_implicit_invocation: true

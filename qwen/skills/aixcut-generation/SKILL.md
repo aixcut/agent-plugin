@@ -1,0 +1,70 @@
+---
+name: aixcut-generation
+description: "Generate images, videos, or music in Aixcut and track asynchronous jobs. Use for new visual or audio assets and generation progress. Do not use to edit existing media or assemble a complete video. Chinese triggers include 生成图片、生成视频、生成音乐、查看生成进度."
+---
+
+# Aixcut Generation
+
+## Conversation guidance
+
+State whether generation is being prepared, queued, running, or complete, and what happens next. Continue safe status checks when possible. Pause before an unaccepted cost or credits, or when a missing creative choice would materially change the result. Do not describe a submitted Job as a finished asset.
+
+Generation creates a durable Job; it is not a synchronous operation.
+
+## Short path
+
+1. Confirm the target Project; read `aixcut_read(view="project")` if needed.
+2. Read the kind's catalog first and keep only `selectable: true` models; for every other model say which `locked_reason` applies, so the user learns what is usable here.
+3. Quote the candidate models with `aixcut_generate(action="quote")`. It does not create a Job and it now echoes the `model` and `provider` the quote is for.
+4. If the user already named a model (or already rejected one), do not ask again: quote that model and go straight to submit. Only when they left it open, offer the options as **model + quoted price** and ask exactly once — never split it into repeated questions, never pick a model for them, and never fall back to a default silently. State that the quote is an estimate and that the charge happens on submit.
+5. Submit only the model the user picked, passing that quote's amount as `accepted_quoted_credits` (and `quote_confirmation` when the quote returned one). This applies to every kind — image, video, music, audio and speech — and to quote-driven retries too.
+6. If the envelope returns `status: "async"`, retain its top-level `job_id` and use `aixcut_generate(action="get")` to read the durable Job; ClipOS runs accepted Jobs independently of polling or the browser connection. Never resubmit a queued or running Job.
+7. Use top-level `next_action.after_seconds` for the next poll. Stop when top-level `terminal` is true.
+8. Report `result.data.job.phase`: `waiting` (queued), `processing` (generating), or `finalizing` (publishing to the Project). Do not report only “in progress.”
+9. After generation, place the result on a timeline when the user asked for it.
+
+## Warnings
+
+A terminal Job may still not be what the user asked for: `warnings` on the Job and on the envelope name what the model could not honour. `generation_duration_ignored` means the track is longer or shorter than the requested length, `generation_frame_resized` means the frame is not the requested pixels, and `generation_layer_decomposition_incomplete` means a layer request came back as a single image. Report every warning verbatim with the produced value, and never present the asset as matching the request without it; the request was accepted, the result is what changed.
+
+For multiple video versions, the assembly Skill first lists and duplicates timelines with `aixcut_timeline(action="list")`. The generation operations create Project-level assets that can be reused by multiple `timeline_id`s. Place and verify the result on each requested timeline.
+
+## Content language and prompt
+
+Follow the user's requested content language and target audience for visible text, dialogue, lyrics, or other language-bearing parts of the asset. A prompt may be written in English for model reliability, but the prompt must still explicitly state the requested spoken/on-screen language when relevant. Do not silently translate the user's creative brief or switch the asset to English because this Skill is in English. Preserve the creative direction and wording unless asked to adapt it. Apply the shared language policy from `aixcut-basics`.
+
+Resolve only the language choice relevant to the requested asset: visible text for images; dialogue and on-screen text for videos; lyrics for songs (instrumental music has no content language); and script language for voiceover. If the user says “song” but does not indicate lyrics or instrumental music, ask which they want before quoting or submitting. Do not ask about language for instrumental music.
+
+## Generation types
+
+- `kind` is `image`, `video`, `music`, or `audio` (Seed Audio); music and audio both reach ClipOS as audio Jobs.
+- Seed Audio writes ambient audio, sound layers, or short voice clips from a prompt: `duration_seconds`, `format`, `sample_rate`, `speech_rate`, `loudness_rate`, `pitch_rate`, `enable_subtitle`, `references`, `import_requested`, and `transcribe` are the supported options, and it can take up to three reference audios and one reference image. It is not music generation; use it when the user asks for a sound, ambience, or an effect rather than a track.
+- If the user does not specify a provider, use the server default. Override only on explicit request.
+- Prompt, style, duration, and language-bearing content should follow the user's brief; do not rewrite the creative direction without reason.
+
+## Asset source
+
+Generation creates images, videos, and music in the Project library; it does not create Motion Graph source assets, import files, or perform post-production on existing audio. Do not use a generic video-generation Job as a substitute for an editable Motion Graph. If no supported MG asset or creation path is available, report that limitation rather than substituting captions. Use `aixcut-timeline-editing` to place, trim, mix, or fade audio, and use its local-media flow to import media. Documents must be uploaded through the Project page because the hosted MCP service cannot read a path on the user's computer. Provider-supported image editing with reference images remains a generation operation.
+
+Generated media does not guarantee exact beat alignment, lyric timing, or caption timing. Do not promise frame-accurate synchronization from a generation prompt; use timeline tools and read-back evidence for placement and synchronization.
+
+- Generated assets enter the Project library. Final video export happens in the open Project page.
+- Do not invent URLs or send local paths as links.
+
+## Boundaries
+
+- Submission is not completion. Do not report success while the Job is `queued`, `running`, or `publishing`.
+- On failure, report `result.data.job.error_code`.
+- Top-level `retryable` appears only for failed Jobs. `true` means the same request may work later; `false` means fix parameters, media, or configuration first. Do not retry automatically when absent.
+- Use `action="cancel"` to cancel and `action="list"` to list Jobs.
+- Generation download URLs are short-lived signed URLs. Do not store them in Project documents or retain them long term.
+
+## Completion
+
+The Job must be terminal, the asset must be placed if requested, and a timeline read must show the corresponding clip. Report `job_id`, final status, and placed ref.
+
+## Brief, anchors, and recovery
+
+For video or image generation, keep a compact brief with subject, action, camera/composition, lighting/style, duration/aspect ratio, language-bearing text or dialogue, negative constraints, and acceptance evidence. Use stable reference media or first/last-frame anchors when continuity matters; inspect the returned asset before placing it. A `submission_unknown` result is recovered with the original idempotency identity and the same request through the durable Job state. Never submit a fresh Job to resolve an uncertain submission.
+
+After two failed attempts for the same creative goal, inspect the failure evidence and change the approach: use supported reference/edit or anchor inputs, reduce scope with the user's existing authorization, or report the capability limit. Never loop through new paid Jobs just by rewriting prompts. Each separately authorized retry preserves completed assets and records what changed.

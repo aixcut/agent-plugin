@@ -1,0 +1,120 @@
+{
+  "name": "aixcut",
+  "version": "1.0.0",
+  "description": "全能剪辑专家。覆盖口播精剪、直播切片、电商信息流、TVC 广告、矩阵批量生产五大场景，帮助用户快速出视频；Aixcut Studio 支持将工程文件导出至主流后期软件。",
+  "author": {
+    "name": "Aixcut"
+  },
+  "homepage": "https://aixcut.cn",
+  "license": "MIT",
+  "keywords": [
+    "aixcut",
+    "video",
+    "video-editing",
+    "captions",
+    "voiceover",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "systemPromptPath": "./SYSTEM.md",
+  "sessionStart": {
+    "skill": "aixcut-host"
+  },
+  "mcpServers": {
+    "aixcut": {
+      "url": "https://web.aixcut.cn/mcp"
+    }
+  },
+  "interface": {
+    "defaultLocale": "zh-CN",
+    "locales": "./locales/",
+    "displayName": "Aixcut",
+    "shortDescription": "AI 视频剪辑全能专家，五大场景快速出片",
+    "longDescription": "全能剪辑专家。覆盖口播精剪、直播切片、电商信息流、TVC 广告、矩阵批量生产五大场景，帮助用户快速出视频；Aixcut Studio 支持将工程文件导出至主流后期软件。",
+    "developerName": "Aixcut",
+    "websiteURL": "https://aixcut.cn",
+    "iconUrl": "https://raw.githubusercontent.com/aixcut/kimi-plugin/main/icon.png",
+    "category": "PRODUCTIVITY",
+    "tryPrompts": [
+      "把这段口播剪得更紧凑，去掉口误和重复，保留原意并校准字幕",
+      "把这场直播切成多条电商信息流短片，每条突出一个商品卖点并检查节奏",
+      "用品牌脚本和素材制作一支 TVC 风格广告，并规划适合矩阵发布的多个版本"
+    ],
+    "mcpOverrides": {
+      "aixcut": {
+        "displayName": "Aixcut",
+        "description": "Aixcut 全能剪辑服务，覆盖口播精剪、直播切片、电商信息流、TVC 广告与矩阵批量生产。"
+      }
+    },
+    "skillOverrides": {
+      "aixcut-basics": {
+        "displayName": "Aixcut 基础规则",
+        "description": "共享的 Aixcut MCP 规则：先读后写、稳定引用、幂等与异步任务、错误封装和宿主边界。没有专门技能适用时先加载它。"
+      },
+      "aixcut-captions": {
+        "displayName": "字幕",
+        "description": "创建、编辑、拆分和样式化 Aixcut 字幕，并与配音或人声对齐。"
+      },
+      "aixcut-documents": {
+        "displayName": "导入文档",
+        "description": "把用户提供的本地文档导入 Aixcut 项目资料库。"
+      },
+      "aixcut-export": {
+        "displayName": "导出成片",
+        "description": "把 Aixcut 项目导出为 MP4、MOV 或 WebM，并查询页面导出状态与结果。"
+      },
+      "aixcut-generation": {
+        "displayName": "素材生成",
+        "description": "在 Aixcut 生成图片、视频或音乐，并跟踪异步生成任务。"
+      },
+      "aixcut-host": {
+        "displayName": "Kimi 宿主适配",
+        "description": "Aixcut 的 Kimi 宿主适配：OAuth、内置浏览器交接、本地素材、工作流存储与导出交付。"
+      },
+      "aixcut-known-errors": {
+        "displayName": "错误排查",
+        "description": "按稳定错误码排查被拒绝的 Aixcut 调用。"
+      },
+      "aixcut-login": {
+        "displayName": "检查登录",
+        "description": "检查 Aixcut MCP 的 OAuth 登录状态，不打开网页。"
+      },
+      "aixcut-mcp-logout": {
+        "displayName": "退出登录",
+        "description": "退出 Aixcut MCP，撤销 OAuth 授权并清除本地凭据。"
+      },
+      "aixcut-projects": {
+        "displayName": "项目管理",
+        "description": "列出、新建、打开、切换或退出 Aixcut 项目。"
+      },
+      "aixcut-scenarios": {
+        "displayName": "五大剪辑场景",
+        "description": "提供口播精剪、直播切片、电商信息流、TVC 品牌广告与矩阵批量生产的标准剪辑工作流与质检清单。"
+      },
+      "aixcut-talking-head": {
+        "displayName": "口播剪辑",
+        "description": "剪辑口播类视频（访谈、课程、播客），重点是去掉口误和停顿。"
+      },
+      "aixcut-timeline-editing": {
+        "displayName": "时间线编辑",
+        "description": "编辑 Aixcut 的片段、文字、音频、轨道和画布，并通过项目页面上传素材。"
+      },
+      "aixcut-verification": {
+        "displayName": "结果核验",
+        "description": "只读核验 Aixcut 的结构、时间线、配音、字幕和可导出性。"
+      },
+      "aixcut-video-assembly": {
+        "displayName": "成片组装",
+        "description": "协调画面、配音、字幕、音乐和导出，组装完整成片。"
+      },
+      "aixcut-visual-effects": {
+        "displayName": "视觉增强",
+        "description": "编辑特效、转场、蒙版、分组、组合节点、组件、生成器、对象动画和关键帧，并用画面与播放证据验收。"
+      },
+      "aixcut-voice": {
+        "displayName": "配音",
+        "description": "编写配音文案、选择音色、合成语音，并可放到时间线上。"
+      }
+    }
+  }
+}

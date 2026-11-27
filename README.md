@@ -5,7 +5,10 @@ Official Codex and OpenAI plugin distribution for Aixcut.
 The repository publishes Aixcut's all-in-one AI video editing plugin for talking-head cuts, livestream clips, e-commerce feed ads, TV commercials, and batch content production. Aixcut Studio supports project-file export to major post-production software.
 
 - `codex/` is the China distribution connected to `https://web.aixcut.cn/mcp`.
-- `openai/` is the OpenAI-format China distribution connected to `https://web.aixcut.cn/mcp`.
+- `openai/` is the OpenAI-format international distribution connected to `https://web.aixcut.com/mcp`.
+- `kimi/` is the Kimi desktop (办公版) China distribution connected to `https://web.aixcut.cn/mcp` (see `https://aixcut.cn/kimi`).
+- `doubao/` is the DoubaoWork (豆包工作版) China distribution connected to `https://web.aixcut.cn/mcp` (see `https://aixcut.cn/doubao`).
+- `qwen/` is the QwenWorkCN (千问办公版) China distribution connected to `https://web.aixcut.cn/mcp` (see `https://aixcut.cn/qwen`).
 
 ## Install
 

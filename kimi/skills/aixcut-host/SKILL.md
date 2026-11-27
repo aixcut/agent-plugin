@@ -1,0 +1,47 @@
+---
+name: aixcut-host
+description: "Kimi host adapter for Aixcut OAuth, built-in browser handoff, user-selected media upload, workflow storage, and export delivery. Load before the first Aixcut MCP call."
+---
+
+# Aixcut Kimi Host
+
+This Skill owns the boundary between Kimi and the Aixcut MCP server. Load it before the first Aixcut call in a conversation.
+
+## Connection and authorization
+
+- `kimi.plugin.json` declares the single remote MCP server named `aixcut`. Kimi owns OAuth, credential storage, refresh, and revocation.
+- Never request, print, store, or pass an access token. Do not ask for a second endpoint or connect through another MCP client.
+- Connection readiness requires the `aixcut` MCP server to expose its tools. Kimi owns OAuth, but it does not resume a turn that is already waiting: when authorization is required, tell the user to finish it in the browser and then send one more message, and continue the interrupted request on that message.
+- If OAuth completed but tools are still absent, ask the user to start a new Kimi conversation or reload the plugin. Do not substitute a subprocess, another agent, or a plain Project URL.
+- For `MCP_AUTH_GRANT_INACTIVE`, use Kimi's plugin connection controls to clear the stale authorization and authorize once. Never repeat the business call with the inactive grant.
+- For logout, call `aixcut_logout` once when available, then use Kimi's plugin controls to remove the local authorization if the host reports that local cleanup is required. Preserve the plugin and MCP declaration.
+
+## Built-in browser handoff
+
+- `aixcut_open` returns a complete, single-use `result.browser_handoff.url`. Open that exact URL in Kimi's built-in browser using the host's browser-opening capability.
+- If no browser-opening capability is available, show the user the non-secret action to open the Aixcut page in Kimi's built-in browser. Never shell out to the system browser and never launch a separate browser automation client.
+- Preserve the full handoff URL while opening it. Do not print, quote, persist, or reuse the URL because it contains a one-time session token. Display only `result.editor_url` when a clean Project link is useful.
+- A handoff request being accepted proves only that the host received it. Wait for the returned interval, then call `aixcut_frontend` with `page_status` before any frame capture, page export, or user-assisted upload.
+- Continue a page-dependent action only when `presence_connections >= 1` and the target Project appears in `pages`. A different online Project is not sufficient.
+
+## Local media and files
+
+- Never start a local HTTP server, loopback file server, or background process for local files in Kimi. Kimi does not allow launching local file-serving processes.
+- Kimi's only supported local-media route is `aixcut_frontend(action="prompt_add_material")`, even when the user provides an absolute file path. A path written in the conversation is not by itself a readable file.
+- After the upload area opens, tell the user to select or drag the files in the Project page and wait for the user's confirmation. Then call `aixcut_read(view="sources")` and match the uploaded source by `file_name`. Do not reopen the upload prompt for the same upload.
+- If the uploaded file is not listed yet, wait about 15 seconds and reread `sources` once. If it is still absent, report that state and ask the user to select the file again in the Project page.
+- A hosted MCP server cannot read a path on the user's computer. Project documents must be selected through the Project Documents panel, then confirmed by reading the document list.
+- Captured frames are temporary until the packaged download helper writes them to a user-approved directory.
+
+## Workflow storage
+
+- When the Core helper creates a Checkpoint, pass `host: "kimi"` and use a writable directory owned by the current Kimi conversation. Only `persisted: true` confirms cross-turn storage.
+- If no such directory is available, report the workflow as non-durable. Do not invent a local path or claim a Checkpoint was saved.
+
+## Export delivery
+
+- Export requires explicit user authorization. A finished edit can prompt the user to export manually or ask the Agent to export; it is not export authorization.
+- Kimi has a built-in browser, but browser rendering is usable only when the target Project page is online and its `capabilities` include `export_timeline`. Use that page path when available.
+- If browser rendering is unavailable, use headless rendering only when every source is cloud-readable. Browser-local-only sources do not silently fall back to headless; ask the user to open the Project page or upload the originals.
+- Browser export success means the download was dispatched. Report `delivery.state` and `file_verified=false`; present a local path only when Kimi provides a verified path.
+- Do not automatically upload the rendered file, download it back, run ffprobe, or analyze it after export. Do those steps only after a separate user request.

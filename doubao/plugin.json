@@ -1,0 +1,33 @@
+{
+  "name": "aixcut-video-editor",
+  "version": "1.0.0",
+  "description": "全能剪辑专家。覆盖口播精剪、直播切片、电商信息流、TVC 广告、矩阵批量生产五大场景，帮助用户快速出视频，工程文件可导出至主流后期软件。",
+  "extensions": {
+    "com.doubao": {
+      "privacyPolicyUrl": "https://aixcut.cn/privacy/",
+      "displayName": {
+        "zh": "Aixcut 视频剪辑师",
+        "en": "Aixcut Video Editor"
+      },
+      "displayDescription": {
+        "zh": "全能剪辑专家。覆盖口播精剪、直播切片、电商信息流、TVC 广告、矩阵批量生产五大场景，帮助用户快速出视频，工程文件可导出至主流后期软件。",
+        "en": "Your all-in-one video editing expert for talking-head cuts, livestream clips, e-commerce ads, TV commercials, and batch content production—with project files exportable to major post-production software."
+      },
+      "icon": "./com.doubao/assets/plugin-icon.png",
+      "chatIcon": "./com.doubao/assets/plugin-icon.png",
+      "mcpServers": {
+        "aixcut": {
+          "displayName": {
+            "zh": "Aixcut 视频剪辑师",
+            "en": "Aixcut Video Editor"
+          },
+          "displayDescription": {
+            "zh": "全能剪辑专家。覆盖口播精剪、直播切片、电商信息流、TVC 广告、矩阵批量生产五大场景，帮助用户快速出视频，工程文件可导出至主流后期软件。",
+            "en": "Your all-in-one video editing expert for talking-head cuts, livestream clips, e-commerce ads, TV commercials, and batch content production—with project files exportable to major post-production software."
+          },
+          "icon": "./com.doubao/assets/plugin-icon.png"
+        }
+      }
+    }
+  }
+}
